@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using PathOS;
 
 /*
 PathOSManager.cs 
@@ -10,28 +10,16 @@ PathOSManager (c) Nine Penguins (Samantha Stahlke) 2018
 
 public class PathOSManager : NPSingleton<PathOSManager>
 {
-    public enum EntityType
-    {
-        ET_NONE = 0,
-        ET_GOAL = 100,
-        ET_ENEMY = 200
-    };
-
-    [System.Serializable]
-    public class LevelEntity
-    {
-        public GameObject entityRef;
-        public EntityType entityType;
-        public string entityID;
-    }
-
     public List<LevelEntity> levelEntities;
 
     public GameObject playerProxy;
 
 	void Awake()
 	{
-		
+		for(int i = 0; i < levelEntities.Count; ++i)
+        {
+            levelEntities[i].rend = levelEntities[i].entityRef.GetComponent<Renderer>();
+        }
 	}
 	
 	void Start() 

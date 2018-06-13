@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using PathOS;
 
 /*
 PathOSMainInspector.cs 
@@ -22,7 +23,6 @@ public class PathOSMainInspector : Editor
         serial = new SerializedObject(manager);
         entityList = serial.FindProperty("levelEntities");
         playerProxy = serial.FindProperty("playerProxy");
-
     }
 
     public override void OnInspectorGUI()
@@ -39,10 +39,10 @@ public class PathOSMainInspector : Editor
             {
                 GUILayout.BeginHorizontal();
 
-                PathOSManager.LevelEntity entity = manager.levelEntities[i];
+                LevelEntity entity = manager.levelEntities[i];
 
                 entity.entityRef = (GameObject)EditorGUILayout.ObjectField(entity.entityRef, typeof(GameObject), true);
-                entity.entityType = (PathOSManager.EntityType)EditorGUILayout.EnumPopup(entity.entityType);
+                entity.entityType = (PathOS.EntityType)EditorGUILayout.EnumPopup(entity.entityType);
 
                 //Append/delete entities in place.
                 if (GUILayout.Button("+", NPGUI.microBtn))
@@ -51,6 +51,9 @@ public class PathOSMainInspector : Editor
                     manager.RemoveEntity(i);
 
                 GUILayout.EndHorizontal();
+
+                entity.omniscientDirection = GUILayout.Toggle(entity.omniscientDirection, "Direction always known");
+                entity.omniscientPosition = GUILayout.Toggle(entity.omniscientPosition, "Position always known");
             }
 
             //Append a new level entity to the end of the list.
