@@ -15,15 +15,22 @@ public class PathOSAgent : MonoBehaviour
     private NavMeshAgent agent;
     private static PathOSManager manager;
 
+    public PathOSAgentMemory memory;
+
     [Range(-1.0f, 1.0f)]
-    public float explorerScaling;
+    public float exploreScaling;
     [Range(-1.0f, 1.0f)]
-    public float achieverScaling;
+    public float achievementScaling;
     [Range(-1.0f, 1.0f)]
     public float aggressiveScaling;
+    [Range(0.0f, 1.0f)]
+    public float experienceScaling;
 
     public float routeComputeTime = 1.0f;
+    public float perceptionComputeTime = 0.25f;
+    public float visitThreshold = 1.0f;
     public Camera playerEyes;
+    private float perceptionTimer = 0.0f;
     private float routeTimer = 0.0f; 
 
     private PerceivedInfo perceivedInfo;
@@ -44,6 +51,11 @@ public class PathOSAgent : MonoBehaviour
         currentDestination = agent.transform.position;
 	}
 
+    private void Start()
+    {
+        ProcessPerception();
+    }
+
     void ProcessPerception()
     {
         Plane[] frustum = GeometryUtility.CalculateFrustumPlanes(playerEyes);
@@ -60,30 +72,112 @@ public class PathOSAgent : MonoBehaviour
             if (entity.rend != null
                 && GeometryUtility.TestPlanesAABB(frustum, entity.rend.bounds)
                 && !Physics.Raycast(entityPos, ray.normalized, ray.magnitude))
-                perceivedInfo.entities.Add(new PerceivedEntity(entity.entityType, entityPos));
+                perceivedInfo.entities.Add(new PerceivedEntity(entity.entityRef, entity.entityType, entityPos));
+        }
 
+        for(int i = 0; i < perceivedInfo.entities.Count; ++i)
+        {
+            memory.Memorize(perceivedInfo.entities[i]);
+        }
+
+        for(int i = 0; i < memory.memory.Count; ++i)
+        {
+            if ((agent.transform.position - memory.memory[i].pos).magnitude < visitThreshold)
+                memory.memory[i].visited = true;      
         }
     }
 
     void ComputeNewDestination()
     {
         Vector3 dest = agent.transform.position;
+        float maxScore = -10000.0f;
 
-        for(int i = 0; i < perceivedInfo.entities.Count; ++i)
+        for(int i = 0; i < memory.memory.Count; ++i)
         {
-            PerceivedEntity entity = perceivedInfo.entities[i];
-
-            if (entity.entityType == EntityType.ET_GOAL)
-                dest = entity.pos;
+            ScoreEntity(memory.memory[i], ref dest, ref maxScore);
         }
 
         currentDestination = dest;
         agent.SetDestination(dest);
     }
 
+    void ScoreEntity(PerceivedEntity entity, ref Vector3 dest, ref float maxScore)
+    {
+        if (memory.Visited(entity)) 
+            return;
+
+        float bias = 0.0f;
+
+        switch (entity.entityType)
+        {
+            case EntityType.ET_GOAL:
+                bias = achievementScaling;
+                break;
+
+            case EntityType.ET_POI:
+                bias = exploreScaling;
+                break;
+
+            case EntityType.ET_ENEMY:
+                bias = aggressiveScaling;
+                break;
+        }
+
+        float score = ScoreDirection(entity.pos - agent.transform.position, bias);
+
+        if (score > maxScore)
+        {
+            maxScore = score;
+            dest = entity.pos;
+        }
+    }
+
+    float ScoreDirection(Vector3 dir, float bias)
+    {
+        dir.Normalize();
+        float score = bias;
+
+        for(int i = 0; i < memory.memory.Count; ++i)
+        {
+            if (memory.memory[i].visited)
+                continue;
+
+            Vector3 entityVec = memory.memory[i].pos - agent.transform.position;
+            float dist2entity = entityVec.magnitude;
+            float distFactor = 1.0f / dist2entity * dist2entity;
+            Vector3 dir2entity = entityVec.normalized;
+
+            float dot = Vector3.Dot(dir, dir2entity);
+
+            switch(memory.memory[i].entityType)
+            {
+                case EntityType.ET_ENEMY:
+                    score += aggressiveScaling * dot * distFactor;
+                    break;
+
+                case EntityType.ET_GOAL:
+                    score += achievementScaling * dot * distFactor;
+                    break;
+
+                case EntityType.ET_POI:
+                    score += exploreScaling * dot * distFactor;
+                    break;
+            }
+        }
+
+        return score;
+    }
+
 	void Update() 
 	{
-        routeTimer += Time.unscaledDeltaTime;
+        routeTimer += Time.deltaTime;
+        perceptionTimer += Time.deltaTime;
+
+        if(perceptionTimer >= perceptionComputeTime)
+        {
+            perceptionTimer = 0.0f;
+            ProcessPerception();
+        }
 
         if(routeTimer >= routeComputeTime)
         {

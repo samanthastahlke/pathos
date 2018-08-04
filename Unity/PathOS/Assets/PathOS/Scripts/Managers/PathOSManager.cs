@@ -21,21 +21,6 @@ public class PathOSManager : NPSingleton<PathOSManager>
             levelEntities[i].rend = levelEntities[i].entityRef.GetComponent<Renderer>();
         }
 	}
-	
-	void Start() 
-	{
-		
-	}
-	
-	void FixedUpdate()
-	{
-		
-	}
-
-	void Update() 
-	{
-		
-	}
 
     public void AddEntity(int index)
     {
