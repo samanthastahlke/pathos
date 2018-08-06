@@ -156,10 +156,12 @@ public class PathOSAgent : MonoBehaviour
                     break;
 
                 case EntityType.ET_GOAL:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
                     score += achievementScaling * dot * distFactor;
                     break;
 
                 case EntityType.ET_POI:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
                     score += exploreScaling * dot * distFactor;
                     break;
             }
