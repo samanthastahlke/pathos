@@ -13,7 +13,9 @@ public class PathOSAgentRenderer : MonoBehaviour
     public PathOSAgent agent;
     public float iconSize = 16.0f;
     public Texture eyecon;
-    public Texture target;
+    public Texture targetIcon;
+    public Texture visitedIcon;
+    public Texture memoryIcon;
 
     private Camera transformCam;
     private bool sceneInit = false;
@@ -29,16 +31,25 @@ public class PathOSAgentRenderer : MonoBehaviour
         if (!sceneInit)
             return;
 
-        List<Vector3> visiblePos = agent.GetPerceivedEntityPositions();
+        List<PathOS.PerceivedEntity> visible = agent.GetPerceivedEntities();
         Vector3 targetPos = agent.GetTargetPosition();
 
-        for(int i = 0; i < visiblePos.Count; ++i)
+        List<PathOS.PerceivedEntity> memory = agent.memory.memory;
+
+        for(int i = 0; i < memory.Count; ++i)
         {
-            GUI.DrawTexture(GetIconRect(visiblePos[i]), eyecon);
+            if (Vector3.SqrMagnitude(memory[i].pos - targetPos) < 0.2f)
+                continue;
+
+            if (!memory[i].visited && visible.Contains(memory[i]))
+                GUI.DrawTexture(GetIconRect(memory[i].pos), eyecon);
+            else
+                GUI.DrawTexture(GetIconRect(memory[i].pos), 
+                    (memory[i].visited) ? visitedIcon : memoryIcon);
         }
 
         Rect targetRect = GetIconRect(targetPos);
-        GUI.DrawTexture(targetRect, target);
+        GUI.DrawTexture(targetRect, targetIcon);
     }
 
     private Rect GetIconRect(Vector3 pos)

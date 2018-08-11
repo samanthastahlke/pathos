@@ -47,12 +47,42 @@ namespace PathOS
 
         public static bool operator==(PerceivedEntity lhs, PerceivedEntity rhs)
         {
+            if(object.ReferenceEquals(lhs, null))
+                return object.ReferenceEquals(rhs, null);
+
+            if (object.ReferenceEquals(rhs, null))
+                return object.ReferenceEquals(lhs, null);
+
             return lhs.instanceID == rhs.instanceID;
         }
 
         public static bool operator!=(PerceivedEntity lhs, PerceivedEntity rhs)
         {
+            if (object.ReferenceEquals(lhs, null))
+                return !object.ReferenceEquals(rhs, null);
+
+            if (object.ReferenceEquals(rhs, null))
+                return object.ReferenceEquals(lhs, null);
+
             return lhs.instanceID != rhs.instanceID;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            PerceivedEntity objAsEntity = obj as PerceivedEntity;
+
+            if (objAsEntity == null)
+                return false;
+
+            return this == objAsEntity;
+        }
+
+        public override int GetHashCode()
+        {
+            return instanceID;
         }
     }
 

@@ -28,10 +28,13 @@ public class PathOSAgent : MonoBehaviour
 
     public float routeComputeTime = 1.0f;
     public float perceptionComputeTime = 0.25f;
+    public float lookTime = 2.0f;
     public float visitThreshold = 1.0f;
     public Camera playerEyes;
     private float perceptionTimer = 0.0f;
-    private float routeTimer = 0.0f; 
+    private float routeTimer = 0.0f;
+    private float lookTimer = 0.0f;
+    private bool lookingAround = false;
 
     private PerceivedInfo perceivedInfo;
     private Vector3 currentDestination;
@@ -175,6 +178,9 @@ public class PathOSAgent : MonoBehaviour
         routeTimer += Time.deltaTime;
         perceptionTimer += Time.deltaTime;
 
+        if(!lookingAround)
+            lookTimer += Time.deltaTime;
+
         if(perceptionTimer >= perceptionComputeTime)
         {
             perceptionTimer = 0.0f;
@@ -187,19 +193,77 @@ public class PathOSAgent : MonoBehaviour
             ProcessPerception();
             ComputeNewDestination();
         }
+
+        if(lookTimer >= lookTime)
+        {
+            lookTimer = 0.0f;
+            lookingAround = true;
+            StartCoroutine(LookAround());
+        }
 	}
 
-    public List<Vector3> GetPerceivedEntityPositions()
+    IEnumerator LookAround()
     {
-        List<Vector3> results = new List<Vector3>();
+        agent.isStopped = true;
+        agent.updateRotation = false;
 
-        for(int i = 0; i < perceivedInfo.entities.Count; ++i)
+        Quaternion home = transform.rotation;
+        Quaternion right = Quaternion.AngleAxis(45.0f, Vector3.up) * home;
+        Quaternion left = Quaternion.AngleAxis(-45.0f, Vector3.up) * home;
+
+        float lookingTime = 0.5f;
+        float lookingTimer = 0.0f;
+
+        while (lookingTimer < lookingTime)
         {
-            if((currentDestination - perceivedInfo.entities[i].pos).magnitude > 0.1f)
-                results.Add(perceivedInfo.entities[i].pos);
+            transform.rotation = Quaternion.Slerp(home, right, lookingTimer / lookingTime);
+            lookingTimer += Time.deltaTime;
+            yield return null;
         }
 
-        return results;
+        lookingTimer = 0.0f;
+
+        while (lookingTimer < lookingTime)
+        {
+            lookingTimer += Time.deltaTime;
+            yield return null;
+        }
+
+        lookingTimer = 0.0f;
+
+        while (lookingTimer < lookingTime)
+        {
+            transform.rotation = Quaternion.Slerp(right, left, lookingTimer / lookingTime);
+            lookingTimer += Time.deltaTime;
+            yield return null;
+        }
+
+        lookingTimer = 0.0f;
+
+        while (lookingTimer < lookingTime)
+        {
+            lookingTimer += Time.deltaTime;
+            yield return null;
+        }
+
+        lookingTimer = 0.0f;
+
+        while (lookingTimer < lookingTime)
+        {
+            transform.rotation = Quaternion.Slerp(left, home, lookingTimer / lookingTime);
+            lookingTimer += Time.deltaTime;
+            yield return null;
+        }
+
+        lookingTimer = 0.0f;
+        lookingAround = false;
+        agent.updateRotation = true;
+        agent.isStopped = false;
+    }
+
+    public List<PerceivedEntity> GetPerceivedEntities()
+    {
+        return perceivedInfo.entities;
     }
 
     public Vector3 GetTargetPosition()

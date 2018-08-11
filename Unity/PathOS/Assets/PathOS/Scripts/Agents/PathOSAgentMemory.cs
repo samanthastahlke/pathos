@@ -28,6 +28,17 @@ public class PathOSAgentMemory : MonoBehaviour
         memory.Add(entity);
     }
 
+    public bool Memorized(PerceivedEntity entity)
+    {
+        for(int i = 0; i < memory.Count; ++i)
+        {
+            if (entity == memory[i])
+                return true;
+        }
+
+        return false;
+    }
+
     public bool Visited(PerceivedEntity entity)
     {
         for(int i = 0; i < memory.Count; ++i)
