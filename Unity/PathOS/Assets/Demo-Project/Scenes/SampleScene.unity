@@ -162,6 +162,36 @@ Prefab:
       propertyPath: lookTime
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 2}
+      propertyPath: aggressiveScaling
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 2}
+      propertyPath: cautionScaling
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 2}
+      propertyPath: curiosityScaling
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 2}
+      propertyPath: completionScaling
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114482611139781848, guid: 607318e5beb058643a9226e07f881723,
+        type: 2}
+      propertyPath: agent
+      value: 
+      objectReference: {fileID: 626367633}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 2}
+      propertyPath: forgetTime
+      value: 60
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 607318e5beb058643a9226e07f881723, type: 2}
   m_IsPrefabAsset: 0
@@ -513,6 +543,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1088327799159616, guid: 607318e5beb058643a9226e07f881723,
     type: 2}
   m_PrefabInternal: {fileID: 73248144}
+--- !u!114 &626367633 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+    type: 2}
+  m_PrefabInternal: {fileID: 73248144}
+  m_Script: {fileID: 11500000, guid: 06ce937a59a90e74fba6431216287456, type: 3}
 --- !u!1 &677844005
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,30 +921,29 @@ MonoBehaviour:
   levelEntities:
   - entityRef: {fileID: 677844005}
     entityType: 200
+    rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-    rend: {fileID: 0}
   - entityRef: {fileID: 1015002897}
     entityType: 100
+    rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-    rend: {fileID: 0}
   - entityRef: {fileID: 1184014103}
     entityType: 200
+    rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-    rend: {fileID: 0}
   - entityRef: {fileID: 2057446723}
     entityType: 100
+    rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-    rend: {fileID: 0}
   - entityRef: {fileID: 516568726}
     entityType: 300
+    rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-    rend: {fileID: 0}
-  playerProxy: {fileID: 626367630}
 --- !u!4 &1664526733
 Transform:
   m_ObjectHideFlags: 0

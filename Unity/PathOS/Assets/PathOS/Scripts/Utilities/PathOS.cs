@@ -10,31 +10,45 @@ PathOS (c) Nine Penguins (Samantha Stahlke) 2018
 namespace PathOS
 {
     /* GAME ENTITIES */
+    //This list is in flux based on the tagging system/typology review.
+    //Right now the proof-of-concept just uses GOAL_OPTIONAL, HAZARD_ENEMY,
+    //and POI.
     public enum EntityType
     {
         ET_NONE = 0,
-        ET_GOAL = 100,
-        ET_ENEMY = 200,
+        ET_GOAL_OPTIONAL = 100,
+        ET_GOAL_MANDATORY = 110,
+        ET_GOAL_COMPLETION = 120,
+        ET_RESOURCE_ACHIEVEMENT = 150,
+        ET_RESOURCE_PRESERVATION = 160,
+        ET_HAZARD_ENEMY = 200,
+        ET_HAZARD_ENVIRONMENT = 250,
         ET_POI = 300
     };
 
+    //Representation of entity objects defined in the PathOS manager.
     [System.Serializable]
     public class LevelEntity
     {
         public GameObject entityRef;
         public EntityType entityType;
+        public Renderer rend;
+
+        //Not used yet. Will be used to simulate compass/map availability.
         public bool omniscientDirection;
         public bool omniscientPosition;
-        public Renderer rend;
     }
 
+    /* PLAYER PERCEPTION */
+    //How an entity is represented in the agent's world model.
     public class PerceivedEntity
     {
         public GameObject entityRef;
-        private int instanceID;
+        //Used for identification/comparison.
+        protected int instanceID;
+
         public EntityType entityType;
         public Vector3 pos;
-        public bool visited = false;
 
         public PerceivedEntity(GameObject entityRef, EntityType entityType,
             Vector3 pos)
@@ -45,6 +59,7 @@ namespace PathOS
             this.pos = pos;
         }
 
+        //Equality operators are overriden to make array search/comparison easier.
         public static bool operator==(PerceivedEntity lhs, PerceivedEntity rhs)
         {
             if(object.ReferenceEquals(lhs, null))
@@ -84,19 +99,34 @@ namespace PathOS
         {
             return instanceID;
         }
+
+        public int GetInstanceID()
+        {
+            return instanceID;
+        }
     }
 
-    public class TargetAnalysis
+    //How the memory of an object is represented in the agent's world model.
+    public class EntityMemory : PerceivedEntity
     {
-        public float explorationScore;
-        public float goalScore;
-        public float dangerScore;
+        public bool visited = false;
+        public float impressionTime = 0.0f;
+
+        public EntityMemory(GameObject entityRef, EntityType entityType,
+            Vector3 pos) : base(entityRef, entityType, pos) { }
+
+        public EntityMemory(PerceivedEntity data) : 
+            base(data.entityRef, data.entityType, data.pos) { }
     }
 
-    /* PLAYER PERCEPTION */
     public class PerceivedInfo
     {
+        //What in-game objects are visible?
         public List<PerceivedEntity> entities;
+
+        //Set of vectors representing directions the environment
+        //will allow us to travel.
+        //Not used yet.
         public List<Vector3> navDirections;
 
         public PerceivedInfo()
