@@ -15,22 +15,17 @@ public class PathOSMainInspector : Editor
     private PathOSManager manager;
     private SerializedObject serial;
     private SerializedProperty entityList;
-    private SerializedProperty playerProxy;
 
     private void OnEnable()
     {
         manager = (PathOSManager)target;
         serial = new SerializedObject(manager);
         entityList = serial.FindProperty("levelEntities");
-        playerProxy = serial.FindProperty("playerProxy");
     }
 
     public override void OnInspectorGUI()
     {
         serial.Update();
-
-        //Player proxy object.
-        EditorGUILayout.PropertyField(playerProxy);
 
         //Level entity list.
         if(EditorGUILayout.PropertyField(entityList))
