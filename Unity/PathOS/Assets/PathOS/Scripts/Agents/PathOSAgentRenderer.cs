@@ -14,14 +14,19 @@ public class PathOSAgentRenderer : MonoBehaviour
     public PathOSAgent agent;
     public float iconSize = 16.0f;
 
+    public string iconExtension = ".png";
+
     //Haha, eye-con, get it? Thank you, thank you.
     //I'll be here all week. Well, for another four years. Well, hopefully longer.
     //I'm going to die at this damn school, aren't I? D:
     public Texture eyecon;
-
+    private string eyeTex;
     public Texture targetIcon;
+    private string targetTex;
     public Texture visitedIcon;
+    private string visitTex;
     public Texture memoryIcon;
+    private string memoryTex;
 
     //Which camera should be used for screen-space transformation?
     private Camera transformCam;
@@ -31,12 +36,32 @@ public class PathOSAgentRenderer : MonoBehaviour
     {
         transformCam = Camera.main;
         sceneInit = true;
+
+        eyeTex = eyecon.name + iconExtension;
+        targetTex = targetIcon.name + iconExtension;
+        visitTex = visitedIcon.name + iconExtension;
+        memoryTex = memoryIcon.name + iconExtension;
     }
 
-    private void OnGUI()
+    private void OnDrawGizmos()
     {
         if (!sceneInit)
             return;
+
+        Matrix4x4 tmp = Gizmos.matrix;
+        Gizmos.matrix = Matrix4x4.TRS(agent.eyes.cam.transform.position,
+            agent.eyes.cam.transform.rotation,
+            agent.eyes.cam.transform.localScale);
+
+        Gizmos.DrawFrustum(Vector3.zero, 
+            agent.eyes.cam.fieldOfView, 
+            agent.eyes.cam.farClipPlane, agent.eyes.cam.nearClipPlane, 
+            agent.eyes.cam.aspect);
+
+        Gizmos.matrix = tmp;
+
+        if (Camera.current != null)
+            transformCam = Camera.current;
 
         List<PathOS.PerceivedEntity> visible = agent.GetPerceivedEntities();
         Vector3 targetPos = agent.GetTargetPosition();
@@ -44,7 +69,7 @@ public class PathOSAgentRenderer : MonoBehaviour
         List<PathOS.EntityMemory> memory = agent.memory.memory;
 
         //Memory will contain visible objects by default.
-        for(int i = 0; i < memory.Count; ++i)
+        for (int i = 0; i < memory.Count; ++i)
         {
             //Skip if this entity is the target.
             if (Vector3.SqrMagnitude(memory[i].pos - targetPos) < 0.2f)
@@ -52,24 +77,24 @@ public class PathOSAgentRenderer : MonoBehaviour
 
             //If not visited and visible, draw the visible icon.
             if (!memory[i].visited && visible.Contains(memory[i]))
-                GUI.DrawTexture(GetIconRect(memory[i].pos), eyecon);
+                Gizmos.DrawIcon(GetGizmoIconPos(memory[i].pos), eyeTex);
             //Draw the visited icon or memorized icon as appropriate.
             else
-                GUI.DrawTexture(GetIconRect(memory[i].pos), 
-                    (memory[i].visited) ? visitedIcon : memoryIcon);
+                Gizmos.DrawIcon(GetGizmoIconPos(memory[i].pos),
+                    (memory[i].visited) ? visitTex : memoryTex);
         }
 
-        //Draw the agent's target.
-        Rect targetRect = GetIconRect(targetPos);
-        GUI.DrawTexture(targetRect, targetIcon);
+        Gizmos.DrawIcon(GetGizmoIconPos(agent.GetTargetPosition()), targetTex);
+
+        transformCam = Camera.main;
     }
 
-    //Screen-space transformation for drawing overlay icons.
-    private Rect GetIconRect(Vector3 pos)
+    //World-space transformation for drawing overlay icons as gizmos.
+    private Vector3 GetGizmoIconPos(Vector3 pos)
     {
-        Vector3 screenPoint = transformCam.WorldToScreenPoint(pos);
+        Vector3 screenPos = transformCam.WorldToScreenPoint(pos);
+        screenPos.z -= 2.0f;
 
-        return new Rect(screenPoint.x - 0.5f * iconSize, 
-            Screen.height - (screenPoint.y + 0.5f * iconSize), iconSize, iconSize);
+        return transformCam.ScreenToWorldPoint(screenPos);
     }
 }

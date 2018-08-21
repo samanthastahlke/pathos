@@ -55,7 +55,7 @@ public class OGVisEditor : Editor
     //Called when the inspector pane is initialized.
     private void OnEnable()
     {
-        Debug.Log("Waking OGVisEditor...");
+        //Debug.Log("Waking OGVisEditor...");
 
         //Grab our sharp line texture - this looks nicer on screen than the default.
         polylinetex = Resources.Load("polylinetex") as Texture2D;

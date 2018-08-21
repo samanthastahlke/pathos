@@ -281,7 +281,7 @@ public class OGLogVisualizer : MonoBehaviour
     //Simply initialize non-serializable properties, etc.
     private void OnEnable()
     {
-        print("Waking OGLog Visualizer...");
+        //print("Waking OGLog Visualizer...");
 
         if(!colsInit)
         {
@@ -604,7 +604,7 @@ public class OGLogVisualizer : MonoBehaviour
         cIndex = 0;
         eIndex = 0;
 
-        print("OGVis data cleared from current session.");
+        //print("OGVis data cleared from current session.");
     }
     
     //Resample individual paths.

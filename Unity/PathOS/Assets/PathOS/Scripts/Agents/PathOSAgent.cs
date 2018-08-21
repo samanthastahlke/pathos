@@ -13,10 +13,14 @@ PathOSAgent (c) Ominous Games 2018
 public class PathOSAgent : MonoBehaviour 
 {
     private NavMeshAgent agent;
-    private static PathOSManager manager;
 
     //The agent's memory/internal world model.
     public PathOSAgentMemory memory;
+    //The agent's eyes/perception model.
+    public PathOSAgentEyes eyes;
+
+    //Used for testing.
+    public bool freezeAgent;
 
     /* MOTIVATORS */
     //This list is in flux alongside the typology review.
@@ -55,66 +59,23 @@ public class PathOSAgent : MonoBehaviour
     //This is for testing right now, basically just a flat value.
     public float forgetTime = 1.0f;
 
-    //The agent's "eyes" - i.e., the camera the player would use.
-    public Camera playerEyes;
-
-    //Timers for handling visual processing, rerouting, and looking around.
-    private float perceptionTimer = 0.0f;
+    //Timers for handling rerouting and looking around.
     private float routeTimer = 0.0f;
     private float lookTimer = 0.0f;
     private bool lookingAround = false;
 
-    //What can the agent "see" currently?
-    private PerceivedInfo perceivedInfo;
     //Where is the agent targeting?
     private Vector3 currentDestination;
 
 	void Awake()
 	{
         agent = GetComponent<NavMeshAgent>();
-
-        if (null == manager)
-            manager = PathOSManager.instance;
-
-        perceivedInfo = new PerceivedInfo();
-
         currentDestination = agent.transform.position;
 	}
 
     private void Start()
     {
-        ProcessPerception();
-    }
-
-    //Update the agent's "visual system".
-    void ProcessPerception()
-    {
-        Plane[] frustum = GeometryUtility.CalculateFrustumPlanes(playerEyes);
-
-        perceivedInfo.entities.Clear();
-        perceivedInfo.navDirections.Clear();
-
-        for (int i = 0; i < manager.levelEntities.Count; ++i)
-        {
-            LevelEntity entity = manager.levelEntities[i];
-            Vector3 entityPos = entity.entityRef.transform.position;
-            Vector3 ray = playerEyes.transform.position - entityPos;
-
-            //Visisbility check.
-            //If object's renderer is in bounds of camera...
-            //And we can draw a ray to the camera from that object without
-            //hitting anything. (The raycast right now is naive and uses
-            //only the object's centre, will need to be improved.)
-            if (entity.rend != null
-                && GeometryUtility.TestPlanesAABB(frustum, entity.rend.bounds)
-                && !Physics.Raycast(entityPos, ray.normalized, ray.magnitude))
-                perceivedInfo.entities.Add(new PerceivedEntity(entity.entityRef, entity.entityType, entityPos));
-        }
-
-        for(int i = 0; i < perceivedInfo.entities.Count; ++i)
-        {
-            memory.Memorize(perceivedInfo.entities[i]);
-        }
+        eyes.ProcessPerception();
     }
 
     //Update the agent's target position.
@@ -220,24 +181,19 @@ public class PathOSAgent : MonoBehaviour
 
 	void Update() 
 	{
+        if (freezeAgent)
+            return;
+
         routeTimer += Time.deltaTime;
-        perceptionTimer += Time.deltaTime;
 
         if(!lookingAround)
             lookTimer += Time.deltaTime;
-
-        //Visual processing update.
-        if(perceptionTimer >= perceptionComputeTime)
-        {
-            perceptionTimer = 0.0f;
-            ProcessPerception();
-        }
 
         //Rerouting update.
         if(routeTimer >= routeComputeTime)
         {
             routeTimer = 0.0f;
-            ProcessPerception();
+            eyes.ProcessPerception();
             ComputeNewDestination();
         }
 
@@ -323,7 +279,7 @@ public class PathOSAgent : MonoBehaviour
 
     public List<PerceivedEntity> GetPerceivedEntities()
     {
-        return perceivedInfo.entities;
+        return eyes.visible;
     }
 
     public Vector3 GetTargetPosition()
