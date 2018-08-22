@@ -50,6 +50,8 @@ public class PathOSAgent : MonoBehaviour
     public float routeComputeTime = 1.0f;
     //How often will the agent's "visual system" process information?
     public float perceptionComputeTime = 0.25f;
+    //How narrow are the bands checked for "explorability"?
+    public float exploreDegrees = 5.0f;
     //How long does it take to look around?
     public float lookTime = 2.0f;
     //How close does the agent have to get to a goal to mark it as visited?
@@ -85,13 +87,26 @@ public class PathOSAgent : MonoBehaviour
         Vector3 dest = agent.transform.position;
         float maxScore = -10000.0f;
 
-        //Right now, we're only going to score entities as potential goals.
-        //In the future, this should include blank "rays" cast out from the agent
-        //which consider environmental geometry in addition to entities in judging
-        //their exploration/reward potential.
-        for(int i = 0; i < memory.memory.Count; ++i)
+        //Potential entity goals.
+        for(int i = 0; i < memory.entities.Count; ++i)
         {
-            ScoreEntity(memory.memory[i], ref dest, ref maxScore);
+            ScoreEntity(memory.entities[i], ref dest, ref maxScore);
+        }
+
+        //Potential directional goals.
+        float halfX = eyes.XFOV() * 0.5f;
+        int steps = (int)(halfX / exploreDegrees);
+
+        Vector3 XZForward = transform.forward;
+        XZForward.y = 0.0f;
+        XZForward.Normalize();
+
+        ScoreExploreDirection(XZForward, ref dest, ref maxScore);
+
+        for(int i = 1; i <= steps; ++i)
+        {
+            ScoreExploreDirection(Quaternion.AngleAxis(i * exploreDegrees, Vector3.up) * XZForward,
+                ref dest, ref maxScore);
         }
 
         currentDestination = dest;
@@ -135,6 +150,25 @@ public class PathOSAgent : MonoBehaviour
         }
     }
 
+    //maxScore is updated if the direction achieves a higher score.
+    void ScoreExploreDirection(Vector3 dir, ref Vector3 dest, ref float maxScore)
+    {
+        //Grab the "extent" of the direction on the navmesh from the perceptual system.
+        NavMeshHit hit = eyes.ExploreVisibilityCheck(dir);
+
+        float bias = (hit.distance
+            / eyes.navmeshCastDistance)
+            * (curiosityScaling + 0.1f);
+
+        float score = ScoreDirection(dir, bias);
+
+        if(score > maxScore)
+        {
+            maxScore = score;
+            dest = hit.position;
+        }
+    }
+
     float ScoreDirection(Vector3 dir, float bias)
     {
         dir.Normalize();
@@ -144,13 +178,13 @@ public class PathOSAgent : MonoBehaviour
 
         //Enumerate over all entities the agent knows about, and use them
         //to affect our assessment of the potential target.
-        for(int i = 0; i < memory.memory.Count; ++i)
+        for(int i = 0; i < memory.entities.Count; ++i)
         {
-            if (memory.memory[i].visited)
+            if (memory.entities[i].visited)
                 continue;
 
             //Vector to the entity.
-            Vector3 entityVec = memory.memory[i].pos - agent.transform.position;
+            Vector3 entityVec = memory.entities[i].pos - agent.transform.position;
             float dist2entity = entityVec.magnitude;
             //Scale our factor by inverse square of distance.
             float distFactor = 1.0f / (dist2entity * dist2entity);
@@ -158,7 +192,7 @@ public class PathOSAgent : MonoBehaviour
 
             float dot = Vector3.Dot(dir, dir2entity);
             
-            switch(memory.memory[i].entityType)
+            switch(memory.entities[i].entityType)
             {
                 case EntityType.ET_HAZARD_ENEMY:
                     score += aggressiveScaling * dot * distFactor - cautionScaling * dot * distFactor;
@@ -181,6 +215,9 @@ public class PathOSAgent : MonoBehaviour
 
 	void Update() 
 	{
+        if(Input.GetKeyDown(KeyCode.Space))
+            print(eyes.ExploreVisibilityCheck(transform.forward));
+
         if (freezeAgent)
             return;
 
@@ -207,10 +244,10 @@ public class PathOSAgent : MonoBehaviour
 
         //Check to see if we've visited something.
         //This should be shifted to a more elegant trigger mechanism in the future.
-        for (int i = 0; i < memory.memory.Count; ++i)
+        for (int i = 0; i < memory.entities.Count; ++i)
         {
-            if ((agent.transform.position - memory.memory[i].pos).magnitude < visitThreshold)
-                memory.memory[i].visited = true;
+            if ((agent.transform.position - memory.entities[i].pos).magnitude < visitThreshold)
+                memory.entities[i].visited = true;
         }
     }
 

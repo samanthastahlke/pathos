@@ -66,7 +66,7 @@ public class PathOSAgentRenderer : MonoBehaviour
         List<PathOS.PerceivedEntity> visible = agent.GetPerceivedEntities();
         Vector3 targetPos = agent.GetTargetPosition();
 
-        List<PathOS.EntityMemory> memory = agent.memory.memory;
+        List<PathOS.EntityMemory> memory = agent.memory.entities;
 
         //Memory will contain visible objects by default.
         for (int i = 0; i < memory.Count; ++i)

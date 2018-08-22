@@ -11,48 +11,51 @@ PathOSAgentMemory (c) Nine Penguins (Samantha Stahlke) 2018
 public class PathOSAgentMemory : MonoBehaviour 
 {
     public PathOSAgent agent;
-    public List<EntityMemory> memory { get; set; }
+
+    //Remembered entities.
+    //This will be extended to include remembered "areas" for exploration.
+    public List<EntityMemory> entities { get; set; }
 
     private void Awake()
     {
-        memory = new List<EntityMemory>();
+        entities = new List<EntityMemory>();
     }
 
     private void Update()
     {
-        for(int i = memory.Count - 1; i > 0; --i)
+        for(int i = entities.Count - 1; i > 0; --i)
         {
-            memory[i].impressionTime += Time.deltaTime;
+            entities[i].impressionTime += Time.deltaTime;
 
             //Placeholder for "forgetting", to test things out.
-            if (!memory[i].visited && memory[i].impressionTime >= agent.forgetTime)
-                memory.RemoveAt(i);
+            if (!entities[i].visited && entities[i].impressionTime >= agent.forgetTime)
+                entities.RemoveAt(i);
         }
     }
 
     //Push an entity into the agent's memory.
     public void Memorize(PerceivedEntity entity)
     {
-        for(int i = 0; i < memory.Count; ++i)
+        for(int i = 0; i < entities.Count; ++i)
         {
-            if (entity == memory[i])
+            if (entity == entities[i])
             {
-                memory[i].impressionTime = 0.0f;
-                memory[i].pos = entity.pos;
+                entities[i].impressionTime = 0.0f;
+                entities[i].pos = entity.pos;
                 return;
             }             
         }
 
-        memory.Add(new EntityMemory(entity));
+        entities.Add(new EntityMemory(entity));
     }
 
     //Has a visible entity been visited?
     public bool Visited(PerceivedEntity entity)
     {
-        for(int i = 0; i < memory.Count; ++i)
+        for(int i = 0; i < entities.Count; ++i)
         {
-            if (entity == memory[i])
-                return memory[i].visited;
+            if (entity == entities[i])
+                return entities[i].visited;
         }
 
         return false;
