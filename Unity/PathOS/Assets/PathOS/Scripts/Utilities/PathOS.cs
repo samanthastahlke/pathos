@@ -119,6 +119,66 @@ namespace PathOS
             base(data.entityRef, data.entityType, data.pos) { }
     }
 
+    public class ExploreMemory
+    {
+        public static float posThreshold = 2.0f;
+        public static float degThreshold = 5.0f;
+
+        public float impressionTime = 0.0f;
+
+        public Vector3 originPoint;
+        public Vector3 direction;
+        public float dEstimate;
+
+        public ExploreMemory(Vector3 originPoint, Vector3 direction, float dEstimate)
+        {
+            this.originPoint = originPoint;
+            this.direction = direction;
+            this.dEstimate = dEstimate;
+        }
+
+        private bool EqualsSimilar(ExploreMemory rhs)
+        {
+            return (originPoint - rhs.originPoint).magnitude <= posThreshold
+                && Vector3.Angle(direction, rhs.direction) <= degThreshold;
+        }
+
+        public static bool operator ==(ExploreMemory lhs, ExploreMemory rhs)
+        {
+            if (object.ReferenceEquals(lhs, null))
+                return object.ReferenceEquals(rhs, null);
+
+            if (object.ReferenceEquals(rhs, null))
+                return object.ReferenceEquals(lhs, null);
+
+            return lhs.EqualsSimilar(rhs);
+        }
+
+        public static bool operator !=(ExploreMemory lhs, ExploreMemory rhs)
+        {
+            if (object.ReferenceEquals(lhs, null))
+                return !object.ReferenceEquals(rhs, null);
+
+            if (object.ReferenceEquals(rhs, null))
+                return object.ReferenceEquals(lhs, null);
+
+            return !lhs.EqualsSimilar(rhs);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            ExploreMemory objAsEntity = obj as ExploreMemory;
+
+            if (objAsEntity == null)
+                return false;
+
+            return this == objAsEntity;
+        }
+    }
+
     public class PerceivedInfo
     {
         //What in-game objects are visible?

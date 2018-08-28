@@ -13,12 +13,26 @@ public class PathOSAgentMemory : MonoBehaviour
     public PathOSAgent agent;
 
     //Remembered entities.
-    //This will be extended to include remembered "areas" for exploration.
     public List<EntityMemory> entities { get; set; }
+
+    //This array is merely a placeholder for now, it is not properly used.
+    //(TODO)
+    public List<ExploreMemory> paths { get; set; }
+
+    //The agent's memory model of the complete navmesh.
+    [Header("Navmesh Memory Model")]
+    public float worldExtentRadius = 200.0f;
+    public float gridSampleSize = 1.0f;
+
+    public PathOSNavUtility.NavmeshMemoryMapper memoryMap { get; set; }
 
     private void Awake()
     {
         entities = new List<EntityMemory>();
+        paths = new List<ExploreMemory>();
+
+        //Initialize the (blank) model of the agent's internal "map".
+        memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, worldExtentRadius);
     }
 
     private void Update()
@@ -30,6 +44,14 @@ public class PathOSAgentMemory : MonoBehaviour
             //Placeholder for "forgetting", to test things out.
             if (!entities[i].visited && entities[i].impressionTime >= agent.forgetTime)
                 entities.RemoveAt(i);
+        }
+
+        for(int i = paths.Count - 1; i > 0; --i)
+        {
+            paths[i].impressionTime += Time.deltaTime;
+
+            if (paths[i].impressionTime >= agent.forgetTime)
+                paths.RemoveAt(i);
         }
     }
 

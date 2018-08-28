@@ -52,6 +52,8 @@ public class PathOSAgent : MonoBehaviour
     public float perceptionComputeTime = 0.25f;
     //How narrow are the bands checked for "explorability"?
     public float exploreDegrees = 5.0f;
+    //How many degrees do we 
+    public float lookDegrees = 60.0f;
     //How long does it take to look around?
     public float lookTime = 2.0f;
     //How close does the agent have to get to a goal to mark it as visited?
@@ -63,6 +65,7 @@ public class PathOSAgent : MonoBehaviour
 
     //Timers for handling rerouting and looking around.
     private float routeTimer = 0.0f;
+    private float perceptionTimer = 0.0f;
     private float lookTimer = 0.0f;
     private bool lookingAround = false;
 
@@ -221,7 +224,12 @@ public class PathOSAgent : MonoBehaviour
         if (freezeAgent)
             return;
 
+        //Update spatial memory.
+        memory.memoryMap.Traverse(agent.transform.position);
+
+        //Update of periodic actions.
         routeTimer += Time.deltaTime;
+        perceptionTimer += Time.deltaTime;
 
         if(!lookingAround)
             lookTimer += Time.deltaTime;
@@ -230,8 +238,16 @@ public class PathOSAgent : MonoBehaviour
         if(routeTimer >= routeComputeTime)
         {
             routeTimer = 0.0f;
+            perceptionTimer = 0.0f;
             eyes.ProcessPerception();
             ComputeNewDestination();
+        }
+
+        //Perception update.
+        if(perceptionTimer >= perceptionComputeTime)
+        {
+            perceptionTimer = 0.0f;
+            eyes.ProcessPerception();
         }
 
         //Look-around update.
@@ -261,8 +277,8 @@ public class PathOSAgent : MonoBehaviour
 
         //Simple 90-degree sweep centred on current heading.
         Quaternion home = transform.rotation;
-        Quaternion right = Quaternion.AngleAxis(45.0f, Vector3.up) * home;
-        Quaternion left = Quaternion.AngleAxis(-45.0f, Vector3.up) * home;
+        Quaternion right = Quaternion.AngleAxis(lookDegrees, Vector3.up) * home;
+        Quaternion left = Quaternion.AngleAxis(-lookDegrees, Vector3.up) * home;
 
         float lookingTime = 0.5f;
         float lookingTimer = 0.0f;
@@ -322,6 +338,5 @@ public class PathOSAgent : MonoBehaviour
     public Vector3 GetTargetPosition()
     {
         return currentDestination;
-    }
-    
+    }   
 }

@@ -100,7 +100,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1088327799159616}
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 11.545111, y: 1.5, z: -3.9602711}
+  m_LocalPosition: {x: 10.79, y: 1.5, z: -5.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4264792810611208}
@@ -256,6 +256,7 @@ MonoBehaviour:
   experienceScaling: 0
   routeComputeTime: 0.5
   perceptionComputeTime: 0.25
+  exploreDegrees: 5
   lookTime: 4
   visitThreshold: 1
   forgetTime: 60
@@ -272,6 +273,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 114084877281343334}
   iconSize: 24
+  showNavmeshMemoryMap: 1
+  navmeshMapScreenMaxSize: 256
+  iconExtension: .png
   eyecon: {fileID: 2800000, guid: cc97256feea8747499af671fcfa34f97, type: 3}
   targetIcon: {fileID: 2800000, guid: 363db2b515d434048878357880428af1, type: 3}
   visitedIcon: {fileID: 2800000, guid: 810ea2e51d38c494ea2838cc3a5c24ed, type: 3}
@@ -288,6 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 114084877281343334}
+  worldBorder: 200
 --- !u!114 &114839472988384982
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -300,6 +305,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 114084877281343334}
+  navmeshCastDistance: 50
+  navmeshCastHeight: 5
   cam: {fileID: 20951506076577970}
 --- !u!136 &136109131112024904
 CapsuleCollider:

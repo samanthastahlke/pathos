@@ -12,8 +12,9 @@ PathOSAgentRenderer (c) Nine Penguins (Samantha Stahlke) 2018
 public class PathOSAgentRenderer : MonoBehaviour 
 {
     public PathOSAgent agent;
-    public float iconSize = 16.0f;
 
+    [Header("Icon Gizmos")]
+    public float iconSize = 16.0f;
     public string iconExtension = ".png";
 
     //Haha, eye-con, get it? Thank you, thank you.
@@ -28,6 +29,18 @@ public class PathOSAgentRenderer : MonoBehaviour
     public Texture memoryIcon;
     private string memoryTex;
 
+    [Header("Map Drawing")]
+    //Should we show the navmesh map contained in the agent's memory?
+    //The purpose of this is twofold:
+    //First, it is great for debugging. Which is invaluable given both the frequency
+    //and severity of mistakes I make whilst programming.
+    //Second, in the release version of the framework, it helps in understanding the 
+    //agent's behaviour and contributes to improved transparency.
+    public bool showNavmeshMemoryMap = true;
+    public float navmeshMapScreenMaxSize = 128;
+    private Texture navmeshMemoryMap;
+    private Rect navmeshMapScreenCoords;
+
     //Which camera should be used for screen-space transformation?
     private Camera transformCam;
     private bool sceneInit = false;
@@ -41,6 +54,38 @@ public class PathOSAgentRenderer : MonoBehaviour
         targetTex = targetIcon.name + iconExtension;
         visitTex = visitedIcon.name + iconExtension;
         memoryTex = memoryIcon.name + iconExtension;
+
+        //We want to draw the memory "map" in the lower-left corner of the screen.
+        //Grab a persistent reference to the texture.
+        navmeshMemoryMap = agent.memory.memoryMap.GetVisualGrid();
+
+        //Little bit of simple math to constrain the map's size and ensure
+        //it is drawn in the correct location.
+        float navmeshMapAsp = agent.memory.memoryMap.GetAspect();
+        float navmeshMapX = 0.0f, navmeshMapY = 0.0f;
+
+        if(navmeshMapAsp > 1.0f)
+        {
+            navmeshMapX = navmeshMapScreenMaxSize;
+            navmeshMapY = navmeshMapX / navmeshMapAsp;
+        }
+        else
+        {
+            navmeshMapY = navmeshMapScreenMaxSize;
+            navmeshMapX = navmeshMapY * navmeshMapAsp;
+        }
+
+        navmeshMapScreenCoords = new Rect(0.0f, Screen.height - navmeshMapY, navmeshMapX, navmeshMapY);
+    }
+
+    private void OnGUI()
+    {
+        if (!sceneInit)
+            return;
+
+        if (showNavmeshMemoryMap)
+            GUI.DrawTexture(navmeshMapScreenCoords,
+                navmeshMemoryMap, ScaleMode.ScaleToFit, false);
     }
 
     private void OnDrawGizmos()
