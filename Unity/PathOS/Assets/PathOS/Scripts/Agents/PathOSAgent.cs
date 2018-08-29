@@ -142,6 +142,26 @@ public class PathOSAgent : MonoBehaviour
             case EntityType.ET_HAZARD_ENEMY:
                 bias += aggressiveScaling - cautionScaling;
                 break;
+
+            case EntityType.ET_GOAL_MANDATORY:
+                bias += completionScaling + efficiencyScaling;
+                break;
+
+            case EntityType.ET_GOAL_COMPLETION:
+                bias += efficiencyScaling;
+                break;
+
+            case EntityType.ET_RESOURCE_ACHIEVEMENT:
+                bias += completionScaling;
+                break;
+
+            case EntityType.ET_RESOURCE_PRESERVATION:
+                bias += cautionScaling + completionScaling;
+                break;
+
+            case EntityType.ET_HAZARD_ENVIRONMENT:
+                bias += aggressiveScaling + adrenalineScaling - cautionScaling;
+                break;
         }
 
         float score = ScoreDirection(entity.pos - agent.transform.position, bias);
@@ -209,6 +229,31 @@ public class PathOSAgent : MonoBehaviour
                 case EntityType.ET_POI:
                     dot = Mathf.Clamp(dot, 0.0f, 1.0f);
                     score += curiosityScaling * dot * distFactor;
+                    break;
+
+                case EntityType.ET_GOAL_MANDATORY:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
+                    score += completionScaling * dot * distFactor + efficiencyScaling * dot * distFactor;
+                    break;
+
+                case EntityType.ET_GOAL_COMPLETION:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
+                    score += efficiencyScaling * dot * distFactor;
+                    break;
+
+                case EntityType.ET_RESOURCE_ACHIEVEMENT:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
+                    score += completionScaling * dot * distFactor;
+                    break;
+
+                case EntityType.ET_RESOURCE_PRESERVATION:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
+                    score += cautionScaling * dot * distFactor + completionScaling * dot * distFactor;
+                    break;
+
+                case EntityType.ET_HAZARD_ENVIRONMENT:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
+                    score += aggressiveScaling * dot * distFactor + adrenalineScaling * dot * distFactor - cautionScaling * dot * distFactor;
                     break;
             }
         }
