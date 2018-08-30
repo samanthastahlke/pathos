@@ -140,7 +140,7 @@ public class PathOSAgent : MonoBehaviour
                 break;
 
             case EntityType.ET_HAZARD_ENEMY:
-                bias += aggressiveScaling - cautionScaling;
+                bias += aggressiveScaling + adrenalineScaling - cautionScaling;
                 break;
 
             case EntityType.ET_GOAL_MANDATORY:
@@ -218,7 +218,7 @@ public class PathOSAgent : MonoBehaviour
             switch(memory.entities[i].entityType)
             {
                 case EntityType.ET_HAZARD_ENEMY:
-                    score += aggressiveScaling * dot * distFactor - cautionScaling * dot * distFactor;
+                    score += aggressiveScaling * dot * distFactor + adrenalineScaling * dot * distFactor - cautionScaling * dot * distFactor;
                     break;
 
                 case EntityType.ET_GOAL_OPTIONAL:
