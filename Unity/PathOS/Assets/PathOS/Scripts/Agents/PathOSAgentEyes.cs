@@ -123,6 +123,9 @@ public class PathOSAgentEyes : MonoBehaviour
             agent.transform.position + dir.normalized * navmeshCastDistance + Vector3.up * navmeshCastHeight,
             out hit, NavMesh.AllAreas);
 
+        agent.memory.memoryMap.Fill(hit.position, 
+            PathOSNavUtility.NavmeshMemoryMapper.NavmeshMapCode.NM_OBSTACLE);
+
         return hit;
     }
 

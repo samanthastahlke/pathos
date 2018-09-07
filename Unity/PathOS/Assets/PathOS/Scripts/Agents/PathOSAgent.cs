@@ -6,7 +6,7 @@ using PathOS;
 
 /*
 PathOSAgent.cs 
-PathOSAgent (c) Ominous Games 2018
+PathOSAgent (c) Samantha Stahlke and Atiya Nova 2018
 */
 
 [RequireComponent(typeof(NavMeshAgent))]
@@ -52,12 +52,16 @@ public class PathOSAgent : MonoBehaviour
     public float perceptionComputeTime = 0.25f;
     //How narrow are the bands checked for "explorability"?
     public float exploreDegrees = 5.0f;
-    //How many degrees do we 
+    //How narrow are the bands out-of-view checked for "explorability"?
+    public float invisibleExploreDegrees = 30.0f;
+    //How many degrees do we sway to either side when looking around?
     public float lookDegrees = 60.0f;
     //How long does it take to look around?
     public float lookTime = 2.0f;
     //How close does the agent have to get to a goal to mark it as visited?
     public float visitThreshold = 1.0f;
+    //How close do two "exploration" goals have to be to be considered the same?
+    public float exploreSimilarityThreshold = 2.0f;
 
     //How quickly does the agent forget something in its memory?
     //This is for testing right now, basically just a flat value.
@@ -86,8 +90,9 @@ public class PathOSAgent : MonoBehaviour
     //Update the agent's target position.
     void ComputeNewDestination()
     {
-        //Base target = where we're standing.
-        Vector3 dest = agent.transform.position;
+        //Base target = our existing destination.
+        Vector3 dest = currentDestination;
+
         float maxScore = -10000.0f;
 
         //Potential entity goals.
@@ -100,17 +105,43 @@ public class PathOSAgent : MonoBehaviour
         float halfX = eyes.XFOV() * 0.5f;
         int steps = (int)(halfX / exploreDegrees);
 
+        //In front of the agent.
         Vector3 XZForward = transform.forward;
         XZForward.y = 0.0f;
         XZForward.Normalize();
 
-        ScoreExploreDirection(XZForward, ref dest, ref maxScore);
+        ScoreExploreDirection(XZForward, true, ref dest, ref maxScore);
 
         for(int i = 1; i <= steps; ++i)
         {
             ScoreExploreDirection(Quaternion.AngleAxis(i * exploreDegrees, Vector3.up) * XZForward,
-                ref dest, ref maxScore);
+                true, ref dest, ref maxScore);
+            ScoreExploreDirection(Quaternion.AngleAxis(i * -exploreDegrees, Vector3.up) * XZForward,
+                true, ref dest, ref maxScore);
         }
+
+        //Behind the agent (from memory).
+        Vector3 XZBack = -XZForward;
+
+        ScoreExploreDirection(XZBack, false, ref dest, ref maxScore);
+        halfX = (360.0f - eyes.XFOV()) * 0.5f;
+        steps = (int)(halfX / invisibleExploreDegrees);
+
+        for(int i = 1; i <= steps; ++i)
+        {
+            ScoreExploreDirection(Quaternion.AngleAxis(i * invisibleExploreDegrees, Vector3.up) * XZBack,
+                false, ref dest, ref maxScore);
+            ScoreExploreDirection(Quaternion.AngleAxis(i * -invisibleExploreDegrees, Vector3.up) * XZBack,
+                false, ref dest, ref maxScore);
+        }
+
+        //The existing goal.
+        Vector3 goalForward = currentDestination - agent.transform.position;
+        goalForward.y = 0.0f;
+        goalForward.Normalize();
+
+        bool goalVisible = Mathf.Abs(Vector3.Angle(XZForward, goalForward)) < (eyes.XFOV() * 0.5f);
+        ScoreExploreDirection(goalForward, goalVisible, ref dest, ref maxScore);
 
         currentDestination = dest;
         agent.SetDestination(dest);
@@ -126,7 +157,8 @@ public class PathOSAgent : MonoBehaviour
         float bias = 0.0f;
 
         //Initial placeholder bias for preferring the goal we have already set.
-        if ((entity.pos - currentDestination).magnitude < 0.1f)
+        if ((entity.pos - currentDestination).magnitude < 0.1f
+            && (agent.transform.position - currentDestination).magnitude > 0.1f)
             bias += 1.0f;
 
         switch (entity.entityType)
@@ -164,7 +196,8 @@ public class PathOSAgent : MonoBehaviour
                 break;
         }
 
-        float score = ScoreDirection(entity.pos - agent.transform.position, bias);
+        Vector3 toEntity = entity.pos - agent.transform.position;
+        float score = ScoreDirection(toEntity, bias, toEntity.magnitude);
 
         if (score > maxScore)
         {
@@ -174,30 +207,58 @@ public class PathOSAgent : MonoBehaviour
     }
 
     //maxScore is updated if the direction achieves a higher score.
-    void ScoreExploreDirection(Vector3 dir, ref Vector3 dest, ref float maxScore)
+    void ScoreExploreDirection(Vector3 dir, bool visible, ref Vector3 dest, ref float maxScore)
     {
-        //Grab the "extent" of the direction on the navmesh from the perceptual system.
-        NavMeshHit hit = eyes.ExploreVisibilityCheck(dir);
+        float distance = 0.0f;
+        Vector3 newDest = agent.transform.position;
 
-        float bias = (hit.distance
-            / eyes.navmeshCastDistance)
+        if(visible)
+        {
+            //Grab the "extent" of the direction on the navmesh from the perceptual system.
+            NavMeshHit hit = eyes.ExploreVisibilityCheck(dir);
+            distance = hit.distance;
+            newDest = hit.position;
+        }
+        else
+        {
+            //Grab the "extent" of the direction on our memory model of the navmesh.
+            PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
+            memory.memoryMap.RaycastMemoryMap(agent.transform.position, dir, eyes.navmeshCastDistance, out hit);
+            distance = hit.distance;
+            newDest = agent.transform.position + distance * dir;
+        }
+
+        float bias = (distance / eyes.navmeshCastDistance) 
             * (curiosityScaling + 0.1f);
 
-        float score = ScoreDirection(dir, bias);
+        //Initial placeholder bias for preferring the goal we have already set.
+        //(If we haven't reached it already.)
+        if ((newDest - currentDestination).magnitude < exploreSimilarityThreshold
+            && (agent.transform.position - currentDestination).magnitude > exploreSimilarityThreshold)
+            bias += 1.0f;
+
+        float score = ScoreDirection(dir, bias, distance);
 
         if(score > maxScore)
         {
             maxScore = score;
-            dest = hit.position;
+            dest = newDest;
         }
     }
 
-    float ScoreDirection(Vector3 dir, float bias)
+    float ScoreDirection(Vector3 dir, float bias, float maxDistance)
     {
         dir.Normalize();
 
         //Score base = bias.
         float score = bias;
+
+        //Add to the score based on our curiosity and the potential to 
+        //"fill in our map" as we move in this direction.
+        //This is similar to the scaling created by assessing an exploration direction.
+        PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
+        memory.memoryMap.RaycastMemoryMap(agent.transform.position, dir, maxDistance, out hit);
+        score += (curiosityScaling + 0.1f) * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples;
 
         //Enumerate over all entities the agent knows about, and use them
         //to affect our assessment of the potential target.
@@ -263,14 +324,19 @@ public class PathOSAgent : MonoBehaviour
 
 	void Update() 
 	{
-        if(Input.GetKeyDown(KeyCode.Space))
-            print(eyes.ExploreVisibilityCheck(transform.forward));
-
+        //Used for testing various functionalities on keypress "in the wild" 
+        ///as they are implemented.
+        /*if(Input.GetKeyDown(KeyCode.Space))
+        {
+            PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
+            memory.memoryMap.RaycastMemoryMap(agent.transform.position, new Vector3(-1.0f, 0.0f, -0.5f), 10.0f, out hit);
+        }*/
+           
         if (freezeAgent)
             return;
 
         //Update spatial memory.
-        memory.memoryMap.Traverse(agent.transform.position);
+        memory.memoryMap.Fill(agent.transform.position);
 
         //Update of periodic actions.
         routeTimer += Time.deltaTime;

@@ -680,6 +680,11 @@ Prefab:
       propertyPath: showNavmeshMemoryMap
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 2}
+      propertyPath: lookDegrees
+      value: 60
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 607318e5beb058643a9226e07f881723, type: 2}
   m_IsPrefabAsset: 0
