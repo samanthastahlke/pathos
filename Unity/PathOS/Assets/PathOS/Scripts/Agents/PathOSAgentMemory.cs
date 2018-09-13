@@ -5,7 +5,7 @@ using PathOS;
 
 /*
 PathOSAgentMemory.cs 
-PathOSAgentMemory (c) Nine Penguins (Samantha Stahlke) 2018
+PathOSAgentMemory (c) Nine Penguins (Samantha Stahlke) and Atiya Nova 2018
 */
 
 public class PathOSAgentMemory : MonoBehaviour 
@@ -25,6 +25,9 @@ public class PathOSAgentMemory : MonoBehaviour
     public float gridSampleSize = 1.0f;
 
     public PathOSNavUtility.NavmeshMemoryMapper memoryMap { get; set; }
+
+    //Check to see if there are any goals left
+    protected bool goalsLeft = true;
 
     private void Awake()
     {
@@ -78,6 +81,57 @@ public class PathOSAgentMemory : MonoBehaviour
         {
             if (entity == entities[i])
                 return entities[i].visited;
+        }
+
+        return false;
+    }
+
+    //Are there any goals left? 
+    bool GoalsRemaining()
+    {
+        for (int i = 0; i < entities.Count; i++)
+        {
+            //this really, really, really needs to be cleaned up pleasedonthateme
+            if ((entities[i].entityType == EntityType.ET_GOAL_OPTIONAL || entities[i].entityType == EntityType.ET_GOAL_MANDATORY
+                || entities[i].entityType == EntityType.ET_RESOURCE_ACHIEVEMENT || entities[i].entityType == EntityType.ET_RESOURCE_PRESERVATION)
+                && entities[i].visited == false)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void CheckGoals()
+    {
+        goalsLeft = GoalsRemaining(); //calculates whether or not there are goals it still needs to go to
+    }
+
+    public bool GetGoalsLeft()
+    {
+        return goalsLeft; //returns whether or not there are goals left
+    }
+
+    //checks the number of hazards in close proximity
+    public bool CheckHazards(Vector3 currentDestination)
+    {
+        int hazardCounter = 0;
+
+        for (int i = 0; i < entities.Count; i++)
+        {
+            //if the hazard is within range... (the range is just a placeholder for now as well, I'm worried that it's too short?)
+            if ((entities[i].pos - currentDestination).magnitude < 12f && (entities[i].entityType == EntityType.ET_HAZARD_ENEMY || entities[i].entityType == EntityType.ET_HAZARD_ENVIRONMENT))
+            {
+                //we increment the counter to see how many hazards are close by
+                hazardCounter++;
+
+                //the 2 is just a placeholder to test that it works
+                if (hazardCounter >= 2)
+                {
+                    //if it's hazardous it returns true
+                    return true;
+                }
+            }
         }
 
         return false;

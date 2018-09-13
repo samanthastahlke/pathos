@@ -76,7 +76,12 @@ public class PathOSAgent : MonoBehaviour
     //Where is the agent targeting?
     private Vector3 currentDestination;
 
-	void Awake()
+    //To check how hazardous the area is
+    private float previousLookTime; 
+    private float hazardousAreaTimer = 0;
+    private bool hazardousArea = false;
+
+    void Awake()
 	{
         agent = GetComponent<NavMeshAgent>();
         currentDestination = agent.transform.position;
@@ -85,6 +90,18 @@ public class PathOSAgent : MonoBehaviour
     private void Start()
     {
         eyes.ProcessPerception();
+
+        //the look timer changes depending on the curiousity
+        lookTime -= (lookTime * (curiosityScaling * 0.5f));
+
+        //Storing the original lookTime value so that we can switch back to it later
+        previousLookTime = lookTime;
+
+        //The more experienced the player is, the more time it takes to forget
+        forgetTime *= (experienceScaling + 1);
+
+        //in case there's only the final goal
+        memory.CheckGoals();
     }
 
     //Update the agent's target position.
@@ -173,6 +190,7 @@ public class PathOSAgent : MonoBehaviour
 
             case EntityType.ET_HAZARD_ENEMY:
                 bias += aggressiveScaling + adrenalineScaling - cautionScaling;
+                if (aggressiveScaling > 0) bias += completionScaling;
                 break;
 
             case EntityType.ET_GOAL_MANDATORY:
@@ -180,7 +198,8 @@ public class PathOSAgent : MonoBehaviour
                 break;
 
             case EntityType.ET_GOAL_COMPLETION:
-                bias += efficiencyScaling;
+                if (memory.GetGoalsLeft() == false) //only adds to the bias if there are no other goals left
+                    bias += efficiencyScaling;
                 break;
 
             case EntityType.ET_RESOURCE_ACHIEVEMENT:
@@ -345,8 +364,29 @@ public class PathOSAgent : MonoBehaviour
         if(!lookingAround)
             lookTimer += Time.deltaTime;
 
+        //Whenever this timer reaches a certain point, the agent checks to see if there are a lot of hazards in the area
+        hazardousAreaTimer += Time.deltaTime;
+
+        if (hazardousAreaTimer > 5)
+        {
+            //we update the lookTime based off of how hazardous the area is
+            //if it's really hazardous then the looktime is cut in half
+            //with max curiousity this makes it so that the agent is looking around constantly
+            //these values are just placeholders, and this code should be more sophisticated for the future
+            if (hazardousArea = memory.CheckHazards(currentDestination))
+            {
+                lookTime = 0.5f;
+            }
+            else
+            {
+                lookTime = previousLookTime; //restores the lookTime if it's not hazardous
+            }
+
+            hazardousAreaTimer = 0;
+        }
+
         //Rerouting update.
-        if(routeTimer >= routeComputeTime)
+        if (routeTimer >= routeComputeTime)
         {
             routeTimer = 0.0f;
             perceptionTimer = 0.0f;
@@ -374,7 +414,12 @@ public class PathOSAgent : MonoBehaviour
         for (int i = 0; i < memory.entities.Count; ++i)
         {
             if ((agent.transform.position - memory.entities[i].pos).magnitude < visitThreshold)
+            {
                 memory.entities[i].visited = true;
+
+                //whenever the agent reaches an area, there's a check to see if it can go to the final goal, or if there are still goals remaining
+                memory.CheckGoals();
+            }
         }
     }
 
