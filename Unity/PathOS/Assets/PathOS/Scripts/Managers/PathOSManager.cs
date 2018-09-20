@@ -18,7 +18,7 @@ public class PathOSManager : NPSingleton<PathOSManager>
         //Grab renderers for object visibility checks by the agent.
 		for(int i = 0; i < levelEntities.Count; ++i)
         {
-            levelEntities[i].rend = levelEntities[i].entityRef.GetComponent<Renderer>();
+            levelEntities[i].rend = levelEntities[i].entityRef.GetComponentInChildren<Renderer>();
         }
 	}
 

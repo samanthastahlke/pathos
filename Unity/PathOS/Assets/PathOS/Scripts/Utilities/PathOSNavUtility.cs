@@ -11,16 +11,18 @@ PathOSNavUtility (c) Nine Penguins (Samantha Stahlke) 2018
 public class PathOSNavUtility 
 {
     //Simple class for defining the boundaries of a NavMesh in the XZ plane.
+    [System.Serializable]
     public class NavmeshBoundsXZ
     {
-        public float altitudeSampleHeight = 0.0f;
-        public Vector3 centre;
+        public float altitudeSampleHeight { get; set; }
+        public Vector3 centre { get; set; }
         public Vector3 min;
         public Vector3 max;
-        public Vector3 size;
+        public Vector3 size { get; set; }
 
         public NavmeshBoundsXZ()
         {
+            altitudeSampleHeight = 0.0f;
             min = new Vector3(float.MaxValue, 0.0f, float.MaxValue);
             max = new Vector3(float.MinValue, 0.0f, float.MinValue);
             size = Vector3.zero;
@@ -28,9 +30,8 @@ public class PathOSNavUtility
         }
 
         public void RecomputeCentreAndSize()
-        { 
-            size.x = max.x - min.x;
-            size.z = max.z - min.z;
+        {
+            size = new Vector3(max.x - min.x, 0.0f, max.z - min.z);
             centre = 0.5f * (max + min);
         }
     }
@@ -62,12 +63,24 @@ public class PathOSNavUtility
 
         Texture2D visualGrid;
 
-        public NavmeshMemoryMapper(float sampleGridSize, float extents)
+        public NavmeshMemoryMapper(float sampleGridSize, float extents, float sampleHeight)
         {
-            //Grab the NavMesh bounds.
-            bounds = GetNavmeshBounds(0.0f, extents);
-
             this.sampleGridSize = sampleGridSize;
+
+            //Grab the NavMesh bounds.
+            SetBounds(GetNavmeshBounds(sampleHeight, extents));
+        }
+
+        public NavmeshMemoryMapper(float sampleGridSize, NavmeshBoundsXZ bounds)
+        {
+            this.sampleGridSize = sampleGridSize;
+            bounds.RecomputeCentreAndSize();
+            SetBounds(bounds);
+        }
+
+        private void SetBounds(NavmeshBoundsXZ bounds)
+        {
+            this.bounds = bounds;
             gridOrigin = bounds.min;
 
             //Calculate the grid size based on NavMesh extents and grid sampling edge.
@@ -80,9 +93,9 @@ public class PathOSNavUtility
             visualGrid = new Texture2D(sizeX, sizeZ, TextureFormat.ARGB32, false, true);
             visualGrid.filterMode = FilterMode.Point;
 
-            for(int i = 0; i < sizeX; ++i)
+            for (int i = 0; i < sizeX; ++i)
             {
-                for(int j = 0; j < sizeZ; ++j)
+                for (int j = 0; j < sizeZ; ++j)
                 {
                     visitedGrid[i, j] = NavmeshMapCode.NM_UNVISITED;
                     visualGrid.SetPixel(i, j, Color.black);

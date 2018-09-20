@@ -21,8 +21,11 @@ public class PathOSAgentMemory : MonoBehaviour
 
     //The agent's memory model of the complete navmesh.
     [Header("Navmesh Memory Model")]
+    public bool autogenerateMapExtents = true;
+    public PathOSNavUtility.NavmeshBoundsXZ navmeshBounds;
     public float worldExtentRadius = 200.0f;
     public float gridSampleSize = 1.0f;
+    public float gridSampleElevation = 10.0f;
 
     public PathOSNavUtility.NavmeshMemoryMapper memoryMap { get; set; }
 
@@ -35,7 +38,10 @@ public class PathOSAgentMemory : MonoBehaviour
         paths = new List<ExploreMemory>();
 
         //Initialize the (blank) model of the agent's internal "map".
-        memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, worldExtentRadius);
+        if (autogenerateMapExtents)
+            memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, worldExtentRadius, gridSampleElevation);
+        else
+            memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, navmeshBounds);
     }
 
     private void Update()
