@@ -282,5 +282,15 @@ public class PathOSNavUtility
         return result;
     }
 
+    public static Vector3 GetClosestPointWalkable(Vector3 p, float margin)
+    {
+        Vector3 result = Vector3.zero;
 
+        NavMeshHit hitResult = new NavMeshHit();
+
+        NavMesh.SamplePosition(p, out hitResult, margin, NavMesh.AllAreas);
+        result = hitResult.position;
+
+        return result;
+    }
 }

@@ -21,6 +21,7 @@ public class PathOSAgent : MonoBehaviour
 
     //Used for testing.
     public bool freezeAgent;
+    public bool verboseDebugging = false;
 
     /* MOTIVATORS */
     //This list is in flux alongside the typology review.
@@ -155,13 +156,20 @@ public class PathOSAgent : MonoBehaviour
         //The existing goal.
         Vector3 goalForward = currentDestination - agent.transform.position;
         goalForward.y = 0.0f;
-        goalForward.Normalize();
-
-        bool goalVisible = Mathf.Abs(Vector3.Angle(XZForward, goalForward)) < (eyes.XFOV() * 0.5f);
-        ScoreExploreDirection(goalForward, goalVisible, ref dest, ref maxScore);
-
+        
+        if(goalForward.sqrMagnitude > 0.1f)
+        {
+            goalForward.Normalize();
+            bool goalVisible = Mathf.Abs(Vector3.Angle(XZForward, goalForward)) < (eyes.XFOV() * 0.5f);
+            ScoreExploreDirection(goalForward, goalVisible, ref dest, ref maxScore);
+        }
+        
         currentDestination = dest;
         agent.SetDestination(dest);
+
+        if(verboseDebugging)
+            NPDebug.LogMessage("Position: " + agent.transform.position + 
+                ", Destination: " + dest);
     }
 
     //maxScore is updated if the entity achieves a higher score.
@@ -244,7 +252,9 @@ public class PathOSAgent : MonoBehaviour
             PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
             memory.memoryMap.RaycastMemoryMap(agent.transform.position, dir, eyes.navmeshCastDistance, out hit);
             distance = hit.distance;
-            newDest = agent.transform.position + distance * dir;
+
+            newDest = PathOSNavUtility.GetClosestPointWalkable(
+                agent.transform.position + distance * dir, memory.worldBorderMargin);
         }
 
         float bias = (distance / eyes.navmeshCastDistance) 

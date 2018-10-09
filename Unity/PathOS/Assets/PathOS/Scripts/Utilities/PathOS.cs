@@ -23,7 +23,8 @@ namespace PathOS
         ET_RESOURCE_PRESERVATION = 160,
         ET_HAZARD_ENEMY = 200,
         ET_HAZARD_ENVIRONMENT = 250,
-        ET_POI = 300
+        ET_POI = 300,
+        ET_POI_NPC = 350
     };
 
     //Representation of entity objects defined in the PathOS manager.

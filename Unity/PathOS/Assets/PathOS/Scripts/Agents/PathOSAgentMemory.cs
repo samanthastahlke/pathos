@@ -24,6 +24,7 @@ public class PathOSAgentMemory : MonoBehaviour
     public bool autogenerateMapExtents = true;
     public PathOSNavUtility.NavmeshBoundsXZ navmeshBounds;
     public float worldExtentRadius = 200.0f;
+    public float worldBorderMargin = 25.0f;
     public float gridSampleSize = 1.0f;
     public float gridSampleElevation = 10.0f;
 

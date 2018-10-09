@@ -1,0 +1,31 @@
+The prefabricated data made with FBX data of a low polygon is included.
+■object
+1,bag
+2,barrel
+3,barrelStand
+4,box
+5,Chest
+
+
+Support is unity5.3.4.
+It can also correspond to unity	4.3.3ｆ1, but it may be necessary to reform a project.
+
+
+Hereinafter in Japanese, the same sentences
+
+※以下日本語同じ文章
+
+ローポリゴンのFBXデータで作られた、プレハブデータが入ってます。
+■object
+1.bag
+2.barrel
+3.barrelStand
+4.box
+5.Chest
+
+
+サポートはunity5.3.4以降です。
+unity4.3にも対応できますが、プロジェクトを作り直す必要があるかもしれません。
+
+SupportEmaill
+rainesyun@hotmail.co.jp

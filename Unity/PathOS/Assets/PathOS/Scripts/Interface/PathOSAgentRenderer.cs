@@ -41,6 +41,12 @@ public class PathOSAgentRenderer : MonoBehaviour
     private Texture navmeshMemoryMap;
     private Rect navmeshMapScreenCoords;
 
+    [Header("Player View")]
+    public bool showPlayerView = true;
+    public float playerViewScreenMaxSize = 128;
+    private RenderTexture playerViewTexture;
+    private Rect playerViewTextureCoords;
+
     //Which camera should be used for screen-space transformation?
     private Camera transformCam;
     private bool sceneInit = false;
@@ -76,6 +82,34 @@ public class PathOSAgentRenderer : MonoBehaviour
         }
 
         navmeshMapScreenCoords = new Rect(0.0f, Screen.height - navmeshMapY, navmeshMapX, navmeshMapY);
+
+        Camera eyesCamera = agent.eyes.cam;
+        float eyesAspect = eyesCamera.aspect;
+
+        float playerViewX = 0.0f, playerViewY = 0.0f;
+
+        if(eyesAspect > 1.0f)
+        {
+            playerViewX = playerViewScreenMaxSize;
+            playerViewY = playerViewX / eyesAspect;
+        }
+        else
+        {
+            playerViewY = playerViewScreenMaxSize;
+            playerViewX = playerViewY * eyesAspect;
+        }
+
+        playerViewTexture = new RenderTexture((int)playerViewX, 
+            (int)playerViewY, 16);
+
+        if(showPlayerView)
+        {
+            eyesCamera.targetTexture = playerViewTexture;
+            eyesCamera.enabled = true;
+        }
+        
+        playerViewTextureCoords = new Rect(Screen.width - playerViewX,
+            Screen.height - playerViewY, playerViewX, playerViewY);
     }
 
     private void OnGUI()
@@ -86,6 +120,10 @@ public class PathOSAgentRenderer : MonoBehaviour
         if (showNavmeshMemoryMap)
             GUI.DrawTexture(navmeshMapScreenCoords,
                 navmeshMemoryMap, ScaleMode.ScaleToFit, false);
+
+        if (showPlayerView)
+            GUI.DrawTexture(playerViewTextureCoords,
+                playerViewTexture, ScaleMode.ScaleToFit, false);
     }
 
     private void OnDrawGizmos()
