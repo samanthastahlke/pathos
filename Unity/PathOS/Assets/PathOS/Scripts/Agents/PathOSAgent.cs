@@ -82,6 +82,10 @@ public class PathOSAgent : MonoBehaviour
     private float hazardousAreaTimer = 0;
     private bool hazardousArea = false;
 
+    //for paths + backtracking
+    private bool backtracking = false;
+    private int currentPath = 0;
+
     void Awake()
 	{
         agent = GetComponent<NavMeshAgent>();
@@ -170,6 +174,9 @@ public class PathOSAgent : MonoBehaviour
         if(verboseDebugging)
             NPDebug.LogMessage("Position: " + agent.transform.position + 
                 ", Destination: " + dest);
+
+        currentPath = memory.paths.Count - 1; //the most recent path
+
     }
 
     //maxScore is updated if the entity achieves a higher score.
@@ -273,6 +280,8 @@ public class PathOSAgent : MonoBehaviour
             maxScore = score;
             dest = newDest;
         }
+
+        memory.AddPath(new ExploreMemory(agent.transform.position, dir, distance));
     }
 
     float ScoreDirection(Vector3 dir, float bias, float maxDistance)
@@ -386,6 +395,14 @@ public class PathOSAgent : MonoBehaviour
             if (hazardousArea = memory.CheckHazards(currentDestination))
             {
                 lookTime = 0.5f;
+
+                //this will get cleaned up I swear
+                if (backtracking == false && currentPath > 0 && cautionScaling > 0.5)
+                {
+                    backtracking = true;
+                    currentPath = memory.GetLastPath();
+                    StartCoroutine(Backtrack());
+                }
             }
             else
             {
@@ -396,7 +413,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //Rerouting update.
-        if (routeTimer >= routeComputeTime)
+        if (routeTimer >= routeComputeTime && backtracking == false)
         {
             routeTimer = 0.0f;
             perceptionTimer = 0.0f;
@@ -494,6 +511,28 @@ public class PathOSAgent : MonoBehaviour
         lookingAround = false;
         agent.updateRotation = true;
         agent.isStopped = false;
+    }
+
+    //Takes the agent back to the last point they were at
+    IEnumerator Backtrack()
+    {
+        currentDestination = memory.paths[currentPath].originPoint;
+
+        //Then it goes down the path
+        while (backtracking)
+        {
+            //I was really worried that the agent would be stuck in an endless loop but it hasn't happened yet, 
+            //this would have to get modified to account for that though
+            agent.SetDestination(memory.paths[currentPath].originPoint);
+
+            if ((agent.transform.position - memory.paths[currentPath].originPoint).magnitude < 0.5)
+            {
+                backtracking = false;
+                routeTimer = routeComputeTime;
+                StopCoroutine(Backtrack());
+            }
+            yield return null;
+        }
     }
 
     public List<PerceivedEntity> GetPerceivedEntities()

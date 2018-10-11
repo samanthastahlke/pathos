@@ -93,6 +93,41 @@ public class PathOSAgentMemory : MonoBehaviour
         return false;
     }
 
+    //Adds a new path to memory
+    public void AddPath(ExploreMemory thePath)
+    {
+        if (!CheckIfPathExists(thePath))
+        {
+            paths.Add(new ExploreMemory(thePath.originPoint, thePath.direction, thePath.dEstimate));
+        }
+    }
+
+    //Checks to see if the path already exists in memory
+    bool CheckIfPathExists(ExploreMemory thePath)
+    {
+        for (int i = paths.Count - 1; i > 0; i--)
+        {
+            if (thePath == paths[i]) return true;
+        }
+        return false;
+    }
+
+    //gets the last traversed path
+    public int GetLastPath()
+    {
+        Vector3 originPoint = paths[paths.Count - 1].originPoint;
+
+        for (int i = paths.Count - 1; i > 0; i--)
+        {
+            if (paths[i].originPoint != originPoint)
+            {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+
     //Are there any goals left? 
     bool GoalsRemaining()
     {
