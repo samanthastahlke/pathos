@@ -281,7 +281,7 @@ public class PathOSAgent : MonoBehaviour
             dest = newDest;
         }
 
-        memory.AddPath(new ExploreMemory(agent.transform.position, dir, distance));
+        memory.AddPath(new ExploreMemory(agent.transform.position, dir, Vector3.Distance(agent.transform.position, dest)));
     }
 
     float ScoreDirection(Vector3 dir, float bias, float maxDistance)
@@ -394,10 +394,10 @@ public class PathOSAgent : MonoBehaviour
             //these values are just placeholders, and this code should be more sophisticated for the future
             if (hazardousArea = memory.CheckHazards(currentDestination))
             {
-                lookTime = 0.5f;
+                lookTime = 0.7f;
 
                 //this will get cleaned up I swear
-                if (backtracking == false && currentPath > 0 && cautionScaling > 0.5)
+                if (ValidBacktracking())
                 {
                     backtracking = true;
                     currentPath = memory.GetLastPath();
@@ -514,26 +514,35 @@ public class PathOSAgent : MonoBehaviour
     }
 
     //Takes the agent back to the last point they were at
+    //This will be cleaned up
     IEnumerator Backtrack()
     {
-        currentDestination = memory.paths[currentPath].originPoint;
+        Vector3 originPoint = memory.paths[currentPath].originPoint;
+        currentDestination = originPoint;
+        Vector3 newDestination = memory.CalculateBacktrackDestination(currentPath);
 
         //Then it goes down the path
-        while (backtracking)
+        while (!((agent.transform.position - currentDestination).magnitude < 2))
         {
-            //I was really worried that the agent would be stuck in an endless loop but it hasn't happened yet, 
-            //this would have to get modified to account for that though
-            agent.SetDestination(memory.paths[currentPath].originPoint);
-
-            if ((agent.transform.position - memory.paths[currentPath].originPoint).magnitude < 0.5)
-            {
-                backtracking = false;
-                routeTimer = routeComputeTime;
-                StopCoroutine(Backtrack());
-            }
+            agent.SetDestination(currentDestination);
             yield return null;
         }
+
+        currentDestination = newDestination;
+        agent.SetDestination(currentDestination);
+
+        while (!((agent.transform.position - currentDestination).magnitude < 2))
+        {
+            agent.SetDestination(currentDestination);
+            yield return null;
+        }
+
+        backtracking = false;
+        routeTimer = 0;
+        hazardousAreaTimer = 0;
+        StopCoroutine(Backtrack());
     }
+
 
     public List<PerceivedEntity> GetPerceivedEntities()
     {
@@ -543,5 +552,19 @@ public class PathOSAgent : MonoBehaviour
     public Vector3 GetTargetPosition()
     {
         return currentDestination;
-    }   
+    }
+
+    bool ValidBacktracking()
+    {
+        if (backtracking)
+            return false;
+        if (currentPath <= 0)
+            return false;
+        if (cautionScaling <= 0.5)
+            return false;
+        if (Vector3.Distance(currentDestination, agent.transform.position) <= 1)
+            return false;
+
+        return true;
+    }
 }

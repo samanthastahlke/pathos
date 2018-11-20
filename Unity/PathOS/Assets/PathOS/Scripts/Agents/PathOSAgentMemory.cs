@@ -33,6 +33,11 @@ public class PathOSAgentMemory : MonoBehaviour
     //Check to see if there are any goals left
     protected bool goalsLeft = true;
 
+    //for hazardous area
+    private Vector3[] nearbyEnemies = new Vector3[2];
+    private float hazardRadius = 0;
+    private int hazardLimit = 2;
+
     private void Awake()
     {
         entities = new List<EntityMemory>();
@@ -162,13 +167,13 @@ public class PathOSAgentMemory : MonoBehaviour
         for (int i = 0; i < entities.Count; i++)
         {
             //if the hazard is within range... (the range is just a placeholder for now as well, I'm worried that it's too short?)
-            if ((entities[i].pos - currentDestination).magnitude < 12f && (entities[i].entityType == EntityType.ET_HAZARD_ENEMY || entities[i].entityType == EntityType.ET_HAZARD_ENVIRONMENT))
+            if ((entities[i].pos - currentDestination).magnitude < 8f && (entities[i].entityType == EntityType.ET_HAZARD_ENEMY || entities[i].entityType == EntityType.ET_HAZARD_ENVIRONMENT))
             {
                 //we increment the counter to see how many hazards are close by
                 hazardCounter++;
 
                 //the 2 is just a placeholder to test that it works
-                if (hazardCounter >= 2)
+                if (hazardCounter >= hazardLimit)
                 {
                     //if it's hazardous it returns true
                     return true;
@@ -177,5 +182,41 @@ public class PathOSAgentMemory : MonoBehaviour
         }
 
         return false;
+    }
+
+    //based off of the area and the paths, it gets a new destination for the backtracking
+    public Vector3 CalculateBacktrackDestination(int startingIndex)
+    {
+        Vector3 midpoint = CalculateMidpoint(nearbyEnemies[0], nearbyEnemies[1]);
+        Vector3 newPath = ChooseNewPath(midpoint, startingIndex);
+        return newPath;
+    }
+
+    //Chooses path away from the area where the enemies are
+    public Vector3 ChooseNewPath(Vector3 centerPoint, int startingIndex)
+    {
+        for (int i = startingIndex; i > 0; i--)
+        {
+            //Uses centerpoint of where the enemies are to pick paths that fall outside of that radius
+            if (Vector3.Distance(CalculatePathDestination(i), centerPoint) > (hazardRadius))
+            {
+                return CalculatePathDestination(i);
+            }
+        }
+        return CalculatePathDestination(0);
+    }
+
+    //Calculates the midpoint
+    //This will be made more sophisticated
+    public Vector3 CalculateMidpoint(Vector3 point1, Vector3 point2)
+    {
+        hazardRadius = Vector3.Distance(point1, point2);
+        return 0.5f * (point1 + point2);
+    }
+
+    //Calculates the destination for that path
+    public Vector3 CalculatePathDestination(int pathIndex)
+    {
+        return paths[pathIndex].originPoint + (paths[pathIndex].direction * paths[pathIndex].dEstimate);
     }
 }
