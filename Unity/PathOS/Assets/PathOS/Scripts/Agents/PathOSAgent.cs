@@ -82,8 +82,8 @@ public class PathOSAgent : MonoBehaviour
     private float hazardousAreaTimer = 0;
     private bool hazardousArea = false;
 
-    //for paths + backtracking
-    private bool backtracking = false;
+    //for traversal
+    private bool detour = false; //can apply to a cautious agent backtracking or a reckless one heading towards danger
     private int currentPath = 0;
 
     void Awake()
@@ -389,31 +389,36 @@ public class PathOSAgent : MonoBehaviour
         if (hazardousAreaTimer > 5)
         {
             //we update the lookTime based off of how hazardous the area is
-            //if it's really hazardous then the looktime is cut in half
-            //with max curiousity this makes it so that the agent is looking around constantly
+            //if it's really hazardous then the agent is looking around constantly
             //these values are just placeholders, and this code should be more sophisticated for the future
+            //**this will get cleaned up I swear**
             if (hazardousArea = memory.CheckHazards(currentDestination))
             {
-                lookTime = 0.7f;
-
-                //this will get cleaned up I swear
-                if (ValidBacktracking())
+                //checks to see if it's more cautious than hazardous
+                //by comparing the caution scale to the aggression+adrenaline scale
+                if (cautionScaling >= ((aggressiveScaling + adrenalineScaling) * 0.5))
                 {
-                    backtracking = true;
-                    currentPath = memory.GetLastPath();
-                    StartCoroutine(Backtrack());
+                    ActivateDetour(Backtrack()); //if the conditions are met the backtrack detour will be activated
+                    lookTime = 0.8f;
+                }
+                else
+                {
+                    ActivateDetour(HeadTowardsHazards()); //otherwise it'll head towards danger
+                    lookTime = previousLookTime; //restores the lookTime if it's not hazardous
+
                 }
             }
             else
             {
-                lookTime = previousLookTime; //restores the lookTime if it's not hazardous
+                lookTime = previousLookTime; 
             }
 
             hazardousAreaTimer = 0;
+
         }
 
         //Rerouting update.
-        if (routeTimer >= routeComputeTime && backtracking == false)
+        if (routeTimer >= routeComputeTime && detour == false)
         {
             routeTimer = 0.0f;
             perceptionTimer = 0.0f;
@@ -519,7 +524,7 @@ public class PathOSAgent : MonoBehaviour
     {
         Vector3 originPoint = memory.paths[currentPath].originPoint;
         currentDestination = originPoint;
-        Vector3 newDestination = memory.CalculateBacktrackDestination(currentPath);
+        Vector3 newDestination = memory.CalculateNewPath(currentPath);
 
         //Then it goes down the path
         while (!((agent.transform.position - currentDestination).magnitude < 2))
@@ -537,13 +542,30 @@ public class PathOSAgent : MonoBehaviour
             yield return null;
         }
 
-        backtracking = false;
+        detour = false;
         routeTimer = 0;
         hazardousAreaTimer = 0;
         StopCoroutine(Backtrack());
     }
 
+    //If the agent is aggressive this will send them to the center of the hazardous area
+    IEnumerator HeadTowardsHazards()
+    {
+        currentDestination = memory.CalculateCentroid();
 
+        //Then it goes down the path
+        while (!((agent.transform.position - currentDestination).magnitude < 2))
+        {
+            agent.SetDestination(currentDestination);
+            yield return null;
+        }
+
+        detour = false;
+        routeTimer = 0;
+        hazardousAreaTimer = 0;
+        StopCoroutine(HeadTowardsHazards());
+    }
+    
     public List<PerceivedEntity> GetPerceivedEntities()
     {
         return eyes.visible;
@@ -554,17 +576,30 @@ public class PathOSAgent : MonoBehaviour
         return currentDestination;
     }
 
-    bool ValidBacktracking()
+    bool IsDetourValid()
     {
-        if (backtracking)
+        //checks to see if the conditions are met to do a detour
+        //will get cleaned up
+        if (detour)
             return false;
         if (currentPath <= 0)
             return false;
-        if (cautionScaling <= 0.5)
+        if (Vector3.Distance(currentDestination, agent.transform.position) <= 1.5f)
             return false;
-        if (Vector3.Distance(currentDestination, agent.transform.position) <= 1)
+        if ((aggressiveScaling + adrenalineScaling * 0.5) > cautionScaling && Vector3.Distance(agent.transform.position, memory.CalculateCentroid()) < 3)
             return false;
 
         return true;
+    }
+
+    void ActivateDetour(IEnumerator theFunction)
+    {
+        //activates the relevant coroutine
+        if (IsDetourValid())
+        {
+            detour = true;
+            currentPath = memory.GetLastPath();
+            StartCoroutine(theFunction);
+        }
     }
 }
