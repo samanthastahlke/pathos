@@ -203,6 +203,10 @@ public class PathOSAgent : MonoBehaviour
                 bias += curiosityScaling;
                 break;
 
+            case EntityType.ET_POI_NPC:
+                bias += curiosityScaling;
+                break;
+
             case EntityType.ET_HAZARD_ENEMY:
                 bias += aggressiveScaling + adrenalineScaling - cautionScaling;
                 if (aggressiveScaling > 0) bias += completionScaling;
@@ -215,6 +219,7 @@ public class PathOSAgent : MonoBehaviour
             case EntityType.ET_GOAL_COMPLETION:
                 if (memory.GetGoalsLeft() == false) //only adds to the bias if there are no other goals left
                     bias += efficiencyScaling;
+               
                 break;
 
             case EntityType.ET_RESOURCE_ACHIEVEMENT:
@@ -298,9 +303,10 @@ public class PathOSAgent : MonoBehaviour
         memory.memoryMap.RaycastMemoryMap(agent.transform.position, dir, maxDistance, out hit);
         score += (curiosityScaling + 0.1f) * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples;
 
+
         //Enumerate over all entities the agent knows about, and use them
         //to affect our assessment of the potential target.
-        for(int i = 0; i < memory.entities.Count; ++i)
+        for (int i = 0; i < memory.entities.Count; ++i)
         {
             if (memory.entities[i].visited)
                 continue;
@@ -327,7 +333,14 @@ public class PathOSAgent : MonoBehaviour
 
                 case EntityType.ET_POI:
                     dot = Mathf.Clamp(dot, 0.0f, 1.0f);
+                    score += curiosityScaling * dot * distFactor ;
+
+                    break;
+
+                case EntityType.ET_POI_NPC:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
                     score += curiosityScaling * dot * distFactor;
+
                     break;
 
                 case EntityType.ET_GOAL_MANDATORY:
