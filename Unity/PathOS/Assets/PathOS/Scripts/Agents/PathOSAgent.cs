@@ -47,6 +47,8 @@ public class PathOSAgent : MonoBehaviour
     [Range(0.0f, 1.0f)]
     public float experienceScaling;
 
+    public List<(PathOS.Heuristic, float)> heuristicWeights;
+
     //How often will the agent re-assess available goals?
     public float routeComputeTime = 1.0f;
     //How often will the agent's "visual system" process information?
@@ -333,7 +335,7 @@ public class PathOSAgent : MonoBehaviour
 
                 case EntityType.ET_POI:
                     dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += curiosityScaling * dot * distFactor ;
+                    score += curiosityScaling * dot * distFactor;
 
                     break;
 

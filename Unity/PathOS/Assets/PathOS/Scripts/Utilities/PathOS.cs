@@ -27,6 +27,46 @@ namespace PathOS
         ET_POI_NPC = 350
     };
 
+    /* AGENT HEURISTICS */
+    //Like the list of entities, this list is subject to change based on
+    //the typology review (ongoing).
+    public enum Heuristic
+    {
+        CURIOSITY = 0,
+        ACHIEVEMENT = 10,
+        COMPLETION = 15,
+        AGGRESSION = 20,
+        ADRENALINE = 25,
+        CAUTION = 30,
+        EFFICIENCY = 35
+    };
+
+    [System.Serializable]
+    public class EntityWeight
+    {
+        public EntityType entype;
+        public float weight;
+
+        public EntityWeight(EntityType m_entype, float m_weight = 0.0f)
+        {
+            entype = m_entype;
+            weight = m_weight;
+        }
+    }
+
+    [System.Serializable]
+    public class HeuristicWeightSet
+    {
+        public Heuristic heuristic;
+        public List<EntityWeight> weights;
+
+        public HeuristicWeightSet(Heuristic m_heuristic)
+        {
+            heuristic = m_heuristic;
+            weights = new List<EntityWeight>();
+        }
+    }
+
     //Representation of entity objects defined in the PathOS manager.
     [System.Serializable]
     public class LevelEntity

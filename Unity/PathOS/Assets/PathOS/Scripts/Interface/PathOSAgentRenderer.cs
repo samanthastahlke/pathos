@@ -133,11 +133,11 @@ public class PathOSAgentRenderer : MonoBehaviour
 
         Matrix4x4 tmp = Gizmos.matrix;
 
-        Gizmos.matrix = Matrix4x4.TRS(Vector3.zero,
-            agent.eyes.cam.transform.rotation,
-            agent.eyes.cam.transform.localScale);
+        Gizmos.matrix = Matrix4x4.TRS(agent.eyes.cam.transform.position,
+        agent.eyes.cam.transform.rotation,
+        agent.eyes.cam.transform.localScale);
 
-        Gizmos.DrawFrustum(agent.eyes.cam.transform.position, 
+        Gizmos.DrawFrustum(Vector3.zero, 
             agent.eyes.cam.fieldOfView, 
             agent.eyes.cam.farClipPlane, agent.eyes.cam.nearClipPlane, 
             agent.eyes.cam.aspect);

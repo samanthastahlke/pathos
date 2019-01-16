@@ -15,22 +15,116 @@ public class PathOSMainInspector : Editor
     private PathOSManager manager;
     private SerializedObject serial;
     private SerializedProperty entityList;
+    private SerializedProperty heuristicWeights;
+
+    private PathOS.Heuristic weightMatrixRowID;
+    private PathOS.EntityType weightMatrixColumnID;
+
+    private Dictionary<Heuristic, int> heuristicIndices;
+    private Dictionary<EntityType, int> entypeIndices;
+
+    private Dictionary<(Heuristic, EntityType), float> weightLookup;
+
+    private bool transposeWeightMatrix;
 
     private void OnEnable()
     {
         manager = (PathOSManager)target;
         serial = new SerializedObject(manager);
         entityList = serial.FindProperty("levelEntities");
+        heuristicWeights = serial.FindProperty("heuristicWeights");
+
+        heuristicIndices = new Dictionary<Heuristic, int>();
+        entypeIndices = new Dictionary<EntityType, int>();
+
+        int index = 0;
+
+        foreach(Heuristic heuristic in System.Enum.GetValues(typeof(Heuristic)))
+        {
+            heuristicIndices.Add(heuristic, index);
+            ++index;
+        }
+
+        index = 0;
+
+        foreach(EntityType entype in System.Enum.GetValues(typeof(EntityType)))
+        {
+            entypeIndices.Add(entype, index);
+            ++index;
+        }
+
+        weightLookup = new Dictionary<(Heuristic, EntityType), float>();
+
+        BuildWeightDictionary();
     }
 
     public override void OnInspectorGUI()
     {
         serial.Update();
 
-        //Level entity list.
-        if(EditorGUILayout.PropertyField(entityList))
+        //Heuristic weight matrix.
+        if(EditorGUILayout.PropertyField(heuristicWeights))
         {
-            for(int i = 0; i < manager.levelEntities.Count; ++i)
+            string transposeButtonText = "View by Entity Type";
+
+            if (transposeWeightMatrix)
+                transposeButtonText = "View by Heuristic";
+
+            if (GUILayout.Button(transposeButtonText))
+                transposeWeightMatrix = !transposeWeightMatrix;
+
+            if (transposeWeightMatrix)
+                weightMatrixColumnID = (PathOS.EntityType)EditorGUILayout.EnumPopup("Selected Entity Type:", weightMatrixColumnID);
+            else
+                weightMatrixRowID = (PathOS.Heuristic)EditorGUILayout.EnumPopup("Selected Heuristic:", weightMatrixRowID);
+
+            Heuristic curHeuristic;
+            EntityType curEntityType;
+
+            System.Type indexType = (transposeWeightMatrix) ? typeof(Heuristic) : typeof(EntityType);
+
+            foreach(var index in System.Enum.GetValues(indexType))
+            {
+                curHeuristic = (transposeWeightMatrix) ? (Heuristic)(index) : weightMatrixRowID;
+                curEntityType = (transposeWeightMatrix) ? weightMatrixColumnID : (EntityType)(index);
+
+                string label = (transposeWeightMatrix) ? curHeuristic.ToString() : curEntityType.ToString();
+
+                if (!weightLookup.ContainsKey((curHeuristic, curEntityType)))
+                    continue;
+
+                weightLookup[(curHeuristic, curEntityType)] = 
+                    EditorGUILayout.FloatField(label, weightLookup[(curHeuristic, curEntityType)]);
+
+                manager.heuristicWeights[heuristicIndices[curHeuristic]].
+                    weights[entypeIndices[curEntityType]].weight =
+                    weightLookup[(curHeuristic, curEntityType)];
+            }
+
+            if (GUILayout.Button("Refresh Matrix"))
+            {
+                manager.ResizeWeightMatrix();
+                BuildWeightDictionary();
+            }
+
+            if(GUILayout.Button("Export Weights..."))
+            {
+                string exportPath = EditorUtility.SaveFilePanel("Export Weights...", Application.dataPath, "heuristic-weights", "csv");
+                manager.ExportWeights(exportPath);
+            }
+
+            if(GUILayout.Button("Import Weights..."))
+            {
+                string importPath = EditorUtility.OpenFilePanel("Import Weights...", Application.dataPath, "csv");
+                manager.ImportWeights(importPath);
+                BuildWeightDictionary();
+            }
+        }
+
+        //Level entity list.
+        if (EditorGUILayout.PropertyField(entityList))
+        {
+            for (int i = 0; i < manager.levelEntities.Count; ++i)
             {
                 GUILayout.BeginHorizontal();
 
@@ -56,7 +150,7 @@ public class PathOSMainInspector : Editor
                 manager.AddEntity(manager.levelEntities.Count);
 
             //Clear the entities list. Safeguard to prevent accidental deletion.
-            if(GUILayout.Button("Clear Entities"))
+            if (GUILayout.Button("Clear Entities"))
             {
                 if (EditorUtility.DisplayDialog("This will delete all PathOS level entities!",
                     "Are you sure you want to do this?",
@@ -66,5 +160,20 @@ public class PathOSMainInspector : Editor
         }
 
         serial.ApplyModifiedProperties();
+    }
+
+    private void BuildWeightDictionary()
+    {
+        weightLookup.Clear();
+
+        for(int i = 0; i < manager.heuristicWeights.Count; ++i)
+        {
+            for(int j = 0; j < manager.heuristicWeights[i].weights.Count; ++j)
+            {
+                weightLookup.Add((manager.heuristicWeights[i].heuristic,
+                    manager.heuristicWeights[i].weights[j].entype),
+                    manager.heuristicWeights[i].weights[j].weight);
+            }
+        }
     }
 }
