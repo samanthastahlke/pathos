@@ -47,7 +47,8 @@ public class PathOSAgent : MonoBehaviour
     [Range(0.0f, 1.0f)]
     public float experienceScaling;
 
-    public List<(PathOS.Heuristic, float)> heuristicWeights;
+    public List<HeuristicScale> heuristicScales;
+    private Dictionary<(Heuristic, EntityType), float> heuristicScoringLookup;
 
     //How often will the agent re-assess available goals?
     public float routeComputeTime = 1.0f;
@@ -92,6 +93,20 @@ public class PathOSAgent : MonoBehaviour
 	{
         agent = GetComponent<NavMeshAgent>();
         currentDestination = agent.transform.position;
+
+        heuristicScoringLookup = new Dictionary<(Heuristic, EntityType), float>();
+
+        PathOSManager manager = PathOSManager.instance;
+
+        for(int i = 0; i < manager.heuristicWeights.Count; ++i)
+        {
+            HeuristicWeightSet curSet = manager.heuristicWeights[i];
+
+            for(int j = 0; j < curSet.weights.Count; ++j)
+            {
+                heuristicScoringLookup.Add((curSet.heuristic, curSet.weights[j].entype), curSet.weights[j].weight);
+            }
+        }
 	}
 
     private void Start()
@@ -109,6 +124,28 @@ public class PathOSAgent : MonoBehaviour
 
         //in case there's only the final goal
         memory.CheckGoals();
+    }
+
+    public void RefreshHeuristicList()
+    {
+        Dictionary<Heuristic, float> weights = new Dictionary<Heuristic, float>();
+
+        for(int i = 0; i < heuristicScales.Count; ++i)
+        {
+            weights.Add(heuristicScales[i].heuristic, heuristicScales[i].scale);
+        }
+
+        heuristicScales.Clear();
+
+        foreach(Heuristic heuristic in System.Enum.GetValues(typeof(Heuristic)))
+        {
+            float weight = 0.0f;
+
+            if (weights.ContainsKey(heuristic))
+                weight = weights[heuristic];
+
+            heuristicScales.Add(new HeuristicScale(heuristic, weight));
+        }
     }
 
     //Update the agent's target position.
@@ -194,6 +231,25 @@ public class PathOSAgent : MonoBehaviour
         if ((entity.pos - currentDestination).magnitude < 0.1f
             && (agent.transform.position - currentDestination).magnitude > 0.1f)
             bias += 1.0f;
+
+        //TODO: Get rid of the switch statement.
+        //New scaling should look like this once the weight matrix has been updated for the manager
+        //in the inspector:
+        
+        /*
+        foreach(HeuristicScale heuristicScale in heuristicScales)
+        {
+            (Heuristic, EntityType) key = (heuristicScale.heuristic, entity.entityType);
+
+            if(!heuristicScoringLookup.ContainsKey(key))
+            {
+                NPDebug.LogError("Couldn't find key " + key.ToString() + " in heuristic scoring lookup!", typeof(PathOSAgent));
+                continue;
+            }
+
+            bias += heuristicScale.scale * heuristicScoringLookup[key];
+        }
+        */
 
         switch (entity.entityType)
         {
@@ -305,7 +361,6 @@ public class PathOSAgent : MonoBehaviour
         memory.memoryMap.RaycastMemoryMap(agent.transform.position, dir, maxDistance, out hit);
         score += (curiosityScaling + 0.1f) * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples;
 
-
         //Enumerate over all entities the agent knows about, and use them
         //to affect our assessment of the potential target.
         for (int i = 0; i < memory.entities.Count; ++i)
@@ -321,10 +376,31 @@ public class PathOSAgent : MonoBehaviour
             Vector3 dir2entity = entityVec.normalized;
 
             float dot = Vector3.Dot(dir, dir2entity);
-            
-            switch(memory.entities[i].entityType)
+            dot = Mathf.Clamp(dot, 0.0f, 1.0f);
+
+            //TODO: Get rid of the switch statement.
+            //New scaling should look like this once the weight matrix has been updated for the manager
+            //in the inspector:
+
+            /*
+            foreach(HeuristicScale heuristicScale in heuristicScales)
+            {
+                (Heuristic, EntityType) key = (heuristicScale.heuristic, memory.entities[i].entityType);
+
+                if(!heuristicScoringLookup.ContainsKey(key))
+                {
+                    NPDebug.LogError("Couldn't find key " + key.ToString() + " in heuristic scoring lookup!", typeof(PathOSAgent));
+                    continue;
+                }
+
+                bias += heuristicScale.scale * heuristicScoringLookup[key] * dot * distFactor;
+            }
+            */
+
+            switch (memory.entities[i].entityType)
             {
                 case EntityType.ET_HAZARD_ENEMY:
+                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
                     score += aggressiveScaling * dot * distFactor + adrenalineScaling * dot * distFactor - cautionScaling * dot * distFactor;
                     break;
 

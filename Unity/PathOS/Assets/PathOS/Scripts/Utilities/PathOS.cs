@@ -67,6 +67,19 @@ namespace PathOS
         }
     }
 
+    [System.Serializable]
+    public class HeuristicScale
+    {
+        public Heuristic heuristic;
+        public float scale;
+
+        public HeuristicScale(Heuristic m_heuristic, float m_scale)
+        {
+            heuristic = m_heuristic;
+            scale = m_scale;
+        }
+    }
+
     //Representation of entity objects defined in the PathOS manager.
     [System.Serializable]
     public class LevelEntity
