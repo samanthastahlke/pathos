@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 using PathOS;
 
 /*
@@ -98,7 +100,7 @@ public class PathOSMainInspector : Editor
 
                 manager.heuristicWeights[heuristicIndices[curHeuristic]].
                     weights[entypeIndices[curEntityType]].weight =
-                    weightLookup[(curHeuristic, curEntityType)];
+                    weightLookup[(curHeuristic, curEntityType)];              
             }
 
             if (GUILayout.Button("Refresh Matrix"))
@@ -160,6 +162,12 @@ public class PathOSMainInspector : Editor
         }
 
         serial.ApplyModifiedProperties();
+        
+        if(GUI.changed)
+        {
+            EditorUtility.SetDirty(manager);
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+        }
     }
 
     private void BuildWeightDictionary()

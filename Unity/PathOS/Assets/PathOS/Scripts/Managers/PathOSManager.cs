@@ -14,8 +14,8 @@ public class PathOSManager : NPSingleton<PathOSManager>
 {
     public List<LevelEntity> levelEntities;
 
-    public List<PathOS.HeuristicWeightSet> heuristicWeights;
-
+    public List<HeuristicWeightSet> heuristicWeights;
+    
 	void Awake()
 	{
         //Grab renderers for object visibility checks by the agent.

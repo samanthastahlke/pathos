@@ -60,6 +60,12 @@ namespace PathOS
         public Heuristic heuristic;
         public List<EntityWeight> weights;
 
+        public HeuristicWeightSet()
+        {
+            heuristic = Heuristic.ACHIEVEMENT;
+            weights = new List<EntityWeight>();
+        }
+
         public HeuristicWeightSet(Heuristic m_heuristic)
         {
             heuristic = m_heuristic;
@@ -68,10 +74,23 @@ namespace PathOS
     }
 
     [System.Serializable]
+    public class TestSerializationClass
+    {
+        public int x;
+        public int y;
+    }
+
+    [System.Serializable]
     public class HeuristicScale
     {
         public Heuristic heuristic;
         public float scale;
+
+        public HeuristicScale()
+        {
+            heuristic = Heuristic.ACHIEVEMENT;
+            scale = 0.0f;
+        }
 
         public HeuristicScale(Heuristic m_heuristic, float m_scale)
         {

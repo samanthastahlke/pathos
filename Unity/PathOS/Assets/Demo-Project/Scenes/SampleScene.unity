@@ -1363,6 +1363,21 @@ MonoBehaviour:
   completionScaling: 1
   efficiencyScaling: 0.5
   experienceScaling: 0.5
+  heuristicScales:
+  - heuristic: 0
+    scale: 0.5
+  - heuristic: 10
+    scale: 0
+  - heuristic: 15
+    scale: 0
+  - heuristic: 20
+    scale: 0
+  - heuristic: 25
+    scale: 0
+  - heuristic: 30
+    scale: 0
+  - heuristic: 35
+    scale: 0
   routeComputeTime: 0.5
   perceptionComputeTime: 0.25
   exploreDegrees: 5
@@ -3401,6 +3416,161 @@ MonoBehaviour:
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
+  heuristicWeights:
+  - heuristic: 0
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 10
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 1
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 15
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 20
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 1
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 25
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 30
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: -1
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 35
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
 --- !u!4 &1664526733
 Transform:
   m_ObjectHideFlags: 0
