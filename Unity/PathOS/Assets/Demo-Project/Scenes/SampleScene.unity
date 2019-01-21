@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.36347458, g: 0.51073194, b: 0.6948253, a: 1}
+  m_IndirectSpecularColor: {r: 0.3634738, g: 0.51073116, b: 0.6948261, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3436,9 +3436,9 @@ MonoBehaviour:
     - entype: 250
       weight: 0
     - entype: 300
-      weight: 0
+      weight: 1
     - entype: 350
-      weight: 0
+      weight: 1
   - heuristic: 10
     weights:
     - entype: 0
@@ -3466,15 +3466,15 @@ MonoBehaviour:
     - entype: 0
       weight: 0
     - entype: 100
-      weight: 0
+      weight: 1
     - entype: 110
-      weight: 0
+      weight: 1
     - entype: 120
       weight: 0
     - entype: 150
-      weight: 0
+      weight: 1
     - entype: 160
-      weight: 0
+      weight: 1
     - entype: 200
       weight: 0
     - entype: 250
@@ -3500,7 +3500,7 @@ MonoBehaviour:
     - entype: 200
       weight: 1
     - entype: 250
-      weight: 0
+      weight: 1
     - entype: 300
       weight: 0
     - entype: 350
@@ -3520,9 +3520,9 @@ MonoBehaviour:
     - entype: 160
       weight: 0
     - entype: 200
-      weight: 0
+      weight: 1
     - entype: 250
-      weight: 0
+      weight: 1
     - entype: 300
       weight: 0
     - entype: 350
@@ -3540,11 +3540,11 @@ MonoBehaviour:
     - entype: 150
       weight: 0
     - entype: 160
-      weight: 0
+      weight: 1
     - entype: 200
       weight: -1
     - entype: 250
-      weight: 0
+      weight: -1
     - entype: 300
       weight: 0
     - entype: 350
@@ -3556,9 +3556,9 @@ MonoBehaviour:
     - entype: 100
       weight: 0
     - entype: 110
-      weight: 0
+      weight: 1
     - entype: 120
-      weight: 0
+      weight: 1
     - entype: 150
       weight: 0
     - entype: 160
