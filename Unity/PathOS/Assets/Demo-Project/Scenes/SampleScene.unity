@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3634738, g: 0.51073116, b: 0.6948261, a: 1}
+  m_IndirectSpecularColor: {r: 0.36347458, g: 0.51073194, b: 0.6948253, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1365,17 +1365,17 @@ MonoBehaviour:
   experienceScaling: 0.5
   heuristicScales:
   - heuristic: 0
-    scale: 0.5
+    scale: 0.31
   - heuristic: 10
-    scale: 0
+    scale: 1
   - heuristic: 15
     scale: 0
   - heuristic: 20
-    scale: 0
+    scale: 0.331
   - heuristic: 25
     scale: 0
   - heuristic: 30
-    scale: 0
+    scale: 0.312
   - heuristic: 35
     scale: 0
   routeComputeTime: 0.5
@@ -3387,7 +3387,7 @@ MonoBehaviour:
     omniscientDirection: 0
     omniscientPosition: 0
   - entityRef: {fileID: 234555605}
-    entityType: 300
+    entityType: 100
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
@@ -3446,11 +3446,11 @@ MonoBehaviour:
     - entype: 100
       weight: 1
     - entype: 110
-      weight: 0
+      weight: 1
     - entype: 120
-      weight: 0
+      weight: 1
     - entype: 150
-      weight: 0
+      weight: 1
     - entype: 160
       weight: 0
     - entype: 200

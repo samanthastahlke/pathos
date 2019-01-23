@@ -232,11 +232,7 @@ public class PathOSAgent : MonoBehaviour
             && (agent.transform.position - currentDestination).magnitude > 0.1f)
             bias += 1.0f;
 
-        //TODO: Get rid of the switch statement.
-        //New scaling should look like this once the weight matrix has been updated for the manager
-        //in the inspector:
-        
-        /*
+        //Weighted scoring function.
         foreach(HeuristicScale heuristicScale in heuristicScales)
         {
             (Heuristic, EntityType) key = (heuristicScale.heuristic, entity.entityType);
@@ -248,49 +244,6 @@ public class PathOSAgent : MonoBehaviour
             }
 
             bias += heuristicScale.scale * heuristicScoringLookup[key];
-        }
-        */
-
-        switch (entity.entityType)
-        {
-            case EntityType.ET_GOAL_OPTIONAL:
-                bias += achievementScaling + completionScaling;
-                break;
-
-            case EntityType.ET_POI:
-                bias += curiosityScaling;
-                break;
-
-            case EntityType.ET_POI_NPC:
-                bias += curiosityScaling;
-                break;
-
-            case EntityType.ET_HAZARD_ENEMY:
-                bias += aggressiveScaling + adrenalineScaling - cautionScaling;
-                if (aggressiveScaling > 0) bias += completionScaling;
-                break;
-
-            case EntityType.ET_GOAL_MANDATORY:
-                bias += completionScaling + efficiencyScaling;
-                break;
-
-            case EntityType.ET_GOAL_COMPLETION:
-                if (memory.GetGoalsLeft() == false) //only adds to the bias if there are no other goals left
-                    bias += efficiencyScaling;
-               
-                break;
-
-            case EntityType.ET_RESOURCE_ACHIEVEMENT:
-                bias += completionScaling;
-                break;
-
-            case EntityType.ET_RESOURCE_PRESERVATION:
-                bias += cautionScaling + completionScaling;
-                break;
-
-            case EntityType.ET_HAZARD_ENVIRONMENT:
-                bias += aggressiveScaling + adrenalineScaling - cautionScaling;
-                break;
         }
 
         Vector3 toEntity = entity.pos - agent.transform.position;
@@ -378,11 +331,7 @@ public class PathOSAgent : MonoBehaviour
             float dot = Vector3.Dot(dir, dir2entity);
             dot = Mathf.Clamp(dot, 0.0f, 1.0f);
 
-            //TODO: Get rid of the switch statement.
-            //New scaling should look like this once the weight matrix has been updated for the manager
-            //in the inspector:
-
-            /*
+            //Weighted scoring function.
             foreach(HeuristicScale heuristicScale in heuristicScales)
             {
                 (Heuristic, EntityType) key = (heuristicScale.heuristic, memory.entities[i].entityType);
@@ -394,57 +343,6 @@ public class PathOSAgent : MonoBehaviour
                 }
 
                 bias += heuristicScale.scale * heuristicScoringLookup[key] * dot * distFactor;
-            }
-            */
-
-            switch (memory.entities[i].entityType)
-            {
-                case EntityType.ET_HAZARD_ENEMY:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += aggressiveScaling * dot * distFactor + adrenalineScaling * dot * distFactor - cautionScaling * dot * distFactor;
-                    break;
-
-                case EntityType.ET_GOAL_OPTIONAL:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += achievementScaling * dot * distFactor + completionScaling * dot * distFactor;
-                    break;
-
-                case EntityType.ET_POI:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += curiosityScaling * dot * distFactor;
-
-                    break;
-
-                case EntityType.ET_POI_NPC:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += curiosityScaling * dot * distFactor;
-
-                    break;
-
-                case EntityType.ET_GOAL_MANDATORY:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += completionScaling * dot * distFactor + efficiencyScaling * dot * distFactor;
-                    break;
-
-                case EntityType.ET_GOAL_COMPLETION:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += efficiencyScaling * dot * distFactor;
-                    break;
-
-                case EntityType.ET_RESOURCE_ACHIEVEMENT:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += completionScaling * dot * distFactor;
-                    break;
-
-                case EntityType.ET_RESOURCE_PRESERVATION:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += cautionScaling * dot * distFactor + completionScaling * dot * distFactor;
-                    break;
-
-                case EntityType.ET_HAZARD_ENVIRONMENT:
-                    dot = Mathf.Clamp(dot, 0.0f, 1.0f);
-                    score += aggressiveScaling * dot * distFactor + adrenalineScaling * dot * distFactor - cautionScaling * dot * distFactor;
-                    break;
             }
         }
 
