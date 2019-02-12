@@ -385,17 +385,18 @@ public class PathOSAgent : MonoBehaviour
             {
                 //checks to see if it's more cautious than hazardous
                 //by comparing the caution scale to the aggression+adrenaline scale
-                if (cautionScaling >= ((aggressiveScaling + adrenalineScaling) * 0.5))
-                {
-                    ActivateDetour(Backtrack()); //if the conditions are met the backtrack detour will be activated
-                    lookTime = 0.8f;
-                }
-                else
-                {
-                    ActivateDetour(HeadTowardsHazards()); //otherwise it'll head towards danger
-                    lookTime = previousLookTime; //restores the lookTime if it's not hazardous
-
-                }
+                //uncommented due to potential bug
+               //if (cautionScaling >= ((aggressiveScaling + adrenalineScaling) * 0.5))
+               //{
+               //    ActivateDetour(Backtrack()); //if the conditions are met the backtrack detour will be activated
+               //    lookTime = 0.8f;
+               //}
+               //else
+               //{
+               //    ActivateDetour(HeadTowardsHazards()); //otherwise it'll head towards danger
+               //    lookTime = previousLookTime; //restores the lookTime if it's not hazardous
+               //
+               //}
             }
             else
             {
