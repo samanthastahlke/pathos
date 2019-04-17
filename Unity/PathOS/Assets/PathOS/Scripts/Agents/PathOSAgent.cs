@@ -385,18 +385,17 @@ public class PathOSAgent : MonoBehaviour
             {
                 //checks to see if it's more cautious than hazardous
                 //by comparing the caution scale to the aggression+adrenaline scale
-                //uncommented due to potential bug
-               //if (cautionScaling >= ((aggressiveScaling + adrenalineScaling) * 0.5))
-               //{
-               //    ActivateDetour(Backtrack()); //if the conditions are met the backtrack detour will be activated
-               //    lookTime = 0.8f;
-               //}
-               //else
-               //{
-               //    ActivateDetour(HeadTowardsHazards()); //otherwise it'll head towards danger
-               //    lookTime = previousLookTime; //restores the lookTime if it's not hazardous
-               //
-               //}
+               if (cautionScaling >= ((aggressiveScaling+adrenalineScaling)*0.5f) && cautionScaling>0)
+               {
+                   ActivateDetour(Backtrack()); //if the conditions are met the backtrack detour will be activated
+                   lookTime = 0.8f;
+               }
+               else if (aggressiveScaling + adrenalineScaling > 0)
+               {
+                   ActivateDetour(HeadTowardsHazards()); //otherwise it'll head towards danger
+                   lookTime = previousLookTime; //restores the lookTime if it's not hazardous
+               
+               }
             }
             else
             {
@@ -514,7 +513,6 @@ public class PathOSAgent : MonoBehaviour
     {
         Vector3 originPoint = memory.paths[currentPath].originPoint;
         currentDestination = originPoint;
-        Vector3 newDestination = memory.CalculateNewPath(currentPath);
 
         //Then it goes down the path
         while (!((agent.transform.position - currentDestination).magnitude < 2))
@@ -523,15 +521,18 @@ public class PathOSAgent : MonoBehaviour
             yield return null;
         }
 
+        //the new destination after backtracking gets calculated
+        Vector3 newDestination = memory.CalculateNewPath(currentPath);
         currentDestination = newDestination;
         agent.SetDestination(currentDestination);
 
-        while (!((agent.transform.position - currentDestination).magnitude < 2))
+        while (!((agent.transform.position - currentDestination).magnitude < 2)) 
         {
-            agent.SetDestination(currentDestination);
+            agent.SetDestination(currentDestination); //sets the new destination
             yield return null;
         }
 
+        //ends the detour
         detour = false;
         routeTimer = 0;
         hazardousAreaTimer = 0;

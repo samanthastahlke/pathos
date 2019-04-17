@@ -171,7 +171,6 @@ public class PathOSAgentMemory : MonoBehaviour
             //if the hazard is within range... (the range is just a placeholder for now as well, I'm worried that it's too short?)
             if ((entities[i].pos - currentDestination).magnitude < hazardRange && (entities[i].entityType == EntityType.ET_HAZARD_ENEMY || entities[i].entityType == EntityType.ET_HAZARD_ENVIRONMENT))
             {
-                //nearbyEnemies[hazardCounter] = entities[i].pos;
                 nearbyEnemies.Add(entities[i].pos);
                 //we increment the counter to see how many hazards are close by
                 hazardCounter++;
@@ -184,13 +183,14 @@ public class PathOSAgentMemory : MonoBehaviour
                 }
             }
         }
-
+        
+        //else return false
         return false;
     }
 
     //Takes the centroid, calculates a new path based off of it
     //So far this hasn't been giving me issues, but I'll keep iterating on it
-    public Vector3 CalculateNewPath(int startingIndex)
+    public Vector3 CalculateNewPath(int startingIndex) 
     {
         Vector3 centroid = CalculateCentroid();
         CalculateHazardRadius(centroid);
@@ -209,13 +209,16 @@ public class PathOSAgentMemory : MonoBehaviour
                 return CalculatePathDestination(i);
             }
         }
+
         return CalculatePathDestination(0);
     }
 
     //Calculates the destination for that path
     public Vector3 CalculatePathDestination(int pathIndex)
     {
-        return paths[pathIndex].originPoint + (paths[pathIndex].direction * paths[pathIndex].dEstimate);
+        //returns a point on the navmesh that the agent can reach with the chosen path
+       return PathOSNavUtility.GetClosestPointWalkable(
+                agent.transform.position + paths[pathIndex].dEstimate * paths[pathIndex].direction, worldBorderMargin);
     }
 
     //based off of what we set the limit to hazards in the area to be,

@@ -4276,6 +4276,7 @@ MonoBehaviour:
   worldBorderMargin: 25
   gridSampleSize: 2
   gridSampleElevation: 8
+  hazardRange: 6
 --- !u!114 &626367634
 MonoBehaviour:
   m_ObjectHideFlags: 0
