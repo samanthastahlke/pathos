@@ -11,8 +11,6 @@ namespace PathOS
 {
     /* GAME ENTITIES */
     //This list is in flux based on the tagging system/typology review.
-    //Right now the proof-of-concept just uses GOAL_OPTIONAL, HAZARD_ENEMY,
-    //and POI.
     public enum EntityType
     {
         ET_NONE = 0,
@@ -180,6 +178,7 @@ namespace PathOS
     }
 
     //How the memory of an object is represented in the agent's world model.
+    //Entity memory = POI which represents an in-game object.
     public class EntityMemory : PerceivedEntity
     {
         public bool visited = false;
@@ -192,6 +191,8 @@ namespace PathOS
             base(data.entityRef, data.entityType, data.pos) { }
     }
 
+    //How the memory of a path/explore point is represented in the agent's world model.
+    //Explore memory = POI which doesn't represent an actual game object - "made up" by the player.
     public class ExploreMemory
     {
         public static float posThreshold = 2.0f;
@@ -233,7 +234,7 @@ namespace PathOS
                 return !object.ReferenceEquals(rhs, null);
 
             if (object.ReferenceEquals(rhs, null))
-                return object.ReferenceEquals(lhs, null);
+                return !object.ReferenceEquals(lhs, null);
 
             return !lhs.EqualsSimilar(rhs);
         }

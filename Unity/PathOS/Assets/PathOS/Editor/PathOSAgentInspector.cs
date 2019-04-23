@@ -17,6 +17,7 @@ public class PathOSAgentInspector : Editor
     private PathOSAgent agent;
     private SerializedObject serial;
 
+    private SerializedProperty experienceScale;
     private SerializedProperty heuristicList;
 
     private SerializedProperty memoryRef;
@@ -35,11 +36,14 @@ public class PathOSAgentInspector : Editor
     private SerializedProperty exploreSimilarityThreshold;
     private SerializedProperty forgetTime;
 
+    private Dictionary<Heuristic, string> heuristicLabels;
+
     private void OnEnable()
     {
         agent = (PathOSAgent)target;
         serial = new SerializedObject(agent);
 
+        experienceScale = serial.FindProperty("experienceScale");
         heuristicList = serial.FindProperty("heuristicScales");
 
         memoryRef = serial.FindProperty("memory");
@@ -59,11 +63,23 @@ public class PathOSAgentInspector : Editor
         forgetTime = serial.FindProperty("forgetTime");
 
         agent.RefreshHeuristicList();
+
+        heuristicLabels = new Dictionary<Heuristic, string>();
+
+        foreach(HeuristicScale curScale in agent.heuristicScales)
+        {
+            string label = curScale.heuristic.ToString();
+
+            label = label.Substring(0, 1).ToUpper() + label.Substring(1).ToLower();
+            heuristicLabels.Add(curScale.heuristic, label);
+        }
     }
 
     public override void OnInspectorGUI()
     {
         serial.Update();
+
+        EditorGUILayout.LabelField("General", EditorStyles.boldLabel);
 
         EditorGUILayout.PropertyField(memoryRef);
         EditorGUILayout.PropertyField(eyeRef);
@@ -71,12 +87,18 @@ public class PathOSAgentInspector : Editor
         EditorGUILayout.PropertyField(freezeAgent);
         EditorGUILayout.PropertyField(verboseDebugging);
 
+        EditorGUILayout.LabelField("Player Characteristics", EditorStyles.boldLabel);
+
+        EditorGUILayout.PropertyField(experienceScale);
+
         for(int i = 0; i < agent.heuristicScales.Count; ++i)
         {
             agent.heuristicScales[i].scale = EditorGUILayout.Slider(
-                 agent.heuristicScales[i].heuristic.ToString(),
+                 heuristicLabels[agent.heuristicScales[i].heuristic],
                  agent.heuristicScales[i].scale, 0.0f, 1.0f);
         }
+
+        EditorGUILayout.LabelField("Navigation", EditorStyles.boldLabel);
 
         EditorGUILayout.PropertyField(routeComputeTime);
         EditorGUILayout.PropertyField(perceptionComputeTime);

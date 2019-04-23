@@ -15,8 +15,7 @@ public class PathOSAgentMemory : MonoBehaviour
     //Remembered entities.
     public List<EntityMemory> entities { get; set; }
 
-    //This array is merely a placeholder for now, it is not properly used.
-    //(TODO)
+    //Remembered paths/directions.
     public List<ExploreMemory> paths { get; set; }
 
     //The agent's memory model of the complete navmesh.
