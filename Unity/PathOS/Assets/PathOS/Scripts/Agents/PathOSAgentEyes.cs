@@ -22,6 +22,7 @@ public class PathOSAgentEyes : MonoBehaviour
 
     //What can the agent "see" currently?
     public List<PerceivedEntity> visible { get; set; }
+    public List<PerceivedEntity> perceptionInfo { get; set; }
 
     //Timer to handle visual processing checks. Roll for perception.
     private float perceptionTimer = 0.0f;
@@ -31,13 +32,27 @@ public class PathOSAgentEyes : MonoBehaviour
 
     //Field of view for immediate-range "explorability" checks.
     private float xFOV;
-    
+    private float timerTest = 0.0f;
+
 	void Awake()
 	{
         visible = new List<PerceivedEntity>();
+        perceptionInfo = new List<PerceivedEntity>();
 
         if (null == manager)
             manager = PathOSManager.instance;
+
+        for (int i = 0; i < manager.levelEntities.Count; ++i)
+        {
+            LevelEntity entity = manager.levelEntities[i];
+            Vector3 entityPos = entity.objectRef.transform.position;
+
+            Vector3 entityVecXZ = entityPos - cam.transform.position;
+            entityVecXZ.y = 0.0f;
+
+            if (entity.rend != null)
+                perceptionInfo.Add(new PerceivedEntity(entity, entity.entityType, entityPos));
+        }
 
         boundsCheck = new Vector3[8];
 
@@ -59,29 +74,38 @@ public class PathOSAgentEyes : MonoBehaviour
         Vector3 camForwardXZ = cam.transform.forward;
         camForwardXZ.y = 0.0f;
 
-        for (int i = 0; i < manager.levelEntities.Count; ++i)
+        for (int i = 0; i < perceptionInfo.Count; ++i)
         {
-            LevelEntity entity = manager.levelEntities[i];
-            Vector3 entityPos = entity.entityRef.transform.position;
+            PerceivedEntity entity = perceptionInfo[i];
+
+            Vector3 entityPos = entity.entityRef.objectRef.transform.position;
 
             Vector3 entityVecXZ = entityPos - cam.transform.position;
             entityVecXZ.y = 0.0f;
-          
-            //Visisbility check.
-            //If object's renderer is in bounds of camera...
-            //And we can draw a ray to the camera from that object without
-            //hitting anything.
-            if (entity.rend != null
-                && Vector3.Dot(camForwardXZ, entityVecXZ) > 0
-                && GeometryUtility.TestPlanesAABB(frustum, entity.rend.bounds)
-                && RaycastVisibilityCheck(entity.rend.bounds, entityPos))
-                visible.Add(new PerceivedEntity(entity.entityRef, entity.entityType, entityPos));
+
+            //Visibility check - this can change between checks as the agent
+            //moves around.
+            entity.visible = Vector3.Dot(camForwardXZ, entityVecXZ) > 0
+                && GeometryUtility.TestPlanesAABB(frustum, entity.entityRef.rend.bounds)
+                && RaycastVisibilityCheck(entity.entityRef.rend.bounds, entityPos);
+
+            //Keep track of how long the object has been in view.
+            entity.visibleTimer = (entity.visible) ?
+                entity.visibleTimer + perceptionTimer : 0.0f;
+
+            if (entity.visible)
+            {
+                visible.Add(entity);
+
+                if (entity.visibleTimer >= PathOS.Constants.Memory.IMPRESSION_TIME_MIN)
+                {
+                    entity.perceivedPos = entityPos;
+                    agent.memory.Memorize(entity);
+                }
+            }          
         }
 
-        for (int i = 0; i < visible.Count; ++i)
-        {
-            agent.memory.Memorize(visible[i]);
-        }
+        perceptionTimer = 0.0f;
     }
 
     //Uses an AABB and given position as nine points for checking
@@ -136,7 +160,6 @@ public class PathOSAgentEyes : MonoBehaviour
         //Visual processing update.
         if (perceptionTimer >= agent.perceptionComputeTime)
         {
-            perceptionTimer = 0.0f;
             ProcessPerception();
         }
     }

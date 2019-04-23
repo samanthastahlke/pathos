@@ -12,7 +12,9 @@ PathOSAgent (c) Samantha Stahlke and Atiya Nova 2018
 [RequireComponent(typeof(NavMeshAgent))]
 public class PathOSAgent : MonoBehaviour 
 {
-    private NavMeshAgent agent;
+    /* OBJECT REFERENCES AND DEBUGGING */
+
+    private NavMeshAgent navAgent;
 
     //The agent's memory/internal world model.
     public PathOSAgentMemory memory;
@@ -23,13 +25,16 @@ public class PathOSAgent : MonoBehaviour
     public bool freezeAgent;
     public bool verboseDebugging = false;
 
-    /* MOTIVATORS */
+    /* PLAYER CHARACTERISTICS */
+
     [Range(0.0f, 1.0f)]
     public float experienceScale;
 
     public List<HeuristicScale> heuristicScales;
     private Dictionary<Heuristic, float> heuristicWeightLookup;
     private Dictionary<(Heuristic, EntityType), float> heuristicScoringLookup;
+
+    /* NAVIGATION PROPERTIES */
 
     //How often will the agent re-assess available goals?
     public float routeComputeTime = 1.0f;
@@ -50,7 +55,7 @@ public class PathOSAgent : MonoBehaviour
 
     //How quickly does the agent forget something in its memory?
     //This is for testing right now, basically just a flat value.
-    public float forgetTime = 1.0f;
+    public float forgetTime { get; set; }
 
     //Timers for handling rerouting and looking around.
     private float routeTimer = 0.0f;
@@ -72,8 +77,8 @@ public class PathOSAgent : MonoBehaviour
 
     void Awake()
 	{
-        agent = GetComponent<NavMeshAgent>();
-        currentDestination = agent.transform.position;
+        navAgent = GetComponent<NavMeshAgent>();
+        currentDestination = navAgent.transform.position;
 
         heuristicWeightLookup = new Dictionary<Heuristic, float>();
         heuristicScoringLookup = new Dictionary<(Heuristic, EntityType), float>();
@@ -92,6 +97,13 @@ public class PathOSAgent : MonoBehaviour
                 heuristicScoringLookup.Add((curSet.heuristic, curSet.weights[j].entype), curSet.weights[j].weight);
             }
         }
+
+        //Duration of working memory for game entities is scaled by experience level.
+        forgetTime = Mathf.Lerp(PathOS.Constants.Memory.FORGET_TIME_MIN,
+            PathOS.Constants.Memory.FORGET_TIME_MAX,
+            experienceScale);
+
+        print(forgetTime);
 	}
 
     private void Start()
@@ -103,9 +115,6 @@ public class PathOSAgent : MonoBehaviour
 
         //Storing the original lookTime value so that we can switch back to it later
         previousLookTime = lookTime;
-
-        //The more experienced the player is, the more time it takes to forget
-        forgetTime *= (experienceScale + 1);
 
         //in case there's only the final goal
         memory.CheckGoals();
@@ -182,7 +191,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //The existing goal.
-        Vector3 goalForward = currentDestination - agent.transform.position;
+        Vector3 goalForward = currentDestination - navAgent.transform.position;
         goalForward.y = 0.0f;
         
         if(goalForward.sqrMagnitude > 0.1f)
@@ -193,10 +202,10 @@ public class PathOSAgent : MonoBehaviour
         }
         
         currentDestination = dest;
-        agent.SetDestination(dest);
+        navAgent.SetDestination(dest);
 
         if(verboseDebugging)
-            NPDebug.LogMessage("Position: " + agent.transform.position + 
+            NPDebug.LogMessage("Position: " + navAgent.transform.position + 
                 ", Destination: " + dest);
 
         currentPath = memory.paths.Count - 1; //the most recent path
@@ -213,8 +222,8 @@ public class PathOSAgent : MonoBehaviour
         float bias = 0.0f;
 
         //Initial placeholder bias for preferring the goal we have already set.
-        if ((entity.pos - currentDestination).magnitude < 0.1f
-            && (agent.transform.position - currentDestination).magnitude > 0.1f)
+        if ((entity.perceivedPos - currentDestination).magnitude < 0.1f
+            && (navAgent.transform.position - currentDestination).magnitude > 0.1f)
             bias += 1.0f;
 
         //Weighted scoring function.
@@ -231,13 +240,13 @@ public class PathOSAgent : MonoBehaviour
             bias += heuristicScale.scale * heuristicScoringLookup[key];
         }
 
-        Vector3 toEntity = entity.pos - agent.transform.position;
+        Vector3 toEntity = entity.perceivedPos - navAgent.transform.position;
         float score = ScoreDirection(toEntity, bias, toEntity.magnitude);
 
         if (score > maxScore)
         {
             maxScore = score;
-            dest = entity.pos;
+            dest = entity.perceivedPos;
         }
     }
 
@@ -245,7 +254,7 @@ public class PathOSAgent : MonoBehaviour
     void ScoreExploreDirection(Vector3 dir, bool visible, ref Vector3 dest, ref float maxScore)
     {
         float distance = 0.0f;
-        Vector3 newDest = agent.transform.position;
+        Vector3 newDest = navAgent.transform.position;
 
         if(visible)
         {
@@ -258,11 +267,11 @@ public class PathOSAgent : MonoBehaviour
         {
             //Grab the "extent" of the direction on our memory model of the navmesh.
             PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
-            memory.memoryMap.RaycastMemoryMap(agent.transform.position, dir, eyes.navmeshCastDistance, out hit);
+            memory.memoryMap.RaycastMemoryMap(navAgent.transform.position, dir, eyes.navmeshCastDistance, out hit);
             distance = hit.distance;
 
             newDest = PathOSNavUtility.GetClosestPointWalkable(
-                agent.transform.position + distance * dir, memory.worldBorderMargin);
+                navAgent.transform.position + distance * dir, memory.worldBorderMargin);
         }
 
         float bias = (distance / eyes.navmeshCastDistance) 
@@ -271,7 +280,7 @@ public class PathOSAgent : MonoBehaviour
         //Initial placeholder bias for preferring the goal we have already set.
         //(If we haven't reached it already.)
         if ((newDest - currentDestination).magnitude < exploreSimilarityThreshold
-            && (agent.transform.position - currentDestination).magnitude > exploreSimilarityThreshold)
+            && (navAgent.transform.position - currentDestination).magnitude > exploreSimilarityThreshold)
             bias += 1.0f;
 
         float score = ScoreDirection(dir, bias, distance);
@@ -282,7 +291,7 @@ public class PathOSAgent : MonoBehaviour
             dest = newDest;
         }
 
-        memory.AddPath(new ExploreMemory(agent.transform.position, dir, Vector3.Distance(agent.transform.position, dest)));
+        memory.AddPath(new ExploreMemory(navAgent.transform.position, dir, Vector3.Distance(navAgent.transform.position, dest)));
     }
 
     float ScoreDirection(Vector3 dir, float bias, float maxDistance)
@@ -296,7 +305,7 @@ public class PathOSAgent : MonoBehaviour
         //"fill in our map" as we move in this direction.
         //This is similar to the scaling created by assessing an exploration direction.
         PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
-        memory.memoryMap.RaycastMemoryMap(agent.transform.position, dir, maxDistance, out hit);
+        memory.memoryMap.RaycastMemoryMap(navAgent.transform.position, dir, maxDistance, out hit);
         score += (heuristicWeightLookup[Heuristic.CURIOSITY] + 0.1f) * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples;
 
         //Enumerate over all entities the agent knows about, and use them
@@ -307,7 +316,7 @@ public class PathOSAgent : MonoBehaviour
                 continue;
 
             //Vector to the entity.
-            Vector3 entityVec = memory.entities[i].pos - agent.transform.position;
+            Vector3 entityVec = memory.entities[i].perceivedPos - navAgent.transform.position;
             float dist2entity = entityVec.magnitude;
             //Scale our factor by inverse square of distance.
             float distFactor = 1.0f / (dist2entity * dist2entity);
@@ -336,19 +345,12 @@ public class PathOSAgent : MonoBehaviour
 
 	void Update() 
 	{
-        //Used for testing various functionalities on keypress "in the wild" 
-        ///as they are implemented.
-        /*if(Input.GetKeyDown(KeyCode.Space))
-        {
-            PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
-            memory.memoryMap.RaycastMemoryMap(agent.transform.position, new Vector3(-1.0f, 0.0f, -0.5f), 10.0f, out hit);
-        }*/
-           
+        //Inactive state toggle for debugging purposes.
         if (freezeAgent)
             return;
 
         //Update spatial memory.
-        memory.memoryMap.Fill(agent.transform.position);
+        memory.memoryMap.Fill(navAgent.transform.position);
 
         //Update of periodic actions.
         routeTimer += Time.deltaTime;
@@ -421,7 +423,7 @@ public class PathOSAgent : MonoBehaviour
         //This should be shifted to a more elegant trigger mechanism in the future.
         for (int i = 0; i < memory.entities.Count; ++i)
         {
-            if ((agent.transform.position - memory.entities[i].pos).magnitude < visitThreshold)
+            if ((navAgent.transform.position - memory.entities[i].perceivedPos).magnitude < visitThreshold)
             {
                 memory.entities[i].visited = true;
 
@@ -436,8 +438,8 @@ public class PathOSAgent : MonoBehaviour
     //And cleaned up. Probably.
     IEnumerator LookAround()
     {
-        agent.isStopped = true;
-        agent.updateRotation = false;
+        navAgent.isStopped = true;
+        navAgent.updateRotation = false;
 
         //Simple 90-degree sweep centred on current heading.
         Quaternion home = transform.rotation;
@@ -490,8 +492,8 @@ public class PathOSAgent : MonoBehaviour
 
         lookingTimer = 0.0f;
         lookingAround = false;
-        agent.updateRotation = true;
-        agent.isStopped = false;
+        navAgent.updateRotation = true;
+        navAgent.isStopped = false;
     }
 
     //Takes the agent back to the last point they were at
@@ -502,20 +504,20 @@ public class PathOSAgent : MonoBehaviour
         currentDestination = originPoint;
 
         //Then it goes down the path
-        while (!((agent.transform.position - currentDestination).magnitude < 2))
+        while (!((navAgent.transform.position - currentDestination).magnitude < 2))
         {
-            agent.SetDestination(currentDestination);
+            navAgent.SetDestination(currentDestination);
             yield return null;
         }
 
         //the new destination after backtracking gets calculated
         Vector3 newDestination = memory.CalculateNewPath(currentPath);
         currentDestination = newDestination;
-        agent.SetDestination(currentDestination);
+        navAgent.SetDestination(currentDestination);
 
-        while (!((agent.transform.position - currentDestination).magnitude < 2)) 
+        while (!((navAgent.transform.position - currentDestination).magnitude < 2)) 
         {
-            agent.SetDestination(currentDestination); //sets the new destination
+            navAgent.SetDestination(currentDestination); //sets the new destination
             yield return null;
         }
 
@@ -532,9 +534,9 @@ public class PathOSAgent : MonoBehaviour
         currentDestination = memory.CalculateCentroid();
 
         //Then it goes down the path
-        while (!((agent.transform.position - currentDestination).magnitude < 2))
+        while (!((navAgent.transform.position - currentDestination).magnitude < 2))
         {
-            agent.SetDestination(currentDestination);
+            navAgent.SetDestination(currentDestination);
             yield return null;
         }
 
@@ -562,10 +564,10 @@ public class PathOSAgent : MonoBehaviour
             return false;
         if (currentPath <= 0)
             return false;
-        if (Vector3.Distance(currentDestination, agent.transform.position) <= 1.5f)
+        if (Vector3.Distance(currentDestination, navAgent.transform.position) <= 1.5f)
             return false;
         if (((heuristicWeightLookup[Heuristic.AGGRESSION] + heuristicWeightLookup[Heuristic.ADRENALINE]) * 0.5) 
-            > heuristicWeightLookup[Heuristic.CAUTION] && Vector3.Distance(agent.transform.position, memory.CalculateCentroid()) < 3)
+            > heuristicWeightLookup[Heuristic.CAUTION] && Vector3.Distance(navAgent.transform.position, memory.CalculateCentroid()) < 3)
             return false;
 
         return true;

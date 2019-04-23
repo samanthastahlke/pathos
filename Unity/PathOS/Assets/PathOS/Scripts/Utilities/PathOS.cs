@@ -72,13 +72,6 @@ namespace PathOS
     }
 
     [System.Serializable]
-    public class TestSerializationClass
-    {
-        public int x;
-        public int y;
-    }
-
-    [System.Serializable]
     public class HeuristicScale
     {
         public Heuristic heuristic;
@@ -101,7 +94,7 @@ namespace PathOS
     [System.Serializable]
     public class LevelEntity
     {
-        public GameObject entityRef;
+        public GameObject objectRef;
         public EntityType entityType;
         public Renderer rend;
 
@@ -114,20 +107,24 @@ namespace PathOS
     //How an entity is represented in the agent's world model.
     public class PerceivedEntity
     {
-        public GameObject entityRef;
+        public LevelEntity entityRef;
+  
         //Used for identification/comparison.
         protected int instanceID;
 
         public EntityType entityType;
-        public Vector3 pos;
+        public Vector3 perceivedPos;
 
-        public PerceivedEntity(GameObject entityRef, EntityType entityType,
+        public bool visible = false;
+        public float visibleTimer = 0.0f;
+
+        public PerceivedEntity(LevelEntity entityRef, EntityType entityType,
             Vector3 pos)
         {
             this.entityRef = entityRef;
-            this.instanceID = entityRef.GetInstanceID();
+            this.instanceID = entityRef.objectRef.GetInstanceID();
             this.entityType = entityType;
-            this.pos = pos;
+            this.perceivedPos = pos;
         }
 
         //Equality operators are overriden to make array search/comparison easier.
@@ -184,11 +181,11 @@ namespace PathOS
         public bool visited = false;
         public float impressionTime = 0.0f;
 
-        public EntityMemory(GameObject entityRef, EntityType entityType,
+        public EntityMemory(LevelEntity entityRef, EntityType entityType,
             Vector3 pos) : base(entityRef, entityType, pos) { }
 
         public EntityMemory(PerceivedEntity data) : 
-            base(data.entityRef, data.entityType, data.pos) { }
+            base(data.entityRef, data.entityType, data.perceivedPos) { }
     }
 
     //How the memory of a path/explore point is represented in the agent's world model.

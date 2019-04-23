@@ -152,19 +152,27 @@ public class PathOSAgentRenderer : MonoBehaviour
 
         List<PathOS.EntityMemory> memory = agent.memory.entities;
 
-        //Memory will contain visible objects by default.
+        //Visible objects.
+        for (int i = 0; i < visible.Count; ++i)
+        {
+            //Skip if this entity is the target.
+            if (Vector3.SqrMagnitude(visible[i].perceivedPos - targetPos) < 0.2f)
+                continue;
+
+            Gizmos.DrawIcon(GetGizmoIconPos(visible[i].perceivedPos), eyeTex);
+        }
+
+        //Memorized objects.
         for (int i = 0; i < memory.Count; ++i)
         {
             //Skip if this entity is the target.
-            if (Vector3.SqrMagnitude(memory[i].pos - targetPos) < 0.2f)
+            if (Vector3.SqrMagnitude(memory[i].perceivedPos - targetPos) < 0.2f)
                 continue;
 
-            //If not visited and visible, draw the visible icon.
-            if (!memory[i].visited && visible.Contains(memory[i]))
-                Gizmos.DrawIcon(GetGizmoIconPos(memory[i].pos), eyeTex);
-            //Draw the visited icon or memorized icon as appropriate.
-            else
-                Gizmos.DrawIcon(GetGizmoIconPos(memory[i].pos),
+            //Draw the visited icon or memorized icon as appropriate, if the entity
+            //isn't visible.
+            if(!visible.Contains(memory[i]))
+                Gizmos.DrawIcon(GetGizmoIconPos(memory[i].perceivedPos),
                     (memory[i].visited) ? visitTex : memoryTex);
         }
 

@@ -108,11 +108,10 @@ public class PathOSAgentInspector : Editor
         EditorGUILayout.PropertyField(lookTime);
         EditorGUILayout.PropertyField(visitThreshold);
         EditorGUILayout.PropertyField(exploreSimilarityThreshold);
-        EditorGUILayout.PropertyField(forgetTime);
 
         serial.ApplyModifiedProperties();
 
-        if (GUI.changed)
+        if (GUI.changed && !EditorApplication.isPlaying)
         {
             EditorUtility.SetDirty(agent);
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());

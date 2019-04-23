@@ -132,7 +132,7 @@ public class PathOSMainInspector : Editor
 
                 LevelEntity entity = manager.levelEntities[i];
 
-                entity.entityRef = (GameObject)EditorGUILayout.ObjectField(entity.entityRef, typeof(GameObject), true);
+                entity.objectRef = (GameObject)EditorGUILayout.ObjectField(entity.objectRef, typeof(GameObject), true);
                 entity.entityType = (PathOS.EntityType)EditorGUILayout.EnumPopup(entity.entityType);
 
                 //Append/delete entities in place.
@@ -163,7 +163,7 @@ public class PathOSMainInspector : Editor
 
         serial.ApplyModifiedProperties();
         
-        if(GUI.changed)
+        if(GUI.changed && !EditorApplication.isPlaying)
         {
             EditorUtility.SetDirty(manager);
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());

@@ -56,7 +56,6 @@ public class PathOSAgentMemory : MonoBehaviour
         {
             entities[i].impressionTime += Time.deltaTime;
 
-            //Placeholder for "forgetting", to test things out.
             if (!entities[i].visited && entities[i].impressionTime >= agent.forgetTime)
                 entities.RemoveAt(i);
         }
@@ -78,7 +77,7 @@ public class PathOSAgentMemory : MonoBehaviour
             if (entity == entities[i])
             {
                 entities[i].impressionTime = 0.0f;
-                entities[i].pos = entity.pos;
+                entities[i].perceivedPos = entity.perceivedPos;
                 return;
             }             
         }
@@ -168,9 +167,9 @@ public class PathOSAgentMemory : MonoBehaviour
         for (int i = 0; i < entities.Count; i++)
         {
             //if the hazard is within range... (the range is just a placeholder for now as well, I'm worried that it's too short?)
-            if ((entities[i].pos - currentDestination).magnitude < hazardRange && (entities[i].entityType == EntityType.ET_HAZARD_ENEMY || entities[i].entityType == EntityType.ET_HAZARD_ENVIRONMENT))
+            if ((entities[i].perceivedPos - currentDestination).magnitude < hazardRange && (entities[i].entityType == EntityType.ET_HAZARD_ENEMY || entities[i].entityType == EntityType.ET_HAZARD_ENVIRONMENT))
             {
-                nearbyEnemies.Add(entities[i].pos);
+                nearbyEnemies.Add(entities[i].perceivedPos);
                 //we increment the counter to see how many hazards are close by
                 hazardCounter++;
 

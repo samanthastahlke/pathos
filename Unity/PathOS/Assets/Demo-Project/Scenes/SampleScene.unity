@@ -928,7 +928,7 @@ GameObject:
   m_Component:
   - component: {fileID: 143845705}
   m_Layer: 0
-  m_Name: EnemyCamp2
+  m_Name: EnemyCamp3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4341,14 +4341,13 @@ MonoBehaviour:
   - heuristic: 35
     scale: 0
   routeComputeTime: 0.5
-  perceptionComputeTime: 0.25
+  perceptionComputeTime: 0.1
   exploreDegrees: 5
   invisibleExploreDegrees: 30
   lookDegrees: 60
   lookTime: 12
   visitThreshold: 1
   exploreSimilarityThreshold: 2
-  forgetTime: 60
 --- !u!195 &626367635
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -4424,12 +4423,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: -43.566, z: 0}
---- !u!1 &632529169 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 180120, guid: a76d6dc72bc81434e93a247dcc2fe116,
-    type: 3}
-  m_PrefabInstance: {fileID: 440974610}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &640875531
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5398,6 +5391,12 @@ Transform:
   m_Father: {fileID: 1251605618}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &870276753 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1965851562501010, guid: e82139b3bae6212439ea1e85ad29678b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1664538791}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &886130593
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10283,112 +10282,112 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelEntities:
-  - entityRef: {fileID: 677844005}
+  - objectRef: {fileID: 677844005}
     entityType: 200
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1161559241}
+  - objectRef: {fileID: 359376571}
     entityType: 200
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 516568726}
+  - objectRef: {fileID: 1868184791}
     entityType: 300
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 173190110}
+  - objectRef: {fileID: 1349998424}
     entityType: 150
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 886130594}
+  - objectRef: {fileID: 187761348}
     entityType: 160
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1678627021}
+  - objectRef: {fileID: 1678627021}
     entityType: 350
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 355248473}
+  - objectRef: {fileID: 355248473}
     entityType: 250
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 640875532}
+  - objectRef: {fileID: 640875532}
     entityType: 250
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 399391077}
+  - objectRef: {fileID: 399391077}
     entityType: 250
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1183932194}
+  - objectRef: {fileID: 2002239194}
     entityType: 200
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 816930659}
+  - objectRef: {fileID: 359376571}
     entityType: 200
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 2002239194}
+  - objectRef: {fileID: 1183932194}
     entityType: 200
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 359376571}
+  - objectRef: {fileID: 816930659}
     entityType: 200
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1068685992}
+  - objectRef: {fileID: 870276753}
     entityType: 160
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1840299230}
+  - objectRef: {fileID: 1015002897}
     entityType: 100
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 53943982}
+  - objectRef: {fileID: 53043637}
     entityType: 110
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 632529169}
+  - objectRef: {fileID: 1775179089}
     entityType: 110
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1775179089}
+  - objectRef: {fileID: 234555605}
     entityType: 100
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 187761348}
+  - objectRef: {fileID: 2057694350}
     entityType: 160
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1260841063}
+  - objectRef: {fileID: 1260841063}
     entityType: 120
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1349998424}
+  - objectRef: {fileID: 173190110}
     entityType: 150
     rend: {fileID: 0}
     omniscientDirection: 0
     omniscientPosition: 0
-  - entityRef: {fileID: 1868184791}
+  - objectRef: {fileID: 53943982}
     entityType: 300
     rend: {fileID: 0}
     omniscientDirection: 0
