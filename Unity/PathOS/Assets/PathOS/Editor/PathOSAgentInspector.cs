@@ -17,14 +17,20 @@ public class PathOSAgentInspector : Editor
     private PathOSAgent agent;
     private SerializedObject serial;
 
+    private GUIStyle foldoutStyle = GUIStyle.none;
+
     private SerializedProperty experienceScale;
     private SerializedProperty heuristicList;
+
+    private bool showPlayerCharacteristics = false;
 
     private SerializedProperty memoryRef;
     private SerializedProperty eyeRef;
 
     private SerializedProperty freezeAgent;
     private SerializedProperty verboseDebugging;
+
+    private bool showNavCharacteristics = false;
 
     private SerializedProperty routeComputeTime;
     private SerializedProperty perceptionComputeTime;
@@ -42,6 +48,9 @@ public class PathOSAgentInspector : Editor
     {
         agent = (PathOSAgent)target;
         serial = new SerializedObject(agent);
+
+        foldoutStyle = new GUIStyle(EditorStyles.foldout);
+        foldoutStyle.fontStyle = FontStyle.Bold;
 
         experienceScale = serial.FindProperty("experienceScale");
         heuristicList = serial.FindProperty("heuristicScales");
@@ -87,28 +96,36 @@ public class PathOSAgentInspector : Editor
         EditorGUILayout.PropertyField(freezeAgent);
         EditorGUILayout.PropertyField(verboseDebugging);
 
-        EditorGUILayout.LabelField("Player Characteristics", EditorStyles.boldLabel);
-
-        EditorGUILayout.PropertyField(experienceScale);
-
-        for(int i = 0; i < agent.heuristicScales.Count; ++i)
+        showPlayerCharacteristics = EditorGUILayout.Foldout(
+            showPlayerCharacteristics, "Player Characteristics", foldoutStyle);
+       
+        if(showPlayerCharacteristics)
         {
-            agent.heuristicScales[i].scale = EditorGUILayout.Slider(
-                 heuristicLabels[agent.heuristicScales[i].heuristic],
-                 agent.heuristicScales[i].scale, 0.0f, 1.0f);
+            EditorGUILayout.PropertyField(experienceScale);
+
+            for (int i = 0; i < agent.heuristicScales.Count; ++i)
+            {
+                agent.heuristicScales[i].scale = EditorGUILayout.Slider(
+                     heuristicLabels[agent.heuristicScales[i].heuristic],
+                     agent.heuristicScales[i].scale, 0.0f, 1.0f);
+            }
         }
 
-        EditorGUILayout.LabelField("Navigation", EditorStyles.boldLabel);
+        showNavCharacteristics = EditorGUILayout.Foldout(
+            showNavCharacteristics, "Navigation", foldoutStyle);
 
-        EditorGUILayout.PropertyField(routeComputeTime);
-        EditorGUILayout.PropertyField(perceptionComputeTime);
-        EditorGUILayout.PropertyField(exploreDegrees);
-        EditorGUILayout.PropertyField(invisibleExploreDegrees);
-        EditorGUILayout.PropertyField(lookDegrees);
-        EditorGUILayout.PropertyField(lookTime);
-        EditorGUILayout.PropertyField(visitThreshold);
-        EditorGUILayout.PropertyField(exploreSimilarityThreshold);
-
+        if(showNavCharacteristics)
+        {
+            EditorGUILayout.PropertyField(routeComputeTime);
+            EditorGUILayout.PropertyField(perceptionComputeTime);
+            EditorGUILayout.PropertyField(exploreDegrees);
+            EditorGUILayout.PropertyField(invisibleExploreDegrees);
+            EditorGUILayout.PropertyField(lookDegrees);
+            EditorGUILayout.PropertyField(lookTime);
+            EditorGUILayout.PropertyField(visitThreshold);
+            EditorGUILayout.PropertyField(exploreSimilarityThreshold);
+        }
+        
         serial.ApplyModifiedProperties();
 
         if (GUI.changed && !EditorApplication.isPlaying)

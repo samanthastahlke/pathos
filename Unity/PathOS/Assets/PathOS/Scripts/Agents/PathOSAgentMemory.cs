@@ -65,8 +65,7 @@ public class PathOSAgentMemory : MonoBehaviour
         {
             if(entity.alwaysKnown)
             {
-                EntityMemory newMemory = new EntityMemory(new PerceivedEntity(
-                    entity, entity.entityType, entity.objectRef.transform.position));
+                EntityMemory newMemory = new EntityMemory(entity);
                 newMemory.MakeUnforgettable();
 
                 entities.Add(newMemory);
@@ -85,7 +84,12 @@ public class PathOSAgentMemory : MonoBehaviour
         {
             entities[i].impressionTime += Time.deltaTime;
 
-            if (entities[i].forgettable && !entities[i].visited && entities[i].impressionTime >= agent.forgetTime)
+            //Only something which is no longer visible and forgettable
+            //can be discarded from memory.
+            if (!entities[i].entity.visible 
+                && entities[i].forgettable 
+                && !entities[i].visited 
+                && entities[i].impressionTime >= agent.forgetTime)
                 entities.RemoveAt(i);
         }
 
@@ -114,7 +118,7 @@ public class PathOSAgentMemory : MonoBehaviour
             if (entity == entities[i])
             {
                 entities[i].impressionTime = 0.0f;
-                entities[i].perceivedPos = entity.perceivedPos;
+                entities[i].entity.perceivedPos = entity.perceivedPos;
                 return;
             }             
         }
@@ -210,8 +214,10 @@ public class PathOSAgentMemory : MonoBehaviour
         for (int i = 0; i < entities.Count; i++)
         {
             //this really, really, really needs to be cleaned up pleasedonthateme
-            if ((entities[i].entityType == EntityType.ET_GOAL_OPTIONAL || entities[i].entityType == EntityType.ET_GOAL_MANDATORY
-                || entities[i].entityType == EntityType.ET_RESOURCE_ACHIEVEMENT || entities[i].entityType == EntityType.ET_RESOURCE_PRESERVATION)
+            if ((entities[i].entity.entityType == EntityType.ET_GOAL_OPTIONAL 
+                || entities[i].entity.entityType == EntityType.ET_GOAL_MANDATORY
+                || entities[i].entity.entityType == EntityType.ET_RESOURCE_ACHIEVEMENT 
+                || entities[i].entity.entityType == EntityType.ET_RESOURCE_PRESERVATION)
                 && entities[i].visited == false)
             {
                 return true;
@@ -239,9 +245,11 @@ public class PathOSAgentMemory : MonoBehaviour
         for (int i = 0; i < entities.Count; i++)
         {
             //if the hazard is within range... (the range is just a placeholder for now as well, I'm worried that it's too short?)
-            if ((entities[i].perceivedPos - currentDestination).magnitude < hazardRange && (entities[i].entityType == EntityType.ET_HAZARD_ENEMY || entities[i].entityType == EntityType.ET_HAZARD_ENVIRONMENT))
+            if ((entities[i].entity.perceivedPos - currentDestination).magnitude < hazardRange 
+                && (entities[i].entity.entityType == EntityType.ET_HAZARD_ENEMY 
+                || entities[i].entity.entityType == EntityType.ET_HAZARD_ENVIRONMENT))
             {
-                nearbyEnemies.Add(entities[i].perceivedPos);
+                nearbyEnemies.Add(entities[i].entity.perceivedPos);
                 //we increment the counter to see how many hazards are close by
                 hazardCounter++;
 

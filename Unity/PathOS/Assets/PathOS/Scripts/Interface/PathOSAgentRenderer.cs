@@ -166,13 +166,13 @@ public class PathOSAgentRenderer : MonoBehaviour
         for (int i = 0; i < memory.Count; ++i)
         {
             //Skip if this entity is the target.
-            if (Vector3.SqrMagnitude(memory[i].perceivedPos - targetPos) < 0.2f)
+            if (Vector3.SqrMagnitude(memory[i].entity.perceivedPos - targetPos) < 0.2f)
                 continue;
 
             //Draw the visited icon or memorized icon as appropriate, if the entity
             //isn't visible.
-            if(!visible.Contains(memory[i]))
-                Gizmos.DrawIcon(GetGizmoIconPos(memory[i].perceivedPos),
+            if(!memory[i].entity.visible)
+                Gizmos.DrawIcon(GetGizmoIconPos(memory[i].entity.perceivedPos),
                     (memory[i].visited) ? visitTex : memoryTex);
         }
 

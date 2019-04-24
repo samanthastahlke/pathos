@@ -50,7 +50,7 @@ public class PathOSAgentEyes : MonoBehaviour
             entityVecXZ.y = 0.0f;
 
             if (entity.rend != null)
-                perceptionInfo.Add(new PerceivedEntity(entity, entity.entityType, entityPos));
+                perceptionInfo.Add(new PerceivedEntity(entity));
         }
 
         boundsCheck = new Vector3[8];

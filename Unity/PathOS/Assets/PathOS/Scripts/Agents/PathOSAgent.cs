@@ -166,7 +166,7 @@ public class PathOSAgent : MonoBehaviour
         //Potential entity goals.
         for(int i = 0; i < memory.entities.Count; ++i)
         {
-            ScoreEntity(memory.entities[i], ref dest, ref maxScore);
+            ScoreEntity(memory.entities[i].entity, ref dest, ref maxScore);
         }
 
         //Potential directional goals.
@@ -331,7 +331,7 @@ public class PathOSAgent : MonoBehaviour
                 continue;
 
             //Vector to the entity.
-            Vector3 entityVec = memory.entities[i].perceivedPos - navAgent.transform.position;
+            Vector3 entityVec = memory.entities[i].entity.perceivedPos - navAgent.transform.position;
             float dist2entity = entityVec.magnitude;
             //Scale our factor by inverse square of distance.
             float distFactor = 1.0f / (dist2entity * dist2entity);
@@ -343,7 +343,8 @@ public class PathOSAgent : MonoBehaviour
             //Weighted scoring function.
             foreach(HeuristicScale heuristicScale in heuristicScales)
             {
-                (Heuristic, EntityType) key = (heuristicScale.heuristic, memory.entities[i].entityType);
+                (Heuristic, EntityType) key = (heuristicScale.heuristic, 
+                    memory.entities[i].entity.entityType);
 
                 if(!heuristicScoringLookup.ContainsKey(key))
                 {
@@ -438,7 +439,7 @@ public class PathOSAgent : MonoBehaviour
         //This should be shifted to a more elegant trigger mechanism in the future.
         for (int i = 0; i < memory.entities.Count; ++i)
         {
-            if ((navAgent.transform.position - memory.entities[i].perceivedPos).magnitude < visitThreshold)
+            if ((navAgent.transform.position - memory.entities[i].entity.perceivedPos).magnitude < visitThreshold)
             {
                 memory.entities[i].visited = true;
 

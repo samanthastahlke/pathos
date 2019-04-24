@@ -121,13 +121,12 @@ namespace PathOS
 
         public int impressionCount = 0;
 
-        public PerceivedEntity(LevelEntity entityRef, EntityType entityType,
-            Vector3 pos)
+        public PerceivedEntity(LevelEntity entityRef)
         {
             this.entityRef = entityRef;
             this.instanceID = entityRef.objectRef.GetInstanceID();
-            this.entityType = entityType;
-            this.perceivedPos = pos;
+            this.entityType = entityRef.entityType;
+            this.perceivedPos = entityRef.objectRef.transform.position;
         }
 
         //Equality operators are overriden to make array search/comparison easier.
@@ -142,6 +141,17 @@ namespace PathOS
             return lhs.instanceID == rhs.instanceID;
         }
 
+        public static bool operator ==(PerceivedEntity lhs, EntityMemory rhs)
+        {
+            if (object.ReferenceEquals(lhs, null))
+                return object.ReferenceEquals(rhs, null);
+
+            if (object.ReferenceEquals(rhs, null))
+                return object.ReferenceEquals(lhs, null);
+
+            return lhs.instanceID == rhs.entity.instanceID;
+        }
+
         public static bool operator!=(PerceivedEntity lhs, PerceivedEntity rhs)
         {
             if (object.ReferenceEquals(lhs, null))
@@ -153,6 +163,17 @@ namespace PathOS
             return lhs.instanceID != rhs.instanceID;
         }
 
+        public static bool operator !=(PerceivedEntity lhs, EntityMemory rhs)
+        {
+            if (object.ReferenceEquals(lhs, null))
+                return !object.ReferenceEquals(rhs, null);
+
+            if (object.ReferenceEquals(rhs, null))
+                return object.ReferenceEquals(lhs, null);
+
+            return lhs.instanceID != rhs.entity.instanceID;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null)
@@ -160,7 +181,7 @@ namespace PathOS
 
             PerceivedEntity objAsEntity = obj as PerceivedEntity;
 
-            if (objAsEntity == null)
+            if (objAsEntity == default(PerceivedEntity))
                 return false;
 
             return this == objAsEntity;
@@ -179,8 +200,9 @@ namespace PathOS
 
     //How the memory of an object is represented in the agent's world model.
     //Entity memory = POI which represents an in-game object.
-    public class EntityMemory : PerceivedEntity
+    public class EntityMemory
     {
+        public PerceivedEntity entity;
         public bool visited = false;
 
         //Whether the memory should be considered long-term.
@@ -194,11 +216,15 @@ namespace PathOS
         //i.e., how long since it was visible.
         public float impressionTime = 0.0f;
 
-        public EntityMemory(LevelEntity entityRef, EntityType entityType,
-            Vector3 pos) : base(entityRef, entityType, pos) { }
+        public EntityMemory(LevelEntity entity)
+        {
+            this.entity = new PerceivedEntity(entity);
+        }
 
-        public EntityMemory(PerceivedEntity data) : 
-            base(data.entityRef, data.entityType, data.perceivedPos) { }
+        public EntityMemory(PerceivedEntity entity)
+        {
+            this.entity = entity;
+        }
 
         public void MakeUnforgettable()
         {
