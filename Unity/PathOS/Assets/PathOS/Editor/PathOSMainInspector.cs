@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using PathOS;
+using Malee.Editor;
 
 /*
 PathOSMainInspector.cs 
@@ -17,6 +18,7 @@ public class PathOSMainInspector : Editor
     private PathOSManager manager;
     private SerializedObject serial;
     private SerializedProperty entityList;
+    private ReorderableList entityListReorderable;
     private SerializedProperty heuristicWeights;
 
     private PathOS.Heuristic weightMatrixRowID;
@@ -35,6 +37,9 @@ public class PathOSMainInspector : Editor
         serial = new SerializedObject(manager);
         entityList = serial.FindProperty("levelEntities");
         heuristicWeights = serial.FindProperty("heuristicWeights");
+
+        entityListReorderable = new ReorderableList(serial.FindProperty("levelEntities"));
+        entityListReorderable.elementNameProperty = "Level Entities";
 
         heuristicIndices = new Dictionary<Heuristic, int>();
         entypeIndices = new Dictionary<EntityType, int>();
@@ -124,7 +129,7 @@ public class PathOSMainInspector : Editor
         }
 
         //Level entity list.
-        if (EditorGUILayout.PropertyField(entityList))
+        /*if (EditorGUILayout.PropertyField(entityList))
         {
             for (int i = 0; i < manager.levelEntities.Count; ++i)
             {
@@ -159,7 +164,9 @@ public class PathOSMainInspector : Editor
                     "Oh yeah, do it", "No, wait!"))
                     manager.ClearEntities();
             }
-        }
+        }*/
+
+        entityListReorderable.DoLayoutList();
 
         serial.ApplyModifiedProperties();
         

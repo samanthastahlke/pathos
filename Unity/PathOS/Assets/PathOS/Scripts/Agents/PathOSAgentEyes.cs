@@ -32,7 +32,6 @@ public class PathOSAgentEyes : MonoBehaviour
 
     //Field of view for immediate-range "explorability" checks.
     private float xFOV;
-    private float timerTest = 0.0f;
 
 	void Awake()
 	{
@@ -83,24 +82,34 @@ public class PathOSAgentEyes : MonoBehaviour
             Vector3 entityVecXZ = entityPos - cam.transform.position;
             entityVecXZ.y = 0.0f;
 
+            bool wasVisible = entity.visible;
+
             //Visibility check - this can change between checks as the agent
             //moves around.
             entity.visible = Vector3.Dot(camForwardXZ, entityVecXZ) > 0
                 && GeometryUtility.TestPlanesAABB(frustum, entity.entityRef.rend.bounds)
                 && RaycastVisibilityCheck(entity.entityRef.rend.bounds, entityPos);
 
-            //Keep track of how long the object has been in view.
-            entity.visibleTimer = (entity.visible) ?
-                entity.visibleTimer + perceptionTimer : 0.0f;
+            if (wasVisible != entity.visible)
+                entity.visibilityTimer = 0.0f;
+
+            //Keep track of how long the object has been in the current visibility state.
+            entity.visibilityTimer = entity.visibilityTimer + perceptionTimer;
 
             if (entity.visible)
             {
                 visible.Add(entity);
 
-                if (entity.visibleTimer >= PathOS.Constants.Memory.IMPRESSION_TIME_MIN)
+                if (entity.visibilityTimer >= PathOS.Constants.Memory.IMPRESSION_TIME_MIN)
                 {
                     entity.perceivedPos = entityPos;
                     agent.memory.Memorize(entity);
+
+                    //Mandatory/completion goals are committed to LTM automatically.
+                    if (entity.visibilityTimer >= PathOS.Constants.Memory.IMPRESSION_CONVERT_LTM
+                        || entity.entityType == EntityType.ET_GOAL_MANDATORY
+                        || entity.entityType == EntityType.ET_GOAL_COMPLETION)
+                        agent.memory.CommitLTM(entity);
                 }
             }          
         }

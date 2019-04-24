@@ -94,13 +94,14 @@ namespace PathOS
     [System.Serializable]
     public class LevelEntity
     {
+        public string name;
+
         public GameObject objectRef;
         public EntityType entityType;
-        public Renderer rend;
+        public Renderer rend { get; set; }
 
         //Not used yet. Will be used to simulate compass/map availability.
-        public bool omniscientDirection;
-        public bool omniscientPosition;
+        public bool alwaysKnown;
     }
 
     /* PLAYER PERCEPTION */
@@ -116,7 +117,9 @@ namespace PathOS
         public Vector3 perceivedPos;
 
         public bool visible = false;
-        public float visibleTimer = 0.0f;
+        public float visibilityTimer = 0.0f;
+
+        public int impressionCount = 0;
 
         public PerceivedEntity(LevelEntity entityRef, EntityType entityType,
             Vector3 pos)
@@ -179,6 +182,16 @@ namespace PathOS
     public class EntityMemory : PerceivedEntity
     {
         public bool visited = false;
+
+        //Whether the memory should be considered long-term.
+        public bool ltm = false;
+
+        //Whether the memory can be forgotten.
+        //(Only false for objects that are "always known" to the player.
+        public bool forgettable = true;
+
+        //How old the current impression of the object is.
+        //i.e., how long since it was visible.
         public float impressionTime = 0.0f;
 
         public EntityMemory(LevelEntity entityRef, EntityType entityType,
@@ -186,6 +199,25 @@ namespace PathOS
 
         public EntityMemory(PerceivedEntity data) : 
             base(data.entityRef, data.entityType, data.perceivedPos) { }
+
+        public void MakeUnforgettable()
+        {
+            this.ltm = true;
+            this.forgettable = false;
+        }
+    }
+
+    //How the agent's trace through the world is represented in the agent's world model.
+    public class WaypointMemory
+    {
+        public Vector3 pos;
+        public bool wasTarget = false;
+
+        public WaypointMemory(Vector3 pos, bool wasTarget = false)
+        {
+            this.pos = pos;
+            this.wasTarget = wasTarget;
+        }
     }
 
     //How the memory of a path/explore point is represented in the agent's world model.
@@ -248,22 +280,13 @@ namespace PathOS
 
             return this == objAsEntity;
         }
-    }
 
-    public class PerceivedInfo
-    {
-        //What in-game objects are visible?
-        public List<PerceivedEntity> entities;
-
-        //Set of vectors representing directions the environment
-        //will allow us to travel.
-        //Not used yet.
-        public List<Vector3> navDirections;
-
-        public PerceivedInfo()
+        //Placeholder - for now our equality check should always be run.
+        //Will probably replace this with a hashing based on snapping the
+        //origin point/direction.
+        public override int GetHashCode()
         {
-            entities = new List<PerceivedEntity>();
-            navDirections = new List<Vector3>();
+            return 0;
         }
     }
 }

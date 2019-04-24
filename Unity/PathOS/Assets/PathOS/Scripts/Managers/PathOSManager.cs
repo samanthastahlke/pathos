@@ -25,9 +25,7 @@ public class PathOSManager : NPSingleton<PathOSManager>
         }
 	}
 
-    //Dynamic entity adding/removal.
-    //Placeholder right now, will be expanded to allow more runtime manipulation
-    //of the framework.
+    //Entity adding/removal (for Inspector).
     public void AddEntity(int index)
     {
         if(index >= 0 && index <= levelEntities.Count)

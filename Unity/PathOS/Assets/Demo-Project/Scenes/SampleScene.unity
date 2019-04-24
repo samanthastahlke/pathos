@@ -4299,6 +4299,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 626367634}
+  waypointCacheSize: 64
+  waypointRegisterTime: 5
   autogenerateMapExtents: 0
   navmeshBounds:
     min: {x: -30, y: 0, z: -30}
@@ -10282,116 +10284,94 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelEntities:
-  - objectRef: {fileID: 677844005}
+  - name: Goblin
+    objectRef: {fileID: 677844005}
     entityType: 200
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 359376571}
+    alwaysKnown: 0
+  - name: Goblin
+    objectRef: {fileID: 2002239194}
     entityType: 200
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 1868184791}
+    alwaysKnown: 0
+  - name: Goblin
+    objectRef: {fileID: 359376571}
+    entityType: 200
+    alwaysKnown: 0
+  - name: Goblin
+    objectRef: {fileID: 1183932194}
+    entityType: 200
+    alwaysKnown: 0
+  - name: Goblin
+    objectRef: {fileID: 816930659}
+    entityType: 200
+    alwaysKnown: 0
+  - name: Goblin
+    objectRef: {fileID: 359376571}
+    entityType: 200
+    alwaysKnown: 0
+  - name: Mushroom POI
+    objectRef: {fileID: 1868184791}
     entityType: 300
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 1349998424}
+    alwaysKnown: 0
+  - name: Player House
+    objectRef: {fileID: 53943982}
+    entityType: 300
+    alwaysKnown: 0
+  - name: Treasure
+    objectRef: {fileID: 1349998424}
     entityType: 150
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 187761348}
+    alwaysKnown: 0
+  - name: Treasure
+    objectRef: {fileID: 173190110}
+    entityType: 150
+    alwaysKnown: 0
+  - name: Sheep
+    objectRef: {fileID: 2057694350}
     entityType: 160
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 1678627021}
+    alwaysKnown: 0
+  - name: Sheep
+    objectRef: {fileID: 870276753}
+    entityType: 160
+    alwaysKnown: 0
+  - name: Cow
+    objectRef: {fileID: 187761348}
+    entityType: 160
+    alwaysKnown: 1
+  - name: Cat
+    objectRef: {fileID: 1678627021}
     entityType: 350
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 355248473}
+    alwaysKnown: 0
+  - name: Mushroom
+    objectRef: {fileID: 355248473}
     entityType: 250
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 640875532}
+    alwaysKnown: 0
+  - name: Mushroom
+    objectRef: {fileID: 640875532}
     entityType: 250
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 399391077}
+    alwaysKnown: 0
+  - name: Mushroom
+    objectRef: {fileID: 399391077}
     entityType: 250
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 2002239194}
-    entityType: 200
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 359376571}
-    entityType: 200
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 1183932194}
-    entityType: 200
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 816930659}
-    entityType: 200
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 870276753}
-    entityType: 160
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 1015002897}
+    alwaysKnown: 0
+  - name: Goal Crystal
+    objectRef: {fileID: 1015002897}
     entityType: 100
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 53043637}
-    entityType: 110
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 1775179089}
-    entityType: 110
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 234555605}
+    alwaysKnown: 0
+  - name: Goal Crystal
+    objectRef: {fileID: 234555605}
     entityType: 100
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 2057694350}
-    entityType: 160
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 1260841063}
+    alwaysKnown: 0
+  - name: Goal Tomb
+    objectRef: {fileID: 53043637}
+    entityType: 110
+    alwaysKnown: 0
+  - name: Goal Cave
+    objectRef: {fileID: 1775179089}
+    entityType: 110
+    alwaysKnown: 0
+  - name: Final Goal
+    objectRef: {fileID: 1260841063}
     entityType: 120
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 173190110}
-    entityType: 150
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
-  - objectRef: {fileID: 53943982}
-    entityType: 300
-    rend: {fileID: 0}
-    omniscientDirection: 0
-    omniscientPosition: 0
+    alwaysKnown: 0
   heuristicWeights:
   - heuristic: 0
     weights:

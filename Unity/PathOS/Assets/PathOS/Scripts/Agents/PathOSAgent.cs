@@ -53,9 +53,11 @@ public class PathOSAgent : MonoBehaviour
     //How close do two "exploration" goals have to be to be considered the same?
     public float exploreSimilarityThreshold = 2.0f;
 
+    /* MEMORY STATS */
     //How quickly does the agent forget something in its memory?
     //This is for testing right now, basically just a flat value.
     public float forgetTime { get; set; }
+    public int stmSize { get; set; }
 
     //Timers for handling rerouting and looking around.
     private float routeTimer = 0.0f;
@@ -66,16 +68,16 @@ public class PathOSAgent : MonoBehaviour
     //Where is the agent targeting?
     private Vector3 currentDestination;
 
-    //To check how hazardous the area is
+    //Hazardous area detection.
     private float previousLookTime; 
     private float hazardousAreaTimer = 0;
     private bool hazardousArea = false;
 
-    //for traversal
+    //For backtracking traversal.
     private bool detour = false; //can apply to a cautious agent backtracking or a reckless one heading towards danger
     private int currentPath = 0;
 
-    void Awake()
+    private void Awake()
 	{
         navAgent = GetComponent<NavMeshAgent>();
         currentDestination = navAgent.transform.position;
@@ -103,7 +105,11 @@ public class PathOSAgent : MonoBehaviour
             PathOS.Constants.Memory.FORGET_TIME_MAX,
             experienceScale);
 
-        print(forgetTime);
+        //Capacitiy of working memory is also scaled by experience level.
+        stmSize = Mathf.RoundToInt(Mathf.Lerp(PathOS.Constants.Memory.MEM_CAPACITY_MIN,
+            PathOS.Constants.Memory.MEM_CAPACITY_MAX,
+            experienceScale));
+
 	}
 
     private void Start()
@@ -120,6 +126,13 @@ public class PathOSAgent : MonoBehaviour
         memory.CheckGoals();
     }
 
+    public Vector3 GetPosition()
+    {
+        return navAgent.transform.position;
+    }
+
+    //Used by the Inspector to ensure scale widgets will appear for all defined heuristics.
+    //This SHOULD NOT be called by anything else.
     public void RefreshHeuristicList()
     {
         Dictionary<Heuristic, float> weights = new Dictionary<Heuristic, float>();
@@ -143,7 +156,7 @@ public class PathOSAgent : MonoBehaviour
     }
 
     //Update the agent's target position.
-    void ComputeNewDestination()
+    private void ComputeNewDestination()
     {
         //Base target = our existing destination.
         Vector3 dest = currentDestination;
@@ -157,6 +170,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //Potential directional goals.
+        //Only considering the XZ plane.
         float halfX = eyes.XFOV() * 0.5f;
         int steps = (int)(halfX / exploreDegrees);
 
@@ -164,7 +178,7 @@ public class PathOSAgent : MonoBehaviour
         Vector3 XZForward = transform.forward;
         XZForward.y = 0.0f;
         XZForward.Normalize();
-
+        
         ScoreExploreDirection(XZForward, true, ref dest, ref maxScore);
 
         for(int i = 1; i <= steps; ++i)
@@ -213,8 +227,9 @@ public class PathOSAgent : MonoBehaviour
     }
 
     //maxScore is updated if the entity achieves a higher score.
-    void ScoreEntity(PerceivedEntity entity, ref Vector3 dest, ref float maxScore)
+    private void ScoreEntity(PerceivedEntity entity, ref Vector3 dest, ref float maxScore)
     {
+        //A previously visited entity shouldn't be targeted.
         if (memory.Visited(entity)) 
             return;
 

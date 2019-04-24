@@ -11,12 +11,19 @@ PathOSAgentMemory (c) Nine Penguins (Samantha Stahlke) and Atiya Nova 2018
 public class PathOSAgentMemory : MonoBehaviour 
 {
     public PathOSAgent agent;
+    private static PathOSManager manager;
 
     //Remembered entities.
     public List<EntityMemory> entities { get; set; }
 
     //Remembered paths/directions.
     public List<ExploreMemory> paths { get; set; }
+
+    //Traversal history.
+    public List<WaypointMemory> waypoints { get; set; }
+    public int waypointCacheSize = 64;
+    public float waypointRegisterTime = 5.0f;
+    private float waypointTimer = 0.0f;
 
     //The agent's memory model of the complete navmesh.
     [Header("Navmesh Memory Model")]
@@ -42,12 +49,34 @@ public class PathOSAgentMemory : MonoBehaviour
     {
         entities = new List<EntityMemory>();
         paths = new List<ExploreMemory>();
+        waypoints = new List<WaypointMemory>();
+
+        if (null == manager)
+            manager = PathOSManager.instance;
 
         //Initialize the (blank) model of the agent's internal "map".
         if (autogenerateMapExtents)
             memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, worldExtentRadius, gridSampleElevation);
         else
             memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, navmeshBounds);
+
+        //Commit any "always-known" entities to memory.
+        foreach (LevelEntity entity in manager.levelEntities)
+        {
+            if(entity.alwaysKnown)
+            {
+                EntityMemory newMemory = new EntityMemory(new PerceivedEntity(
+                    entity, entity.entityType, entity.objectRef.transform.position));
+                newMemory.MakeUnforgettable();
+
+                entities.Add(newMemory);
+            }
+        }
+    }
+
+    private void Start()
+    {
+        PushWaypoint(agent.GetPosition());
     }
 
     private void Update()
@@ -56,7 +85,7 @@ public class PathOSAgentMemory : MonoBehaviour
         {
             entities[i].impressionTime += Time.deltaTime;
 
-            if (!entities[i].visited && entities[i].impressionTime >= agent.forgetTime)
+            if (entities[i].forgettable && !entities[i].visited && entities[i].impressionTime >= agent.forgetTime)
                 entities.RemoveAt(i);
         }
 
@@ -67,6 +96,14 @@ public class PathOSAgentMemory : MonoBehaviour
             if (paths[i].impressionTime >= agent.forgetTime)
                 paths.RemoveAt(i);
         }
+
+        waypointTimer += Time.deltaTime;
+
+        if (waypointTimer >= waypointRegisterTime)
+        {
+            waypointTimer = 0.0f;
+            PushWaypoint(agent.GetPosition());
+        }       
     }
 
     //Push an entity into the agent's memory.
@@ -83,6 +120,21 @@ public class PathOSAgentMemory : MonoBehaviour
         }
 
         entities.Add(new EntityMemory(entity));
+    }
+
+    public void CommitLTM(PerceivedEntity entity)
+    {
+        for(int i = 0; i < entities.Count; ++i)
+        {
+            if(entity == entities[i])
+            {
+                entities[i].ltm = true;
+                return;
+            }
+        }
+
+        entities.Add(new EntityMemory(entity));
+        entities[entities.Count - 1].ltm = true;
     }
 
     //Has a visible entity been visited?
@@ -131,6 +183,26 @@ public class PathOSAgentMemory : MonoBehaviour
         return 0;
     }
 
+    public void PushWaypoint(Vector3 pos, bool wasTarget = false)
+    {
+        waypoints.Add(new WaypointMemory(pos, wasTarget));
+
+        if (waypoints.Count > waypointCacheSize)
+            waypoints.RemoveAt(0);
+    }
+
+    public Vector3 GetLastWaypoint()
+    {
+        if(waypoints.Count == 0)
+        {
+            NPDebug.LogError("Attempted to access waypoint memory before initialization!",
+                typeof(PathOSAgentMemory));
+
+            return Vector3.zero;
+        }
+
+        return waypoints[waypoints.Count - 1].pos;
+    }
 
     //Are there any goals left? 
     bool GoalsRemaining()
