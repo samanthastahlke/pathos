@@ -67,13 +67,18 @@ public class PathOSAgent : MonoBehaviour
     private bool lookingAround = false;
 
     //Where is the agent targeting?
-    private TargetDest currentDestination;
+    private TargetDest currentDest;
 
     //Hazardous area detection.
     private float hazardousAreaTimer = 0;
     private bool hazardousArea = false;
 
     //For backtracking traversal.
+    private float memPathChance = PathOS.Constants.Behaviour.BASE_MEMORY_NAV_CHANCE;
+    private bool onMemPath = false;
+    private List<Vector3> memPathWaypoints;
+    private Vector3 memWaypoint = Vector3.zero;
+
     private bool detour = false; //can apply to a cautious agent backtracking or a reckless one heading towards danger
     private int currentPath = 0;
 
@@ -81,8 +86,10 @@ public class PathOSAgent : MonoBehaviour
 	{
         navAgent = GetComponent<NavMeshAgent>();
 
-        currentDestination = new TargetDest();
-        currentDestination.pos = GetPosition();
+        currentDest = new TargetDest();
+        currentDest.pos = GetPosition();
+
+        memPathWaypoints = new List<Vector3>();
 
         heuristicScaleLookup = new Dictionary<Heuristic, float>();
         entityScoringLookup = new Dictionary<(Heuristic, EntityType), float>();
@@ -117,6 +124,16 @@ public class PathOSAgent : MonoBehaviour
             PathOS.Constants.Behaviour.LOOK_TIME_MAX,
             heuristicScaleLookup[Heuristic.CURIOSITY]);
 
+        float memPathScale = (heuristicScaleLookup[Heuristic.CAUTION] 
+            + 1.0f - heuristicScaleLookup[Heuristic.CURIOSITY]) 
+            * 0.5f;
+
+        memPathChance = Mathf.Lerp(PathOS.Constants.Behaviour.MEMORY_NAV_CHANCE_MIN,
+            PathOS.Constants.Behaviour.MEMORY_NAV_CHANCE_MAX,
+            memPathScale);
+
+        print(memPathChance);
+
         lookTime = baseLookTime;
 	}
 
@@ -126,20 +143,6 @@ public class PathOSAgent : MonoBehaviour
 
         //in case there's only the final goal
         memory.CheckGoals();
-
-        //Test case for A* "backtracking".
-        /*memory.memoryMap.Fill(GetPosition());
-
-        for(int i = -8; i < 8; i += 2)
-        {
-            for(int j = -8; j < 8; j += 2)
-            {
-                memory.memoryMap.Fill(GetPosition() + i * Vector3.right + j * Vector3.forward);
-            }
-        }
-
-        List<Vector3> waypoints = new List<Vector3>();
-        memory.memoryMap.NavigateAStar(GetPosition(), new Vector3(6.8f, 0.0f, 15.8f), ref waypoints);*/
     }
 
     public Vector3 GetPosition()
@@ -190,7 +193,7 @@ public class PathOSAgent : MonoBehaviour
     private void ComputeNewDestination()
     {
         //Base target = our existing destination.
-        TargetDest dest = new TargetDest(currentDestination);
+        TargetDest dest = new TargetDest(currentDest);
 
         float maxScore = -10000.0f;
 
@@ -236,7 +239,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //The existing goal.
-        Vector3 goalForward = currentDestination.pos - navAgent.transform.position;
+        Vector3 goalForward = currentDest.pos - navAgent.transform.position;
         goalForward.y = 0.0f;
         
         if(goalForward.sqrMagnitude > 0.1f)
@@ -245,16 +248,39 @@ public class PathOSAgent : MonoBehaviour
             bool goalVisible = Mathf.Abs(Vector3.Angle(XZForward, goalForward)) < (eyes.XFOV() * 0.5f);
             ScoreExploreDirection(goalForward, goalVisible, ref dest, ref maxScore);
         }
-        
-        currentDestination = dest;
-        navAgent.SetDestination(dest.pos);
 
-        if(null != dest.entity)
-            memory.CommitLTM(dest.entity);
+        //Only recompute goal routing if our new goal is different
+        //from the previous goal.
+        if((currentDest.pos - dest.pos).sqrMagnitude > 
+            PathOS.Constants.Behaviour.GOAL_EPSILON_SQR)
+        {
+            float memChanceRoll = Random.Range(0.0f, 1.0f);
+            onMemPath = false;
+
+            if (memChanceRoll <= memPathChance)
+                onMemPath = memory.memoryMap.NavigateAStar(GetPosition(), dest.pos, ref memPathWaypoints);
+
+            if (onMemPath)
+            {
+                navAgent.SetDestination(memPathWaypoints[0]);
+                memWaypoint.x = memPathWaypoints[0].x;
+                memWaypoint.z = memPathWaypoints[0].z;
+            }
+            else
+            {
+                onMemPath = false;
+                navAgent.SetDestination(dest.pos);
+            }
+
+            if (null != dest.entity)
+                memory.CommitLTM(dest.entity);
+
+            currentDest = dest;
+        }
 
         if(verboseDebugging)
             NPDebug.LogMessage("Position: " + navAgent.transform.position + 
-                ", Destination: " + dest);
+                ", Destination: " + currentDest);
 
         currentPath = memory.paths.Count - 1; //the most recent path
 
@@ -271,8 +297,8 @@ public class PathOSAgent : MonoBehaviour
         float bias = 0.0f;
 
         //Initial placeholder bias for preferring the goal we have already set.
-        if ((entity.perceivedPos - currentDestination.pos).magnitude < 0.1f
-            && (navAgent.transform.position - currentDestination.pos).magnitude > 0.1f)
+        if ((entity.perceivedPos - currentDest.pos).magnitude < 0.1f
+            && (navAgent.transform.position - currentDest.pos).magnitude > 0.1f)
             bias += 1.0f;
 
         //Weighted scoring function.
@@ -329,8 +355,8 @@ public class PathOSAgent : MonoBehaviour
 
         //Initial placeholder bias for preferring the goal we have already set.
         //(If we haven't reached it already.)
-        if ((newDest - currentDestination.pos).magnitude < exploreSimilarityThreshold
-            && (GetPosition() - currentDestination.pos).magnitude > exploreSimilarityThreshold)
+        if ((newDest - currentDest.pos).magnitude < exploreSimilarityThreshold
+            && (GetPosition() - currentDest.pos).magnitude > exploreSimilarityThreshold)
             bias += 1.0f;
 
         float score = ScoreDirection(dir, bias, distance);
@@ -416,7 +442,7 @@ public class PathOSAgent : MonoBehaviour
             lookTimer += Time.deltaTime;
 
         //Whenever this timer reaches a certain point, the agent checks to see if there are a lot of hazards in the area
-        hazardousAreaTimer += Time.deltaTime;
+        /*hazardousAreaTimer += Time.deltaTime;
 
         if (hazardousAreaTimer > 5)
         {
@@ -424,7 +450,7 @@ public class PathOSAgent : MonoBehaviour
             //if it's really hazardous then the agent is looking around constantly
             //these values are just placeholders, and this code should be more sophisticated for the future
             //**this will get cleaned up I swear**
-            if (hazardousArea = memory.CheckHazards(currentDestination.pos))
+            if (hazardousArea = memory.CheckHazards(currentDest.pos))
             {
                 //checks to see if it's more cautious than hazardous
                 //by comparing the caution scale to the aggression+adrenaline scale
@@ -443,15 +469,42 @@ public class PathOSAgent : MonoBehaviour
 
             hazardousAreaTimer = 0;
 
-        }
+        }*/
 
         //Rerouting update.
-        if (routeTimer >= routeComputeTime && detour == false)
+        if (routeTimer >= routeComputeTime)
         {
             routeTimer = 0.0f;
             perceptionTimer = 0.0f;
             eyes.ProcessPerception();
             ComputeNewDestination();
+        }
+
+        //Memory path update.
+        if(onMemPath)
+        {
+            print("On path from memory!");
+
+            Vector3 curXZ = GetPosition();
+            curXZ.y = 0.0f;
+
+            if ((curXZ - memWaypoint).sqrMagnitude
+                < PathOS.Constants.Behaviour.WAYPOINT_EPSILON_SQR)
+            {
+                memPathWaypoints.RemoveAt(0);
+
+                if (memPathWaypoints.Count == 0)
+                {
+                    onMemPath = false;
+                    navAgent.SetDestination(currentDest.pos);
+                }
+                else
+                {
+                    navAgent.SetDestination(memPathWaypoints[0]);
+                    memWaypoint.x = memPathWaypoints[0].x;
+                    memWaypoint.z = memPathWaypoints[0].z;
+                }      
+            }  
         }
 
         //Perception update.
@@ -557,23 +610,23 @@ public class PathOSAgent : MonoBehaviour
     IEnumerator Backtrack()
     {
         Vector3 originPoint = memory.paths[currentPath].originPoint;
-        currentDestination.pos = originPoint;
+        currentDest.pos = originPoint;
 
         //Then it goes down the path
-        while (!((GetPosition() - currentDestination.pos).magnitude < 2))
+        while (!((GetPosition() - currentDest.pos).magnitude < 2))
         {
-            navAgent.SetDestination(currentDestination.pos);
+            navAgent.SetDestination(currentDest.pos);
             yield return null;
         }
 
         //the new destination after backtracking gets calculated
         Vector3 newDestination = memory.CalculateNewPath(currentPath);
-        currentDestination.pos = newDestination;
-        navAgent.SetDestination(currentDestination.pos);
+        currentDest.pos = newDestination;
+        navAgent.SetDestination(currentDest.pos);
 
-        while (!((GetPosition() - currentDestination.pos).magnitude < 2)) 
+        while (!((GetPosition() - currentDest.pos).magnitude < 2)) 
         {
-            navAgent.SetDestination(currentDestination.pos); //sets the new destination
+            navAgent.SetDestination(currentDest.pos); //sets the new destination
             yield return null;
         }
 
@@ -587,12 +640,12 @@ public class PathOSAgent : MonoBehaviour
     //If the agent is aggressive this will send them to the center of the hazardous area
     IEnumerator HeadTowardsHazards()
     {
-        currentDestination.pos = memory.CalculateCentroid();
+        currentDest.pos = memory.CalculateCentroid();
 
         //Then it goes down the path
-        while (!((GetPosition() - currentDestination.pos).magnitude < 2))
+        while (!((GetPosition() - currentDest.pos).magnitude < 2))
         {
-            navAgent.SetDestination(currentDestination.pos);
+            navAgent.SetDestination(currentDest.pos);
             yield return null;
         }
 
@@ -609,7 +662,7 @@ public class PathOSAgent : MonoBehaviour
 
     public Vector3 GetTargetPosition()
     {
-        return currentDestination.pos;
+        return currentDest.pos;
     }
 
     bool IsDetourValid()
@@ -620,7 +673,7 @@ public class PathOSAgent : MonoBehaviour
             return false;
         if (currentPath <= 0)
             return false;
-        if (Vector3.Distance(currentDestination.pos, GetPosition()) <= 1.5f)
+        if (Vector3.Distance(currentDest.pos, GetPosition()) <= 1.5f)
             return false;
         if (((heuristicScaleLookup[Heuristic.AGGRESSION] + heuristicScaleLookup[Heuristic.ADRENALINE]) * 0.5) 
             > heuristicScaleLookup[Heuristic.CAUTION] && Vector3.Distance(navAgent.transform.position, memory.CalculateCentroid()) < 3)

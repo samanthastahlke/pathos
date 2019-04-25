@@ -4329,7 +4329,7 @@ MonoBehaviour:
   experienceScale: 0.468
   heuristicScales:
   - heuristic: 0
-    scale: 0.59
+    scale: 0
   - heuristic: 10
     scale: 0.55
   - heuristic: 15
@@ -4339,7 +4339,7 @@ MonoBehaviour:
   - heuristic: 25
     scale: 0
   - heuristic: 30
-    scale: 0
+    scale: 1
   - heuristic: 35
     scale: 0
   routeComputeTime: 0.5

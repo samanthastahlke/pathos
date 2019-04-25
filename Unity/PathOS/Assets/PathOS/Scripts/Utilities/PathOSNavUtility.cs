@@ -405,6 +405,7 @@ public class PathOSNavUtility
         public bool NavigateAStar(Vector3 start, Vector3 dest, ref List<Vector3> waypoints)
         {
             int gridX = 0, gridZ = 0;
+            waypoints.Clear();
 
             //Define tiles for the start and destination.
             GetGridCoords(start, ref gridX, ref gridZ);
@@ -429,7 +430,7 @@ public class PathOSNavUtility
 
             AStarTile curTile = startTile;
 
-            NPDebug.LogMessage("Initialized A-Star.");
+            //NPDebug.LogMessage("Initialized A-Star.");
 
             while(!complete)
             { 
@@ -437,7 +438,7 @@ public class PathOSNavUtility
 
                 if(curTile == destTile)
                 {
-                    NPDebug.LogMessage("Reached destination.");
+                    //NPDebug.LogMessage("Reached destination.");
                     complete = true;
                     destinationReached = true;
                     break;
@@ -462,7 +463,7 @@ public class PathOSNavUtility
 
                 if (open.Count == 0)
                 {
-                    NPDebug.LogMessage("Failed to reach destination.");
+                    //NPDebug.LogMessage("Failed to reach destination.");
                     complete = true;
                     break;
                 }
@@ -512,7 +513,12 @@ public class PathOSNavUtility
             visualGrid.Apply();
             */
 
-            return destinationReached;
+            for(int i = 1; i < path.Count - 1; ++i)
+            {
+                waypoints.Add(GetPoint(path[i].xCoord, path[i].zCoord));
+            }
+
+            return path.Count >= PathOS.Constants.Behaviour.MIN_A_STAR_MEMORY_LENGTH;
         }
 
         private bool Walkable(int x, int z)
