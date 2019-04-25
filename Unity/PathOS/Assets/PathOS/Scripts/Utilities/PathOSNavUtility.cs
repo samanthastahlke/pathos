@@ -46,6 +46,105 @@ public class PathOSNavUtility
             public float distance;
         }
 
+        public class AStarTile
+        {
+            public int xCoord = 0;
+            public int zCoord = 0;
+            public float gScore = 1000.0f;
+            public float hScore = 1000.0f;
+            public float fScore = 1000.0f;
+
+            public AStarTile parent = null;
+
+            public AStarTile() { }
+
+            public AStarTile(AStarTile parent)
+            {
+                this.xCoord = parent.xCoord;
+                this.zCoord = parent.zCoord;
+                this.gScore = parent.gScore + 1;
+                this.parent = parent;           
+            }
+
+            public void UpdateScores(AStarTile dest)
+            {
+                this.hScore = Mathf.Abs(dest.xCoord - this.xCoord)
+                    + Mathf.Abs(dest.zCoord - this.zCoord);
+
+                RecomputeF();
+            }
+
+            private void RecomputeF()
+            {
+                fScore = (hScore == 0) ? -1000.0f : gScore + hScore;
+            }
+
+            public void ChangeParentOptimal(AStarTile parent)
+            {
+                if (parent.gScore + 1 < this.gScore)
+                {
+                    this.parent = parent;
+                    this.gScore = parent.gScore + 1;
+                    RecomputeF();
+                }           
+            }
+
+            public void InsertByScore(ref List<AStarTile> list)
+            {
+                for(int i = 0; i < list.Count; ++i)
+                {
+                    if (list[i].fScore >= this.fScore)
+                    {
+                        list.Insert(i, this);
+                        return;
+                    }
+                }
+
+                list.Add(this);
+            }
+
+            //Equality is determined by location.
+            public static bool operator==(AStarTile lhs, AStarTile rhs)
+            {
+                if (object.ReferenceEquals(lhs, null))
+                    return object.ReferenceEquals(rhs, null);
+
+                if (object.ReferenceEquals(rhs, null))
+                    return object.ReferenceEquals(lhs, null);
+
+                return lhs.xCoord == rhs.xCoord && lhs.zCoord == rhs.zCoord;
+            }
+
+            public static bool operator !=(AStarTile lhs, AStarTile rhs)
+            {
+                if (object.ReferenceEquals(lhs, null))
+                    return !object.ReferenceEquals(rhs, null);
+
+                if (object.ReferenceEquals(rhs, null))
+                    return !object.ReferenceEquals(lhs, null);
+
+                return lhs.xCoord != rhs.xCoord || lhs.zCoord != rhs.zCoord;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (null == obj)
+                    return false;
+
+                AStarTile objAsTile = obj as AStarTile;
+
+                if (objAsTile == default(AStarTile))
+                    return false;
+
+                return this == objAsTile;
+            }
+
+            public override int GetHashCode()
+            {
+                return xCoord * zCoord;
+            }
+        }
+
         public enum NavmeshMapCode
         {
             NM_DNE = -1,
@@ -128,6 +227,21 @@ public class PathOSNavUtility
             //Calculate grid indices based on sampling size.
             gridX = (int)(diff.x / sampleGridSize);
             gridZ = (int)(diff.z / sampleGridSize);
+        }
+
+        private Vector3 GetPoint(int gridX, int gridZ)
+        {
+            Vector3 diff = Vector3.zero;
+
+            //Calculate difference between grid origin and sample tile in world units.
+            diff.x = gridX * sampleGridSize;
+            diff.z = gridZ * sampleGridSize;
+
+            //Compute point based on grid origin.
+            Vector3 point = gridOrigin + diff;
+            point.y = bounds.altitudeSampleHeight;
+
+            return point;
         }
 
         private NavmeshMapCode SampleMap(Vector3 point)
@@ -224,9 +338,13 @@ public class PathOSNavUtility
                 return;
             }
 
+            if (visitedGrid[gridX, gridZ] == NavmeshMapCode.NM_VISITED)
+                return;
+
             visitedGrid[gridX, gridZ] = code;
 
             Color fillColor = Color.black;
+
             switch(code)
             {
                 case NavmeshMapCode.NM_VISITED:
@@ -240,6 +358,171 @@ public class PathOSNavUtility
 
             visualGrid.SetPixel(gridX, gridZ, fillColor);
             visualGrid.Apply();
+        }
+
+        private void GetAdjacentWalkable(ref List<AStarTile> adjacent,
+            ref AStarTile parent, ref AStarTile dest)
+        {
+            adjacent.Clear();
+
+            AStarTile left = new AStarTile(parent);
+            --left.xCoord;
+
+            AStarTile right = new AStarTile(parent);
+            ++right.xCoord;
+
+            AStarTile up = new AStarTile(parent);
+            ++up.zCoord;
+
+            AStarTile down = new AStarTile(parent);
+            --down.zCoord;
+
+            if (Walkable(left.xCoord, left.zCoord))
+            {
+                left.UpdateScores(dest);
+                adjacent.Add(left);
+            }
+                
+            if (Walkable(right.xCoord, right.zCoord))
+            {
+                right.UpdateScores(dest);
+                adjacent.Add(right);
+            }
+                
+            if (Walkable(up.xCoord, up.zCoord))
+            {
+                up.UpdateScores(dest);
+                adjacent.Add(up);
+            }
+                
+            if (Walkable(down.xCoord, down.zCoord))
+            {
+                down.UpdateScores(dest);
+                adjacent.Add(down);
+            }
+        }
+
+        public bool NavigateAStar(Vector3 start, Vector3 dest, ref List<Vector3> waypoints)
+        {
+            int gridX = 0, gridZ = 0;
+
+            //Define tiles for the start and destination.
+            GetGridCoords(start, ref gridX, ref gridZ);
+            AStarTile startTile = new AStarTile();
+            startTile.xCoord = gridX;
+            startTile.zCoord = gridZ;
+
+            GetGridCoords(dest, ref gridX, ref gridZ);
+            AStarTile destTile = new AStarTile();
+            destTile.xCoord = gridX;
+            destTile.zCoord = gridZ;
+
+            startTile.gScore = Mathf.Abs(startTile.xCoord - destTile.xCoord)
+                + Mathf.Abs(startTile.zCoord - destTile.zCoord);
+
+            List<AStarTile> open = new List<AStarTile>();
+            List<AStarTile> adjacent = new List<AStarTile>();
+            List<AStarTile> closed = new List<AStarTile>();
+
+            bool complete = false;
+            bool destinationReached = false;
+
+            AStarTile curTile = startTile;
+
+            NPDebug.LogMessage("Initialized A-Star.");
+
+            while(!complete)
+            { 
+                closed.Add(curTile);
+
+                if(curTile == destTile)
+                {
+                    NPDebug.LogMessage("Reached destination.");
+                    complete = true;
+                    destinationReached = true;
+                    break;
+                }
+
+                GetAdjacentWalkable(ref adjacent, ref curTile, ref destTile);
+
+                for (int i = 0; i < adjacent.Count; ++i)
+                {
+                    if (closed.Contains(adjacent[i]))
+                        continue;
+
+                    if (open.Contains(adjacent[i]))
+                    {
+                        AStarTile existingTile = open.Find(tile => tile == adjacent[i]);
+                        existingTile.ChangeParentOptimal(curTile);
+                        continue;
+                    }
+
+                    adjacent[i].InsertByScore(ref open);
+                }
+
+                if (open.Count == 0)
+                {
+                    NPDebug.LogMessage("Failed to reach destination.");
+                    complete = true;
+                    break;
+                }
+
+                curTile = open[0];
+                open.RemoveAt(0);
+            }
+
+            List<AStarTile> path = new List<AStarTile>();
+
+            //Construct final path.
+            if(destinationReached)
+            {
+                while(curTile != startTile)
+                {
+                    path.Insert(0, curTile);
+                    curTile = curTile.parent;
+                }          
+            }
+            else
+            {
+                //"Try" to navigate back - take the tile that got closest and build path.
+                AStarTile best = closed[0];
+
+                for(int i = 1; i < closed.Count; ++i)
+                {
+                    if (closed[i].hScore < best.hScore)
+                        best = closed[i];
+                }
+
+                curTile = best;
+
+                while(curTile != startTile)
+                {
+                    path.Insert(0, curTile);
+                    curTile = curTile.parent;
+                }
+            }
+
+            //For debugging.
+            /*
+            for (int i = 0; i < path.Count; ++i)
+            {
+                visualGrid.SetPixel(path[i].xCoord, path[i].zCoord, Color.blue);
+            }
+
+            visualGrid.Apply();
+            */
+
+            return destinationReached;
+        }
+
+        private bool Walkable(int x, int z)
+        {
+            if (x < 0 || z < 0
+                || x > visitedGrid.GetLength(0)
+                || z > visitedGrid.GetLength(1))
+                return false;
+
+            return visitedGrid[x, z] == NavmeshMapCode.NM_VISITED;
         }
     }
 

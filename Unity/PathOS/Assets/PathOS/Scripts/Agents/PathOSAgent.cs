@@ -82,7 +82,6 @@ public class PathOSAgent : MonoBehaviour
         navAgent = GetComponent<NavMeshAgent>();
 
         currentDestination = new TargetDest();
-        print(currentDestination.pos);
         currentDestination.pos = GetPosition();
 
         heuristicScaleLookup = new Dictionary<Heuristic, float>();
@@ -127,6 +126,20 @@ public class PathOSAgent : MonoBehaviour
 
         //in case there's only the final goal
         memory.CheckGoals();
+
+        //Test case for A* "backtracking".
+        /*memory.memoryMap.Fill(GetPosition());
+
+        for(int i = -8; i < 8; i += 2)
+        {
+            for(int j = -8; j < 8; j += 2)
+            {
+                memory.memoryMap.Fill(GetPosition() + i * Vector3.right + j * Vector3.forward);
+            }
+        }
+
+        List<Vector3> waypoints = new List<Vector3>();
+        memory.memoryMap.NavigateAStar(GetPosition(), new Vector3(6.8f, 0.0f, 15.8f), ref waypoints);*/
     }
 
     public Vector3 GetPosition()

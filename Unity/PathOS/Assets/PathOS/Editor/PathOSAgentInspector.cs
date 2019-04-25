@@ -37,7 +37,6 @@ public class PathOSAgentInspector : Editor
     private SerializedProperty exploreDegrees;
     private SerializedProperty invisibleExploreDegrees;
     private SerializedProperty lookDegrees;
-    private SerializedProperty lookTime;
     private SerializedProperty visitThreshold;
     private SerializedProperty exploreSimilarityThreshold;
     private SerializedProperty forgetTime;
@@ -48,9 +47,6 @@ public class PathOSAgentInspector : Editor
     {
         agent = (PathOSAgent)target;
         serial = new SerializedObject(agent);
-
-        foldoutStyle = new GUIStyle(EditorStyles.foldout);
-        foldoutStyle.fontStyle = FontStyle.Bold;
 
         experienceScale = serial.FindProperty("experienceScale");
         heuristicList = serial.FindProperty("heuristicScales");
@@ -66,7 +62,6 @@ public class PathOSAgentInspector : Editor
         exploreDegrees = serial.FindProperty("exploreDegrees");
         invisibleExploreDegrees = serial.FindProperty("invisibleExploreDegrees");
         lookDegrees = serial.FindProperty("lookDegrees");
-        lookTime = serial.FindProperty("lookTime");
         visitThreshold = serial.FindProperty("visitThreshold");
         exploreSimilarityThreshold = serial.FindProperty("exploreSimilarityThreshold");
         forgetTime = serial.FindProperty("forgetTime");
@@ -96,6 +91,11 @@ public class PathOSAgentInspector : Editor
         EditorGUILayout.PropertyField(freezeAgent);
         EditorGUILayout.PropertyField(verboseDebugging);
 
+        //Placed here since Unity seems to have issues with having these 
+        //styles initialized on enable sometimes.
+        foldoutStyle = EditorStyles.foldout;
+        foldoutStyle.fontStyle = FontStyle.Bold;
+
         showPlayerCharacteristics = EditorGUILayout.Foldout(
             showPlayerCharacteristics, "Player Characteristics", foldoutStyle);
        
@@ -121,7 +121,6 @@ public class PathOSAgentInspector : Editor
             EditorGUILayout.PropertyField(exploreDegrees);
             EditorGUILayout.PropertyField(invisibleExploreDegrees);
             EditorGUILayout.PropertyField(lookDegrees);
-            EditorGUILayout.PropertyField(lookTime);
             EditorGUILayout.PropertyField(visitThreshold);
             EditorGUILayout.PropertyField(exploreSimilarityThreshold);
         }

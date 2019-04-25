@@ -158,7 +158,7 @@ namespace PathOS
                 return !object.ReferenceEquals(rhs, null);
 
             if (object.ReferenceEquals(rhs, null))
-                return object.ReferenceEquals(lhs, null);
+                return !object.ReferenceEquals(lhs, null);
 
             return lhs.instanceID != rhs.instanceID;
         }
@@ -169,7 +169,7 @@ namespace PathOS
                 return !object.ReferenceEquals(rhs, null);
 
             if (object.ReferenceEquals(rhs, null))
-                return object.ReferenceEquals(lhs, null);
+                return !object.ReferenceEquals(lhs, null);
 
             return lhs.instanceID != rhs.entity.instanceID;
         }
