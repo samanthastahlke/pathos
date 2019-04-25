@@ -4347,7 +4347,6 @@ MonoBehaviour:
   exploreDegrees: 5
   invisibleExploreDegrees: 30
   lookDegrees: 60
-  lookTime: 12
   visitThreshold: 1
   exploreSimilarityThreshold: 2
 --- !u!195 &626367635
@@ -10293,7 +10292,7 @@ MonoBehaviour:
     entityType: 200
     alwaysKnown: 0
   - name: Goblin
-    objectRef: {fileID: 359376571}
+    objectRef: {fileID: 1161559241}
     entityType: 200
     alwaysKnown: 0
   - name: Goblin

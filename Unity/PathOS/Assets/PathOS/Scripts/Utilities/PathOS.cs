@@ -198,6 +198,20 @@ namespace PathOS
         }
     }
 
+    public class TargetDest
+    {
+        public PerceivedEntity entity = null;
+        public Vector3 pos = Vector3.zero;
+
+        public TargetDest() { }
+
+        public TargetDest(TargetDest data)
+        {
+            entity = data.entity;
+            pos = data.pos;
+        }
+    }
+
     //How the memory of an object is represented in the agent's world model.
     //Entity memory = POI which represents an in-game object.
     public class EntityMemory

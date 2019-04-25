@@ -67,10 +67,9 @@ public class PathOSAgent : MonoBehaviour
     private bool lookingAround = false;
 
     //Where is the agent targeting?
-    private Vector3 currentDestination;
+    private TargetDest currentDestination;
 
     //Hazardous area detection.
-    private float previousLookTime; 
     private float hazardousAreaTimer = 0;
     private bool hazardousArea = false;
 
@@ -81,7 +80,10 @@ public class PathOSAgent : MonoBehaviour
     private void Awake()
 	{
         navAgent = GetComponent<NavMeshAgent>();
-        currentDestination = navAgent.transform.position;
+
+        currentDestination = new TargetDest();
+        print(currentDestination.pos);
+        currentDestination.pos = GetPosition();
 
         heuristicScaleLookup = new Dictionary<Heuristic, float>();
         entityScoringLookup = new Dictionary<(Heuristic, EntityType), float>();
@@ -175,7 +177,7 @@ public class PathOSAgent : MonoBehaviour
     private void ComputeNewDestination()
     {
         //Base target = our existing destination.
-        Vector3 dest = currentDestination;
+        TargetDest dest = new TargetDest(currentDestination);
 
         float maxScore = -10000.0f;
 
@@ -221,7 +223,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //The existing goal.
-        Vector3 goalForward = currentDestination - navAgent.transform.position;
+        Vector3 goalForward = currentDestination.pos - navAgent.transform.position;
         goalForward.y = 0.0f;
         
         if(goalForward.sqrMagnitude > 0.1f)
@@ -232,7 +234,10 @@ public class PathOSAgent : MonoBehaviour
         }
         
         currentDestination = dest;
-        navAgent.SetDestination(dest);
+        navAgent.SetDestination(dest.pos);
+
+        if(null != dest.entity)
+            memory.CommitLTM(dest.entity);
 
         if(verboseDebugging)
             NPDebug.LogMessage("Position: " + navAgent.transform.position + 
@@ -243,7 +248,7 @@ public class PathOSAgent : MonoBehaviour
     }
 
     //maxScore is updated if the entity achieves a higher score.
-    private void ScoreEntity(PerceivedEntity entity, ref Vector3 dest, ref float maxScore)
+    private void ScoreEntity(PerceivedEntity entity, ref TargetDest dest, ref float maxScore)
     {
         //A previously visited entity shouldn't be targeted.
         if (memory.Visited(entity)) 
@@ -253,8 +258,8 @@ public class PathOSAgent : MonoBehaviour
         float bias = 0.0f;
 
         //Initial placeholder bias for preferring the goal we have already set.
-        if ((entity.perceivedPos - currentDestination).magnitude < 0.1f
-            && (navAgent.transform.position - currentDestination).magnitude > 0.1f)
+        if ((entity.perceivedPos - currentDestination.pos).magnitude < 0.1f
+            && (navAgent.transform.position - currentDestination.pos).magnitude > 0.1f)
             bias += 1.0f;
 
         //Weighted scoring function.
@@ -277,12 +282,13 @@ public class PathOSAgent : MonoBehaviour
         if (score > maxScore)
         {
             maxScore = score;
-            dest = entity.perceivedPos;
+            dest.entity = entity;
+            dest.pos = entity.perceivedPos;
         }
     }
 
     //maxScore is updated if the direction achieves a higher score.
-    void ScoreExploreDirection(Vector3 dir, bool visible, ref Vector3 dest, ref float maxScore)
+    void ScoreExploreDirection(Vector3 dir, bool visible, ref TargetDest dest, ref float maxScore)
     {
         float distance = 0.0f;
         Vector3 newDest = navAgent.transform.position;
@@ -310,8 +316,8 @@ public class PathOSAgent : MonoBehaviour
 
         //Initial placeholder bias for preferring the goal we have already set.
         //(If we haven't reached it already.)
-        if ((newDest - currentDestination).magnitude < exploreSimilarityThreshold
-            && (navAgent.transform.position - currentDestination).magnitude > exploreSimilarityThreshold)
+        if ((newDest - currentDestination.pos).magnitude < exploreSimilarityThreshold
+            && (GetPosition() - currentDestination.pos).magnitude > exploreSimilarityThreshold)
             bias += 1.0f;
 
         float score = ScoreDirection(dir, bias, distance);
@@ -319,10 +325,12 @@ public class PathOSAgent : MonoBehaviour
         if(score > maxScore)
         {
             maxScore = score;
-            dest = newDest;
+            dest.pos = newDest;
+            dest.entity = null;
         }
 
-        memory.AddPath(new ExploreMemory(navAgent.transform.position, dir, Vector3.Distance(navAgent.transform.position, dest)));
+        memory.AddPath(new ExploreMemory(GetPosition(), dir, 
+            Vector3.Distance(GetPosition(), dest.pos)));
     }
 
     float ScoreDirection(Vector3 dir, float bias, float maxDistance)
@@ -403,7 +411,7 @@ public class PathOSAgent : MonoBehaviour
             //if it's really hazardous then the agent is looking around constantly
             //these values are just placeholders, and this code should be more sophisticated for the future
             //**this will get cleaned up I swear**
-            if (hazardousArea = memory.CheckHazards(currentDestination))
+            if (hazardousArea = memory.CheckHazards(currentDestination.pos))
             {
                 //checks to see if it's more cautious than hazardous
                 //by comparing the caution scale to the aggression+adrenaline scale
@@ -536,23 +544,23 @@ public class PathOSAgent : MonoBehaviour
     IEnumerator Backtrack()
     {
         Vector3 originPoint = memory.paths[currentPath].originPoint;
-        currentDestination = originPoint;
+        currentDestination.pos = originPoint;
 
         //Then it goes down the path
-        while (!((navAgent.transform.position - currentDestination).magnitude < 2))
+        while (!((GetPosition() - currentDestination.pos).magnitude < 2))
         {
-            navAgent.SetDestination(currentDestination);
+            navAgent.SetDestination(currentDestination.pos);
             yield return null;
         }
 
         //the new destination after backtracking gets calculated
         Vector3 newDestination = memory.CalculateNewPath(currentPath);
-        currentDestination = newDestination;
-        navAgent.SetDestination(currentDestination);
+        currentDestination.pos = newDestination;
+        navAgent.SetDestination(currentDestination.pos);
 
-        while (!((navAgent.transform.position - currentDestination).magnitude < 2)) 
+        while (!((GetPosition() - currentDestination.pos).magnitude < 2)) 
         {
-            navAgent.SetDestination(currentDestination); //sets the new destination
+            navAgent.SetDestination(currentDestination.pos); //sets the new destination
             yield return null;
         }
 
@@ -566,12 +574,12 @@ public class PathOSAgent : MonoBehaviour
     //If the agent is aggressive this will send them to the center of the hazardous area
     IEnumerator HeadTowardsHazards()
     {
-        currentDestination = memory.CalculateCentroid();
+        currentDestination.pos = memory.CalculateCentroid();
 
         //Then it goes down the path
-        while (!((navAgent.transform.position - currentDestination).magnitude < 2))
+        while (!((GetPosition() - currentDestination.pos).magnitude < 2))
         {
-            navAgent.SetDestination(currentDestination);
+            navAgent.SetDestination(currentDestination.pos);
             yield return null;
         }
 
@@ -588,7 +596,7 @@ public class PathOSAgent : MonoBehaviour
 
     public Vector3 GetTargetPosition()
     {
-        return currentDestination;
+        return currentDestination.pos;
     }
 
     bool IsDetourValid()
@@ -599,7 +607,7 @@ public class PathOSAgent : MonoBehaviour
             return false;
         if (currentPath <= 0)
             return false;
-        if (Vector3.Distance(currentDestination, navAgent.transform.position) <= 1.5f)
+        if (Vector3.Distance(currentDestination.pos, GetPosition()) <= 1.5f)
             return false;
         if (((heuristicScaleLookup[Heuristic.AGGRESSION] + heuristicScaleLookup[Heuristic.ADRENALINE]) * 0.5) 
             > heuristicScaleLookup[Heuristic.CAUTION] && Vector3.Distance(navAgent.transform.position, memory.CalculateCentroid()) < 3)
