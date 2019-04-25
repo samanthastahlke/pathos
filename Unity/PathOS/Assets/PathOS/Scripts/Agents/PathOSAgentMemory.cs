@@ -20,6 +20,7 @@ public class PathOSAgentMemory : MonoBehaviour
     public List<ExploreMemory> paths { get; set; }
 
     //Traversal history.
+    //Change to landmarks.
     public List<WaypointMemory> waypoints { get; set; }
     public int waypointCacheSize = 64;
     public float waypointRegisterTime = 5.0f;
@@ -234,6 +235,33 @@ public class PathOSAgentMemory : MonoBehaviour
     public bool GetGoalsLeft()
     {
         return goalsLeft; //returns whether or not there are goals left
+    }
+
+    //Score the area as hazardous on a normalized 0-1 scale. This is 
+    //used to modulate the look-around behaviour of cautious agents.
+    public float ScoreHazards(Vector3 pos)
+    {
+        int hazardCount = 0;
+
+        for (int i = 0; i < entities.Count; ++i)
+        {
+            if(!entities[i].visited
+                && (entities[i].entity.entityType == EntityType.ET_HAZARD_ENEMY
+                || entities[i].entity.entityType == EntityType.ET_HAZARD_ENVIRONMENT))
+            {
+                if ((entities[i].entity.perceivedPos - pos).sqrMagnitude >
+                    PathOS.Constants.Behaviour.ENEMY_RADIUS_SQR)
+                    ++hazardCount;
+
+                if (hazardCount >= PathOS.Constants.Behaviour.ENEMY_COUNT_THRESHOLD)
+                    return 1.0f;
+            }
+        }
+
+        float hazardScore = (float)hazardCount / 
+            PathOS.Constants.Behaviour.ENEMY_COUNT_THRESHOLD;
+
+        return hazardScore;
     }
 
     //checks the number of hazards in close proximity

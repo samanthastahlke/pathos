@@ -31,8 +31,8 @@ public class PathOSAgent : MonoBehaviour
     public float experienceScale;
 
     public List<HeuristicScale> heuristicScales;
-    private Dictionary<Heuristic, float> heuristicWeightLookup;
-    private Dictionary<(Heuristic, EntityType), float> heuristicScoringLookup;
+    private Dictionary<Heuristic, float> heuristicScaleLookup;
+    private Dictionary<(Heuristic, EntityType), float> entityScoringLookup;
 
     /* NAVIGATION PROPERTIES */
 
@@ -47,7 +47,6 @@ public class PathOSAgent : MonoBehaviour
     //How many degrees do we sway to either side when looking around?
     public float lookDegrees = 60.0f;
     //How long does it take to look around?
-    public float lookTime = 2.0f;
     //How close does the agent have to get to a goal to mark it as visited?
     public float visitThreshold = 1.0f;
     //How close do two "exploration" goals have to be to be considered the same?
@@ -62,6 +61,8 @@ public class PathOSAgent : MonoBehaviour
     //Timers for handling rerouting and looking around.
     private float routeTimer = 0.0f;
     private float perceptionTimer = 0.0f;
+    private float baseLookTime = PathOS.Constants.Behaviour.LOOK_TIME_MAX;
+    private float lookTime = PathOS.Constants.Behaviour.LOOK_TIME_MAX;
     private float lookTimer = 0.0f;
     private bool lookingAround = false;
 
@@ -82,21 +83,21 @@ public class PathOSAgent : MonoBehaviour
         navAgent = GetComponent<NavMeshAgent>();
         currentDestination = navAgent.transform.position;
 
-        heuristicWeightLookup = new Dictionary<Heuristic, float>();
-        heuristicScoringLookup = new Dictionary<(Heuristic, EntityType), float>();
+        heuristicScaleLookup = new Dictionary<Heuristic, float>();
+        entityScoringLookup = new Dictionary<(Heuristic, EntityType), float>();
 
         PathOSManager manager = PathOSManager.instance;
 
         foreach(HeuristicScale curScale in heuristicScales)
         {
-            heuristicWeightLookup.Add(curScale.heuristic, curScale.scale);
+            heuristicScaleLookup.Add(curScale.heuristic, curScale.scale);
         }
 
         foreach(HeuristicWeightSet curSet in manager.heuristicWeights)
         {
             for(int j = 0; j < curSet.weights.Count; ++j)
             {
-                heuristicScoringLookup.Add((curSet.heuristic, curSet.weights[j].entype), curSet.weights[j].weight);
+                entityScoringLookup.Add((curSet.heuristic, curSet.weights[j].entype), curSet.weights[j].weight);
             }
         }
 
@@ -110,17 +111,17 @@ public class PathOSAgent : MonoBehaviour
             PathOS.Constants.Memory.MEM_CAPACITY_MAX,
             experienceScale));
 
+        //Base look time is scaled by curiosity.
+        baseLookTime = Mathf.Lerp(PathOS.Constants.Behaviour.LOOK_TIME_MIN_EXPLORE,
+            PathOS.Constants.Behaviour.LOOK_TIME_MAX,
+            heuristicScaleLookup[Heuristic.CURIOSITY]);
+
+        lookTime = baseLookTime;
 	}
 
     private void Start()
     {
-        eyes.ProcessPerception();
-
-        //The look timer changes depending on the curiosity
-        lookTime -= (lookTime * (heuristicWeightLookup[Heuristic.CURIOSITY] * 0.5f));
-
-        //Storing the original lookTime value so that we can switch back to it later
-        previousLookTime = lookTime;
+        PerceptionUpdate();
 
         //in case there's only the final goal
         memory.CheckGoals();
@@ -129,6 +130,21 @@ public class PathOSAgent : MonoBehaviour
     public Vector3 GetPosition()
     {
         return navAgent.transform.position;
+    }
+
+    private void UpdateLookTime()
+    {
+        lookTime = baseLookTime;
+
+        //Actual look time can fluctuate based on the agent's caution and the 
+        //danger in the current area.
+        float lookTimeScale = memory.ScoreHazards(GetPosition()) * 
+            heuristicScaleLookup[Heuristic.CAUTION];
+
+        lookTime = Mathf.Min(baseLookTime,
+            Mathf.Lerp(PathOS.Constants.Behaviour.LOOK_TIME_MAX,
+            PathOS.Constants.Behaviour.LOOK_TIME_MIN_CAUTION,
+            lookTimeScale));
     }
 
     //Used by the Inspector to ensure scale widgets will appear for all defined heuristics.
@@ -246,13 +262,13 @@ public class PathOSAgent : MonoBehaviour
         {
             (Heuristic, EntityType) key = (heuristicScale.heuristic, entity.entityType);
 
-            if(!heuristicScoringLookup.ContainsKey(key))
+            if(!entityScoringLookup.ContainsKey(key))
             {
                 NPDebug.LogError("Couldn't find key " + key.ToString() + " in heuristic scoring lookup!", typeof(PathOSAgent));
                 continue;
             }
 
-            bias += heuristicScale.scale * heuristicScoringLookup[key];
+            bias += heuristicScale.scale * entityScoringLookup[key];
         }
 
         Vector3 toEntity = entity.perceivedPos - navAgent.transform.position;
@@ -290,7 +306,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         float bias = (distance / eyes.navmeshCastDistance) 
-            * (heuristicWeightLookup[Heuristic.CURIOSITY] + 0.1f);
+            * (heuristicScaleLookup[Heuristic.CURIOSITY] + 0.1f);
 
         //Initial placeholder bias for preferring the goal we have already set.
         //(If we haven't reached it already.)
@@ -321,7 +337,10 @@ public class PathOSAgent : MonoBehaviour
         //This is similar to the scaling created by assessing an exploration direction.
         PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
         memory.memoryMap.RaycastMemoryMap(navAgent.transform.position, dir, maxDistance, out hit);
-        score += (heuristicWeightLookup[Heuristic.CURIOSITY] + 0.1f) * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples;
+
+        score += (heuristicScaleLookup[Heuristic.CURIOSITY] 
+            + PathOS.Constants.Behaviour.HEURISTIC_EPSILON) 
+            * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples;
 
         //Enumerate over all entities the agent knows about, and use them
         //to affect our assessment of the potential target.
@@ -346,20 +365,20 @@ public class PathOSAgent : MonoBehaviour
                 (Heuristic, EntityType) key = (heuristicScale.heuristic, 
                     memory.entities[i].entity.entityType);
 
-                if(!heuristicScoringLookup.ContainsKey(key))
+                if(!entityScoringLookup.ContainsKey(key))
                 {
                     NPDebug.LogError("Couldn't find key " + key.ToString() + " in heuristic scoring lookup!", typeof(PathOSAgent));
                     continue;
                 }
 
-                bias += heuristicScale.scale * heuristicScoringLookup[key] * dot * distFactor;
+                bias += heuristicScale.scale * entityScoringLookup[key] * dot * distFactor;
             }
         }
 
         return score;
     }
 
-	void Update() 
+	private void Update() 
 	{
         //Inactive state toggle for debugging purposes.
         if (freezeAgent)
@@ -388,23 +407,17 @@ public class PathOSAgent : MonoBehaviour
             {
                 //checks to see if it's more cautious than hazardous
                 //by comparing the caution scale to the aggression+adrenaline scale
-               if (heuristicWeightLookup[Heuristic.CAUTION] >= 
-                    ((heuristicWeightLookup[Heuristic.ADRENALINE] + heuristicWeightLookup[Heuristic.AGGRESSION])*0.5f) 
-                    && heuristicWeightLookup[Heuristic.CAUTION]>0)
+               if (heuristicScaleLookup[Heuristic.CAUTION] >= 
+                    ((heuristicScaleLookup[Heuristic.ADRENALINE] + heuristicScaleLookup[Heuristic.AGGRESSION])*0.5f) 
+                    && heuristicScaleLookup[Heuristic.CAUTION]>0)
                {
                    ActivateDetour(Backtrack()); //if the conditions are met the backtrack detour will be activated
-                   lookTime = 0.8f;
                }
-               else if (heuristicWeightLookup[Heuristic.AGGRESSION] + heuristicWeightLookup[Heuristic.ADRENALINE] > 0)
+               else if (heuristicScaleLookup[Heuristic.AGGRESSION] + heuristicScaleLookup[Heuristic.ADRENALINE] > 0)
                {
                    ActivateDetour(HeadTowardsHazards()); //otherwise it'll head towards danger
-                   lookTime = previousLookTime; //restores the lookTime if it's not hazardous
                
                }
-            }
-            else
-            {
-                lookTime = previousLookTime; 
             }
 
             hazardousAreaTimer = 0;
@@ -424,7 +437,7 @@ public class PathOSAgent : MonoBehaviour
         if(perceptionTimer >= perceptionComputeTime)
         {
             perceptionTimer = 0.0f;
-            eyes.ProcessPerception();
+            PerceptionUpdate();
         }
 
         //Look-around update.
@@ -447,6 +460,12 @@ public class PathOSAgent : MonoBehaviour
                 memory.CheckGoals();
             }
         }
+    }
+
+    private void PerceptionUpdate()
+    {
+        eyes.ProcessPerception();
+        UpdateLookTime();
     }
 
     //Inelegant and brute-force "animation" of the agent to look around.
@@ -582,8 +601,8 @@ public class PathOSAgent : MonoBehaviour
             return false;
         if (Vector3.Distance(currentDestination, navAgent.transform.position) <= 1.5f)
             return false;
-        if (((heuristicWeightLookup[Heuristic.AGGRESSION] + heuristicWeightLookup[Heuristic.ADRENALINE]) * 0.5) 
-            > heuristicWeightLookup[Heuristic.CAUTION] && Vector3.Distance(navAgent.transform.position, memory.CalculateCentroid()) < 3)
+        if (((heuristicScaleLookup[Heuristic.AGGRESSION] + heuristicScaleLookup[Heuristic.ADRENALINE]) * 0.5) 
+            > heuristicScaleLookup[Heuristic.CAUTION] && Vector3.Distance(navAgent.transform.position, memory.CalculateCentroid()) < 3)
             return false;
 
         return true;
