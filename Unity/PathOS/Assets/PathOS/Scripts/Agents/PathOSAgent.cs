@@ -611,11 +611,6 @@ public class PathOSAgent : MonoBehaviour
         navAgent.isStopped = false;
     }
     
-    public List<PerceivedEntity> GetPerceivedEntities()
-    {
-        return eyes.visible;
-    }
-
     public Vector3 GetTargetPosition()
     {
         return currentDest.pos;

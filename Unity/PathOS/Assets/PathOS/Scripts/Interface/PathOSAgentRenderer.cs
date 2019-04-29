@@ -147,35 +147,28 @@ public class PathOSAgentRenderer : MonoBehaviour
         if (Camera.current != null)
             transformCam = Camera.current;
 
-        List<PathOS.PerceivedEntity> visible = agent.GetPerceivedEntities();
+        //List<PathOS.PerceivedEntity> visible = agent.GetPerceivedEntities();
         Vector3 targetPos = agent.GetTargetPosition();
 
         List<PathOS.EntityMemory> memory = agent.memory.entities;
 
-        //Visible objects.
-        for (int i = 0; i < visible.Count; ++i)
-        {
-            //Skip if this entity is the target.
-            if (Vector3.SqrMagnitude(visible[i].perceivedPos - targetPos) 
-                < PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
-                continue;
-
-            Gizmos.DrawIcon(GetGizmoIconPos(visible[i].perceivedPos), eyeTex);
-        }
-
         //Memorized objects.
         for (int i = 0; i < memory.Count; ++i)
         {
+            Vector3 pos = memory[i].entity.perceivedPos;
+
             //Skip if this entity is the target.
-            if (Vector3.SqrMagnitude(memory[i].entity.perceivedPos - targetPos) 
+            if (Vector3.SqrMagnitude(pos - targetPos) 
                 < PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
                 continue;
 
-            //Draw the visited icon or memorized icon as appropriate, if the entity
-            //isn't visible.
-            if(!memory[i].entity.visible)
-                Gizmos.DrawIcon(GetGizmoIconPos(memory[i].entity.perceivedPos),
-                    (memory[i].visited) ? visitTex : memoryTex);
+            //Draw the visited, memorized, or visible icon as appropriate.
+            if (memory[i].visited)
+                Gizmos.DrawIcon(GetGizmoIconPos(pos), visitTex);
+            else if (memory[i].entity.visible)
+                Gizmos.DrawIcon(GetGizmoIconPos(pos), eyeTex);
+            else
+                Gizmos.DrawIcon(GetGizmoIconPos(pos), memoryTex);
         }
 
         Gizmos.DrawIcon(GetGizmoIconPos(agent.GetTargetPosition()), targetTex);
