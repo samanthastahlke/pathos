@@ -21,11 +21,23 @@ namespace PathOS
             public const int MEM_CAPACITY_MAX = 5;
         }
 
+        struct Navigation
+        {
+            //How close need the agent pass by an entity to consider it visited?
+            public const float VISIT_THRESHOLD_SQR = 1.0f;
+
+            //How close do two goals need to be to be considered the same?
+            public const float GOAL_EPSILON_SQR = 0.1f;
+
+            //How close do we need to be to a waypoint to have crossed it?
+            public const float WAYPOINT_EPSILON_SQR = 1.0f;
+        }
+
         struct Behaviour
         {
-            public const float LOOK_TIME_MAX = 20.0f;
-            public const float LOOK_TIME_MIN_EXPLORE = 6.0f;
-            public const float LOOK_TIME_MIN_CAUTION = 2.0f;
+            public const float LOOK_TIME_MAX = 30.0f;
+            public const float LOOK_TIME_MIN_EXPLORE = 10.0f;
+            public const float LOOK_TIME_MIN_CAUTION = 5.0f;
 
             public const float ENEMY_RADIUS = 8.0f;
             public const float ENEMY_RADIUS_SQR = ENEMY_RADIUS * ENEMY_RADIUS;
@@ -43,11 +55,12 @@ namespace PathOS
             public const float MEMORY_NAV_CHANCE_MIN = 0.0f;
             public const float MEMORY_NAV_CHANCE_MAX = 1.0f;
 
-            //How close do two goals need to be to be considered the same?
-            public const float GOAL_EPSILON_SQR = 0.1f;
-
-            //How close do we need to be to a waypoint to have crossed it?
-            public const float WAYPOINT_EPSILON_SQR = 1.0f;
+            //Govern the "ending" behaviour of the agent.
+            public const float FINAL_GOAL_BONUS_FACTOR = 5.0f;
+            //Penalty used to reduce score of the end goal if optional goals remain.
+            public const float FINAL_GOAL_ACHIEVER_PENALTY_FACTOR = 1.0f;
+            //Penalty used to reduce score of the end goal for unexplored entities.
+            public const float FINAL_GOAL_EXPLORER_PENALTY_FACTOR = 1.0f;
         }
     }
 }

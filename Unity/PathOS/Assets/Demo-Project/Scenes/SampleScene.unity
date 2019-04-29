@@ -4299,8 +4299,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 626367634}
-  waypointCacheSize: 64
-  waypointRegisterTime: 5
   autogenerateMapExtents: 0
   navmeshBounds:
     min: {x: -30, y: 0, z: -30}
@@ -10282,6 +10280,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55fbb645fe59ccf4db9d6c8ff55b211c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  limitSimulationTime: 1
+  maxSimulationTime: 180
+  endOnCompletionGoal: 1
   levelEntities:
   - name: Goblin
     objectRef: {fileID: 677844005}
@@ -10334,7 +10335,7 @@ MonoBehaviour:
   - name: Cow
     objectRef: {fileID: 187761348}
     entityType: 160
-    alwaysKnown: 1
+    alwaysKnown: 0
   - name: Cat
     objectRef: {fileID: 1678627021}
     entityType: 350
@@ -10362,15 +10363,15 @@ MonoBehaviour:
   - name: Goal Tomb
     objectRef: {fileID: 53043637}
     entityType: 110
-    alwaysKnown: 0
+    alwaysKnown: 1
   - name: Goal Cave
     objectRef: {fileID: 1775179089}
     entityType: 110
-    alwaysKnown: 0
+    alwaysKnown: 1
   - name: Final Goal
     objectRef: {fileID: 1260841063}
     entityType: 120
-    alwaysKnown: 0
+    alwaysKnown: 1
   heuristicWeights:
   - heuristic: 0
     weights:

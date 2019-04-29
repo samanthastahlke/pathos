@@ -17,6 +17,12 @@ public class PathOSMainInspector : Editor
 {
     private PathOSManager manager;
     private SerializedObject serial;
+
+    private SerializedProperty limitSimulationTime;
+    private SerializedProperty maxSimulationTime;
+    private SerializedProperty endOnCompletionGoal;
+    private GUIContent completionLabel;
+
     private SerializedProperty entityList;
     private ReorderableList entityListReorderable;
     private SerializedProperty heuristicWeights;
@@ -35,6 +41,13 @@ public class PathOSMainInspector : Editor
     {
         manager = (PathOSManager)target;
         serial = new SerializedObject(manager);
+
+        limitSimulationTime = serial.FindProperty("limitSimulationTime");
+        maxSimulationTime = serial.FindProperty("maxSimulationTime");
+        endOnCompletionGoal = serial.FindProperty("endOnCompletionGoal");
+
+        completionLabel = new GUIContent("Final Goal Triggers End");
+
         entityList = serial.FindProperty("levelEntities");
         heuristicWeights = serial.FindProperty("heuristicWeights");
 
@@ -68,6 +81,10 @@ public class PathOSMainInspector : Editor
     public override void OnInspectorGUI()
     {
         serial.Update();
+
+        EditorGUILayout.PropertyField(limitSimulationTime);
+        EditorGUILayout.PropertyField(maxSimulationTime);
+        EditorGUILayout.PropertyField(endOnCompletionGoal, completionLabel);
 
         //Heuristic weight matrix.
         if(EditorGUILayout.PropertyField(heuristicWeights))

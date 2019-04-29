@@ -12,18 +12,38 @@ PathOSManager (c) Nine Penguins (Samantha Stahlke) 2018
 //Simple class for defining entities in the level.
 public class PathOSManager : NPSingleton<PathOSManager>
 {
+    public bool limitSimulationTime = false;
+    public float maxSimulationTime = 180.0f;
+    public bool endOnCompletionGoal = true;
+
     public List<LevelEntity> levelEntities;
 
     public List<HeuristicWeightSet> heuristicWeights;
-    
-	void Awake()
-	{
-        //Grab renderers for object visibility checks by the agent.
+
+    private float simulationTimer = 0.0f;
+
+	private void Awake()
+	{ 
 		for(int i = 0; i < levelEntities.Count; ++i)
         {
+            //Grab renderers for object visibility checks by the agent.
             levelEntities[i].rend = levelEntities[i].objectRef.GetComponentInChildren<Renderer>();
         }
 	}
+
+    private void Update()
+    {
+        simulationTimer += Time.deltaTime;
+
+#if UNITY_EDITOR
+        if(limitSimulationTime && simulationTimer > maxSimulationTime
+            && UnityEditor.EditorApplication.isPlaying)
+        {
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
+#endif
+
+    }
 
     //Entity adding/removal (for Inspector).
     public void AddEntity(int index)

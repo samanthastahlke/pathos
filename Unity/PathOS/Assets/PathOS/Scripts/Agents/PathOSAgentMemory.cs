@@ -16,15 +16,13 @@ public class PathOSAgentMemory : MonoBehaviour
     //Remembered entities.
     public List<EntityMemory> entities { get; set; }
 
+    //Keep track of mandatory goals.
+    private List<EntityMemory> finalGoalTracker;
+    private EntityMemory finalGoal;
+    private bool finalGoalCompleted;
+
     //Remembered paths/directions.
     public List<ExploreMemory> paths { get; set; }
-
-    //Traversal history.
-    //Change to landmarks.
-    public List<WaypointMemory> waypoints { get; set; }
-    public int waypointCacheSize = 64;
-    public float waypointRegisterTime = 5.0f;
-    private float waypointTimer = 0.0f;
 
     //The agent's memory model of the complete navmesh.
     [Header("Navmesh Memory Model")]
@@ -40,17 +38,11 @@ public class PathOSAgentMemory : MonoBehaviour
     //Check to see if there are any goals left
     protected bool goalsLeft = true;
 
-    //for hazardous area
-    private List<Vector3> nearbyEnemies = new List<Vector3>();
-    private float hazardRadius = 0;
-    private int hazardLimit = 2;
-    private float hazardRange = 6f;
-
     private void Awake()
     {
         entities = new List<EntityMemory>();
+        finalGoalTracker = new List<EntityMemory>();
         paths = new List<ExploreMemory>();
-        waypoints = new List<WaypointMemory>();
 
         if (null == manager)
             manager = PathOSManager.instance;
@@ -62,52 +54,74 @@ public class PathOSAgentMemory : MonoBehaviour
             memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, navmeshBounds);
 
         //Commit any "always-known" entities to memory.
-        foreach (LevelEntity entity in manager.levelEntities)
+        foreach (PerceivedEntity entity in agent.eyes.perceptionInfo)
         {
-            if(entity.alwaysKnown)
+            if(entity.entityRef.alwaysKnown)
             {
                 EntityMemory newMemory = new EntityMemory(entity);
                 newMemory.MakeUnforgettable();
 
                 entities.Add(newMemory);
             }
-        }
-    }
 
-    private void Start()
-    {
-        PushWaypoint(agent.GetPosition());
+            if(entity.entityType == EntityType.ET_GOAL_MANDATORY)
+            {
+                EntityMemory newMemory = new EntityMemory(entity);
+                finalGoalTracker.Add(newMemory);
+            }
+            else if(entity.entityType == EntityType.ET_GOAL_COMPLETION)
+                finalGoal = new EntityMemory(entity);
+        }
     }
 
     private void Update()
     {
-        for(int i = entities.Count - 1; i > 0; --i)
+        Vector3 agentPos = agent.GetPosition();
+
+        for(int i = entities.Count - 1; i >= 0; --i)
         {
-            entities[i].impressionTime += Time.deltaTime;
+            EntityMemory entity = entities[i];
+
+            entity.impressionTime += Time.deltaTime;
+
+            //Flag an entity as visited if we pass by in close range.
+            //Inelegant brute-force to prevent "accidental" completion.
+            if ((entity.entity.ActualPosition() - agentPos).sqrMagnitude <
+                PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR
+                && entity.entity.entityType != EntityType.ET_GOAL_COMPLETION)
+                entity.visited = true;
 
             //Only something which is no longer visible and forgettable
             //can be discarded from memory.
-            if (!entities[i].entity.visible 
-                && entities[i].forgettable 
-                && !entities[i].visited 
-                && entities[i].impressionTime >= agent.forgetTime)
+            if (!entity.entity.visible 
+                && entity.forgettable 
+                && !entity.visited 
+                && entity.impressionTime >= agent.forgetTime)
                 entities.RemoveAt(i);
         }
 
-        for(int i = paths.Count - 1; i > 0; --i)
+        for(int i = 0; i < finalGoalTracker.Count; ++i)
+        {
+            if ((finalGoalTracker[i].entity.ActualPosition() - agentPos).sqrMagnitude <
+                PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
+                finalGoalTracker[i].visited = true;
+        }
+
+        //Only mark completion if the agent actively targets the final goal.
+        if(agent.IsTargeted(finalGoal.entity)
+            && (finalGoal.entity.ActualPosition() - agentPos).sqrMagnitude
+            < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
+        {
+            finalGoal.visited = true;
+            finalGoalCompleted = true;
+        }
+
+        for(int i = paths.Count - 1; i >= 0; --i)
         {
             paths[i].impressionTime += Time.deltaTime;
 
             if (paths[i].impressionTime >= agent.forgetTime)
                 paths.RemoveAt(i);
-        }
-
-        waypointTimer += Time.deltaTime;
-
-        if (waypointTimer >= waypointRegisterTime)
-        {
-            waypointTimer = 0.0f;
-            PushWaypoint(agent.GetPosition());
         }       
     }
 
@@ -142,6 +156,18 @@ public class PathOSAgentMemory : MonoBehaviour
         entities[entities.Count - 1].ltm = true;
     }
 
+    public void CommitUnforgettable(PerceivedEntity entity)
+    {
+        for(int i = 0; i < entities.Count; ++i)
+        {
+            if(entity == entities[i])
+            {
+                entities[i].MakeUnforgettable();
+                return;
+            }
+        }
+    }
+
     //Has a visible entity been visited?
     public bool Visited(PerceivedEntity entity)
     {
@@ -164,7 +190,7 @@ public class PathOSAgentMemory : MonoBehaviour
     }
 
     //Checks to see if the path already exists in memory
-    bool CheckIfPathExists(ExploreMemory thePath)
+    private bool CheckIfPathExists(ExploreMemory thePath)
     {
         for (int i = paths.Count - 1; i > 0; i--)
         {
@@ -188,53 +214,52 @@ public class PathOSAgentMemory : MonoBehaviour
         return 0;
     }
 
-    public void PushWaypoint(Vector3 pos, bool wasTarget = false)
+    //How many entities is the agent aware of that haven't been visited?
+    public int UnvisitedRemaining()
     {
-        waypoints.Add(new WaypointMemory(pos, wasTarget));
+        int unvisitedCount = 0;
 
-        if (waypoints.Count > waypointCacheSize)
-            waypoints.RemoveAt(0);
-    }
-
-    public Vector3 GetLastWaypoint()
-    {
-        if(waypoints.Count == 0)
+        for (int i = 0; i < entities.Count; ++i)
         {
-            NPDebug.LogError("Attempted to access waypoint memory before initialization!",
-                typeof(PathOSAgentMemory));
-
-            return Vector3.zero;
+            if (!entities[i].visited)
+                ++unvisitedCount;
         }
 
-        return waypoints[waypoints.Count - 1].pos;
+        return unvisitedCount;
     }
 
-    //Are there any goals left? 
-    bool GoalsRemaining()
+    //Are there optional goals or achievements remaining?
+    //(To the agent's knowledge)
+    public int AchievementGoalsLeft()
     {
-        for (int i = 0; i < entities.Count; i++)
+        int goalCount = 0;
+
+        for (int i = 0; i < entities.Count; ++i)
         {
-            //this really, really, really needs to be cleaned up pleasedonthateme
-            if ((entities[i].entity.entityType == EntityType.ET_GOAL_OPTIONAL 
-                || entities[i].entity.entityType == EntityType.ET_GOAL_MANDATORY
-                || entities[i].entity.entityType == EntityType.ET_RESOURCE_ACHIEVEMENT 
-                || entities[i].entity.entityType == EntityType.ET_RESOURCE_PRESERVATION)
-                && entities[i].visited == false)
-            {
+            if ((entities[i].entity.entityType == EntityType.ET_GOAL_OPTIONAL
+                || entities[i].entity.entityType == EntityType.ET_RESOURCE_ACHIEVEMENT)
+                && !entities[i].visited)
+                ++goalCount;
+        }
+
+        return goalCount;
+    }
+
+    //Are there still mandatory goals remaining?
+    public bool MandatoryGoalsLeft()
+    {
+        for (int i = 0; i < finalGoalTracker.Count; ++i)
+        {
+            if (!finalGoalTracker[i].visited)
                 return true;
-            }
         }
+
         return false;
     }
 
-    public void CheckGoals()
+    public bool FinalGoalCompleted()
     {
-        goalsLeft = GoalsRemaining(); //calculates whether or not there are goals it still needs to go to
-    }
-
-    public bool GetGoalsLeft()
-    {
-        return goalsLeft; //returns whether or not there are goals left
+        return finalGoalCompleted;
     }
 
     //Score the area as hazardous on a normalized 0-1 scale. This is 
@@ -264,53 +289,13 @@ public class PathOSAgentMemory : MonoBehaviour
         return hazardScore;
     }
 
-    //checks the number of hazards in close proximity
-    public bool CheckHazards(Vector3 currentDestination)
-    {
-        int hazardCounter = 0;
-        nearbyEnemies.Clear();
-
-        for (int i = 0; i < entities.Count; i++)
-        {
-            //if the hazard is within range... (the range is just a placeholder for now as well, I'm worried that it's too short?)
-            if ((entities[i].entity.perceivedPos - currentDestination).magnitude < hazardRange 
-                && (entities[i].entity.entityType == EntityType.ET_HAZARD_ENEMY 
-                || entities[i].entity.entityType == EntityType.ET_HAZARD_ENVIRONMENT))
-            {
-                nearbyEnemies.Add(entities[i].entity.perceivedPos);
-                //we increment the counter to see how many hazards are close by
-                hazardCounter++;
-
-                //the 2 is just a placeholder to test that it works
-                if (hazardCounter >= hazardLimit)
-                {
-                    //if it's hazardous it returns true
-                    return true;
-                }
-            }
-        }
-        
-        //else return false
-        return false;
-    }
-
-    //Takes the centroid, calculates a new path based off of it
-    //So far this hasn't been giving me issues, but I'll keep iterating on it
-    public Vector3 CalculateNewPath(int startingIndex) 
-    {
-        Vector3 centroid = CalculateCentroid();
-        CalculateHazardRadius(centroid);
-        Vector3 newPath = CalculateNewDirection(centroid, startingIndex);
-        return newPath;
-    }
-
     //Chooses path away from the area where the enemies are
     public Vector3 CalculateNewDirection(Vector3 centerPoint, int startingIndex)
     {
         for (int i = startingIndex; i > 0; i--)
         {
             //Uses centerpoint of where the enemies are to pick paths that fall outside of that radius
-            if (Vector3.Distance(CalculatePathDestination(i), centerPoint) > (hazardRadius))
+            if (Vector3.Distance(CalculatePathDestination(i), centerPoint) > (PathOS.Constants.Behaviour.ENEMY_RADIUS))
             {
                 return CalculatePathDestination(i);
             }
@@ -325,34 +310,5 @@ public class PathOSAgentMemory : MonoBehaviour
         //returns a point on the navmesh that the agent can reach with the chosen path
        return PathOSNavUtility.GetClosestPointWalkable(
                 agent.transform.position + paths[pathIndex].dEstimate * paths[pathIndex].direction, worldBorderMargin);
-    }
-
-    //based off of what we set the limit to hazards in the area to be,
-    //it calculates the center
-    //that we can then use to determine the approximate area of hazards
-    public Vector3 CalculateCentroid()
-    {
-        Vector3 centroid = Vector3.zero;
-
-        for (int i = 0; i < hazardLimit; i++)
-        {
-            centroid.x += nearbyEnemies[i].x;
-            centroid.y += nearbyEnemies[i].y;
-            centroid.z += nearbyEnemies[i].z;
-        }
-
-        centroid = centroid / hazardLimit;
-
-        return centroid;
-    }
-
-    //This gets the radius of the area
-    public void CalculateHazardRadius(Vector3 centroid)
-    {
-        for (int i = 0; i < hazardLimit; i++)
-        {
-            if (Vector3.Distance(nearbyEnemies[i], centroid) > hazardRadius)
-                hazardRadius = Vector3.Distance(nearbyEnemies[i], centroid);
-        }
     }
 }

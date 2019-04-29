@@ -156,7 +156,8 @@ public class PathOSAgentRenderer : MonoBehaviour
         for (int i = 0; i < visible.Count; ++i)
         {
             //Skip if this entity is the target.
-            if (Vector3.SqrMagnitude(visible[i].perceivedPos - targetPos) < 0.2f)
+            if (Vector3.SqrMagnitude(visible[i].perceivedPos - targetPos) 
+                < PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
                 continue;
 
             Gizmos.DrawIcon(GetGizmoIconPos(visible[i].perceivedPos), eyeTex);
@@ -166,7 +167,8 @@ public class PathOSAgentRenderer : MonoBehaviour
         for (int i = 0; i < memory.Count; ++i)
         {
             //Skip if this entity is the target.
-            if (Vector3.SqrMagnitude(memory[i].entity.perceivedPos - targetPos) < 0.2f)
+            if (Vector3.SqrMagnitude(memory[i].entity.perceivedPos - targetPos) 
+                < PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
                 continue;
 
             //Draw the visited icon or memorized icon as appropriate, if the entity

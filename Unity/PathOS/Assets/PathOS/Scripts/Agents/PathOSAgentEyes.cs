@@ -106,11 +106,12 @@ public class PathOSAgentEyes : MonoBehaviour
                     agent.memory.Memorize(entity);
 
                     //Mandatory/completion goals are committed to LTM automatically.
-                    if (entity.visibilityTimer >= PathOS.Constants.Memory.IMPRESSION_CONVERT_LTM
-                        || entity.entityType == EntityType.ET_GOAL_MANDATORY
+                    if (entity.entityType == EntityType.ET_GOAL_MANDATORY
                         || entity.entityType == EntityType.ET_GOAL_COMPLETION)
+                        agent.memory.CommitUnforgettable(entity);
+                    else if (entity.visibilityTimer >= PathOS.Constants.Memory.IMPRESSION_CONVERT_LTM)
                         agent.memory.CommitLTM(entity);
-                }
+                }  
             }          
         }
 

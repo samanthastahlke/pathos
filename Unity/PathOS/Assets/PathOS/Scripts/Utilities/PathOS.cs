@@ -129,6 +129,11 @@ namespace PathOS
             this.perceivedPos = entityRef.objectRef.transform.position;
         }
 
+        public Vector3 ActualPosition()
+        {
+            return entityRef.objectRef.transform.position;
+        }
+
         //Equality operators are overriden to make array search/comparison easier.
         public static bool operator==(PerceivedEntity lhs, PerceivedEntity rhs)
         {

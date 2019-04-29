@@ -21,6 +21,8 @@ public class PathOSAgent : MonoBehaviour
     //The agent's eyes/perception model.
     public PathOSAgentEyes eyes;
 
+    private static PathOSManager manager;
+
     //Used for testing.
     public bool freezeAgent;
     public bool verboseDebugging = false;
@@ -69,10 +71,6 @@ public class PathOSAgent : MonoBehaviour
     //Where is the agent targeting?
     private TargetDest currentDest;
 
-    //Hazardous area detection.
-    private float hazardousAreaTimer = 0;
-    private bool hazardousArea = false;
-
     //For backtracking traversal.
     private float memPathChance = PathOS.Constants.Behaviour.BASE_MEMORY_NAV_CHANCE;
     private bool onMemPath = false;
@@ -94,7 +92,8 @@ public class PathOSAgent : MonoBehaviour
         heuristicScaleLookup = new Dictionary<Heuristic, float>();
         entityScoringLookup = new Dictionary<(Heuristic, EntityType), float>();
 
-        PathOSManager manager = PathOSManager.instance;
+        if(null == manager)
+            manager = PathOSManager.instance;
 
         foreach(HeuristicScale curScale in heuristicScales)
         {
@@ -132,17 +131,12 @@ public class PathOSAgent : MonoBehaviour
             PathOS.Constants.Behaviour.MEMORY_NAV_CHANCE_MAX,
             memPathScale);
 
-        print(memPathChance);
-
         lookTime = baseLookTime;
 	}
 
     private void Start()
     {
         PerceptionUpdate();
-
-        //in case there's only the final goal
-        memory.CheckGoals();
     }
 
     public Vector3 GetPosition()
@@ -252,7 +246,7 @@ public class PathOSAgent : MonoBehaviour
         //Only recompute goal routing if our new goal is different
         //from the previous goal.
         if((currentDest.pos - dest.pos).sqrMagnitude > 
-            PathOS.Constants.Behaviour.GOAL_EPSILON_SQR)
+            PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
         {
             float memChanceRoll = Random.Range(0.0f, 1.0f);
             onMemPath = false;
@@ -293,12 +287,35 @@ public class PathOSAgent : MonoBehaviour
         if (memory.Visited(entity)) 
             return;
 
+        bool isFinalGoal = entity.entityType == EntityType.ET_GOAL_COMPLETION;
+
         //Initial bias added to account for object's type.
         float bias = 0.0f;
 
+        //Special circumstances for the final goal - since it marks the end of play
+        //for a player.
+        if (isFinalGoal)
+        {
+            //If mandatory goals remain, the final goal can't be targeted.
+            if (memory.MandatoryGoalsLeft())
+                return;
+
+            bias += PathOS.Constants.Behaviour.FINAL_GOAL_BONUS_FACTOR;
+
+            //Number of "unvisited" entities reduced by one to account for 
+            //the goal itself - which shouldn't add to its penalty.
+            bias -= Mathf.Min(memory.UnvisitedRemaining() - 1, 0)
+                * PathOS.Constants.Behaviour.FINAL_GOAL_EXPLORER_PENALTY_FACTOR;
+
+            bias -= memory.AchievementGoalsLeft()
+                * PathOS.Constants.Behaviour.FINAL_GOAL_ACHIEVER_PENALTY_FACTOR;
+        }
+
         //Initial placeholder bias for preferring the goal we have already set.
-        if ((entity.perceivedPos - currentDest.pos).magnitude < 0.1f
-            && (navAgent.transform.position - currentDest.pos).magnitude > 0.1f)
+        if ((entity.perceivedPos - currentDest.pos).sqrMagnitude 
+            < PathOS.Constants.Navigation.GOAL_EPSILON_SQR
+            && (navAgent.transform.position - currentDest.pos).sqrMagnitude 
+            > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
             bias += 1.0f;
 
         //Weighted scoring function.
@@ -441,36 +458,6 @@ public class PathOSAgent : MonoBehaviour
         if(!lookingAround)
             lookTimer += Time.deltaTime;
 
-        //Whenever this timer reaches a certain point, the agent checks to see if there are a lot of hazards in the area
-        /*hazardousAreaTimer += Time.deltaTime;
-
-        if (hazardousAreaTimer > 5)
-        {
-            //we update the lookTime based off of how hazardous the area is
-            //if it's really hazardous then the agent is looking around constantly
-            //these values are just placeholders, and this code should be more sophisticated for the future
-            //**this will get cleaned up I swear**
-            if (hazardousArea = memory.CheckHazards(currentDest.pos))
-            {
-                //checks to see if it's more cautious than hazardous
-                //by comparing the caution scale to the aggression+adrenaline scale
-               if (heuristicScaleLookup[Heuristic.CAUTION] >= 
-                    ((heuristicScaleLookup[Heuristic.ADRENALINE] + heuristicScaleLookup[Heuristic.AGGRESSION])*0.5f) 
-                    && heuristicScaleLookup[Heuristic.CAUTION]>0)
-               {
-                   ActivateDetour(Backtrack()); //if the conditions are met the backtrack detour will be activated
-               }
-               else if (heuristicScaleLookup[Heuristic.AGGRESSION] + heuristicScaleLookup[Heuristic.ADRENALINE] > 0)
-               {
-                   ActivateDetour(HeadTowardsHazards()); //otherwise it'll head towards danger
-               
-               }
-            }
-
-            hazardousAreaTimer = 0;
-
-        }*/
-
         //Rerouting update.
         if (routeTimer >= routeComputeTime)
         {
@@ -483,13 +470,11 @@ public class PathOSAgent : MonoBehaviour
         //Memory path update.
         if(onMemPath)
         {
-            print("On path from memory!");
-
             Vector3 curXZ = GetPosition();
             curXZ.y = 0.0f;
 
             if ((curXZ - memWaypoint).sqrMagnitude
-                < PathOS.Constants.Behaviour.WAYPOINT_EPSILON_SQR)
+                < PathOS.Constants.Navigation.WAYPOINT_EPSILON_SQR)
             {
                 memPathWaypoints.RemoveAt(0);
 
@@ -508,6 +493,9 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //Perception update.
+        //This will allow the agent's eyes to "process" nearby entities
+        //and also update the time threshold for looking around based 
+        //on nearby hazards.
         if(perceptionTimer >= perceptionComputeTime)
         {
             perceptionTimer = 0.0f;
@@ -524,16 +512,32 @@ public class PathOSAgent : MonoBehaviour
 
         //Check to see if we've visited something.
         //This should be shifted to a more elegant trigger mechanism in the future.
-        for (int i = 0; i < memory.entities.Count; ++i)
+        /*for (int i = 0; i < memory.entities.Count; ++i)
         {
-            if ((navAgent.transform.position - memory.entities[i].entity.perceivedPos).magnitude < visitThreshold)
+            if ((GetPosition() - memory.entities[i].entity.ActualPosition()).sqrMagnitude
+                < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
             {
                 memory.entities[i].visited = true;
 
                 //whenever the agent reaches an area, there's a check to see if it can go to the final goal, or if there are still goals remaining
                 memory.CheckGoals();
             }
+        }*/
+
+        
+#if UNITY_EDITOR
+
+        //In editor, if we reach the final goal, end the simulation
+        //if the relevant setting is enabled.
+        if(manager.endOnCompletionGoal 
+            && memory.FinalGoalCompleted()
+            && UnityEditor.EditorApplication.isPlaying)
+        {
+            UnityEditor.EditorApplication.isPlaying = false;
         }
+
+#endif
+
     }
 
     private void PerceptionUpdate()
@@ -604,56 +608,6 @@ public class PathOSAgent : MonoBehaviour
         navAgent.updateRotation = true;
         navAgent.isStopped = false;
     }
-
-    //Takes the agent back to the last point they were at
-    //This will be cleaned up
-    IEnumerator Backtrack()
-    {
-        Vector3 originPoint = memory.paths[currentPath].originPoint;
-        currentDest.pos = originPoint;
-
-        //Then it goes down the path
-        while (!((GetPosition() - currentDest.pos).magnitude < 2))
-        {
-            navAgent.SetDestination(currentDest.pos);
-            yield return null;
-        }
-
-        //the new destination after backtracking gets calculated
-        Vector3 newDestination = memory.CalculateNewPath(currentPath);
-        currentDest.pos = newDestination;
-        navAgent.SetDestination(currentDest.pos);
-
-        while (!((GetPosition() - currentDest.pos).magnitude < 2)) 
-        {
-            navAgent.SetDestination(currentDest.pos); //sets the new destination
-            yield return null;
-        }
-
-        //ends the detour
-        detour = false;
-        routeTimer = 0;
-        hazardousAreaTimer = 0;
-        StopCoroutine(Backtrack());
-    }
-
-    //If the agent is aggressive this will send them to the center of the hazardous area
-    IEnumerator HeadTowardsHazards()
-    {
-        currentDest.pos = memory.CalculateCentroid();
-
-        //Then it goes down the path
-        while (!((GetPosition() - currentDest.pos).magnitude < 2))
-        {
-            navAgent.SetDestination(currentDest.pos);
-            yield return null;
-        }
-
-        detour = false;
-        routeTimer = 0;
-        hazardousAreaTimer = 0;
-        StopCoroutine(HeadTowardsHazards());
-    }
     
     public List<PerceivedEntity> GetPerceivedEntities()
     {
@@ -665,31 +619,8 @@ public class PathOSAgent : MonoBehaviour
         return currentDest.pos;
     }
 
-    bool IsDetourValid()
+    public bool IsTargeted(PerceivedEntity entity)
     {
-        //checks to see if the conditions are met to do a detour
-        //will get cleaned up
-        if (detour)
-            return false;
-        if (currentPath <= 0)
-            return false;
-        if (Vector3.Distance(currentDest.pos, GetPosition()) <= 1.5f)
-            return false;
-        if (((heuristicScaleLookup[Heuristic.AGGRESSION] + heuristicScaleLookup[Heuristic.ADRENALINE]) * 0.5) 
-            > heuristicScaleLookup[Heuristic.CAUTION] && Vector3.Distance(navAgent.transform.position, memory.CalculateCentroid()) < 3)
-            return false;
-
-        return true;
-    }
-
-    void ActivateDetour(IEnumerator theFunction)
-    {
-        //activates the relevant coroutine
-        if (IsDetourValid())
-        {
-            detour = true;
-            currentPath = memory.GetLastPath();
-            StartCoroutine(theFunction);
-        }
+        return currentDest.entity == entity;
     }
 }
