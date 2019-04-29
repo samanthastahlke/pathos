@@ -149,13 +149,15 @@ public class PathOSNavUtility
         {
             NM_DNE = -1,
             NM_UNVISITED = 0,
-            NM_VISITED = 1,
-            NM_OBSTACLE = 10
+            NM_SEEN = 5,
+            NM_OBSTACLE = 10,
+            NM_VISITED = 100
         };
 
         NavmeshBoundsXZ bounds;
         float sampleGridSize;
         public const int maxCastSamples = 64;
+        private bool visualGridDirty = false;
 
         Vector3 gridOrigin;
         NavmeshMapCode[,] visitedGrid;
@@ -262,7 +264,8 @@ public class PathOSNavUtility
         //Right now the distance will be an estimation of the straight-line distance 
         //traversable in that direction, and unexplored tiles will stop being counted
         //if the ray samples from an obstacle tile.
-        public void RaycastMemoryMap(Vector3 origin, Vector3 dir, float maxDistance, out NavmeshMemoryMapperCastHit hit)
+        public void RaycastMemoryMap(Vector3 origin, Vector3 dir, float maxDistance, out NavmeshMemoryMapperCastHit hit,
+            bool fillSeen = false)
         {
             Vector3 point = origin;
 
@@ -301,7 +304,8 @@ public class PathOSNavUtility
             {
                 sample = SampleMap(point);
 
-                if (sample == NavmeshMapCode.NM_UNVISITED)
+                if (sample == NavmeshMapCode.NM_UNVISITED
+                    || sample == NavmeshMapCode.NM_SEEN)
                     ++numUnexplored;
                 else if (sample == NavmeshMapCode.NM_OBSTACLE)
                     ++obstacleCount;
@@ -310,6 +314,10 @@ public class PathOSNavUtility
                 //(This "hit detection" for obstacles should be improved as well.)
                 else if (sample == NavmeshMapCode.NM_DNE || obstacleCount > 1)
                     break;
+
+                //Fill in sight information, if applicable.
+                if (fillSeen)
+                    Fill(point, NavmeshMapCode.NM_SEEN);
 
                 ++totalSampled;
                 point += d;
@@ -338,7 +346,10 @@ public class PathOSNavUtility
                 return;
             }
 
-            if (visitedGrid[gridX, gridZ] == NavmeshMapCode.NM_VISITED)
+            NavmeshMapCode oldCode = visitedGrid[gridX, gridZ];
+
+            //Override based on priority of codes.
+            if (oldCode >= code)
                 return;
 
             visitedGrid[gridX, gridZ] = code;
@@ -351,13 +362,26 @@ public class PathOSNavUtility
                     fillColor = Color.green;
                     break;
 
+                case NavmeshMapCode.NM_SEEN:
+                    fillColor = Color.blue;
+                    break;
+
                 case NavmeshMapCode.NM_OBSTACLE:
                     fillColor = Color.red;
                     break;
             }
 
             visualGrid.SetPixel(gridX, gridZ, fillColor);
-            visualGrid.Apply();
+            visualGridDirty = true;
+        }
+
+        public void BakeVisualGrid()
+        {
+            if(visualGridDirty)
+            {
+                visualGrid.Apply();
+                visualGridDirty = false;
+            }
         }
 
         private void GetAdjacentWalkable(ref List<AStarTile> adjacent,

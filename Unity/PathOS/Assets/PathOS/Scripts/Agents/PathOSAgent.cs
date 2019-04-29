@@ -198,6 +198,16 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //Potential directional goals.
+
+        //Memorized paths.
+        //Treated as not visible since they are based on the player's "idea" of the space.
+        for (int i = 0; i < memory.paths.Count; ++i)
+        {
+            ScoreExploreDirection(memory.paths[i].originPoint,
+                memory.paths[i].direction,
+                false, ref dest, ref maxScore);
+        }
+
         //Only considering the XZ plane.
         float halfX = eyes.XFOV() * 0.5f;
         int steps = (int)(halfX / exploreDegrees);
@@ -206,47 +216,47 @@ public class PathOSAgent : MonoBehaviour
         Vector3 XZForward = transform.forward;
         XZForward.y = 0.0f;
         XZForward.Normalize();
-        
-        ScoreExploreDirection(XZForward, true, ref dest, ref maxScore);
+
+        ScoreExploreDirection(GetPosition(), XZForward, true, ref dest, ref maxScore);
 
         for(int i = 1; i <= steps; ++i)
         {
-            ScoreExploreDirection(Quaternion.AngleAxis(i * exploreDegrees, Vector3.up) * XZForward,
+            ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * exploreDegrees, Vector3.up) * XZForward,
                 true, ref dest, ref maxScore);
-            ScoreExploreDirection(Quaternion.AngleAxis(i * -exploreDegrees, Vector3.up) * XZForward,
+            ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * -exploreDegrees, Vector3.up) * XZForward,
                 true, ref dest, ref maxScore);
         }
 
         //Behind the agent (from memory).
         Vector3 XZBack = -XZForward;
 
-        ScoreExploreDirection(XZBack, false, ref dest, ref maxScore);
+        ScoreExploreDirection(GetPosition(), XZBack, false, ref dest, ref maxScore);
         halfX = (360.0f - eyes.XFOV()) * 0.5f;
         steps = (int)(halfX / invisibleExploreDegrees);
 
         for(int i = 1; i <= steps; ++i)
         {
-            ScoreExploreDirection(Quaternion.AngleAxis(i * invisibleExploreDegrees, Vector3.up) * XZBack,
+            ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * invisibleExploreDegrees, Vector3.up) * XZBack,
                 false, ref dest, ref maxScore);
-            ScoreExploreDirection(Quaternion.AngleAxis(i * -invisibleExploreDegrees, Vector3.up) * XZBack,
+            ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * -invisibleExploreDegrees, Vector3.up) * XZBack,
                 false, ref dest, ref maxScore);
         }
 
         //The existing goal.
-        Vector3 goalForward = currentDest.pos - navAgent.transform.position;
+        Vector3 goalForward = currentDest.pos - GetPosition();
         goalForward.y = 0.0f;
         
         if(goalForward.sqrMagnitude > 0.1f)
         {
             goalForward.Normalize();
             bool goalVisible = Mathf.Abs(Vector3.Angle(XZForward, goalForward)) < (eyes.XFOV() * 0.5f);
-            ScoreExploreDirection(goalForward, goalVisible, ref dest, ref maxScore);
+            ScoreExploreDirection(GetPosition(), goalForward, goalVisible, ref dest, ref maxScore);
         }
 
         //Only recompute goal routing if our new goal is different
         //from the previous goal.
-        if((currentDest.pos - dest.pos).sqrMagnitude > 
-            PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
+        if(Vector3.SqrMagnitude(currentDest.pos - dest.pos) 
+            > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
         {
             float memChanceRoll = Random.Range(0.0f, 1.0f);
             onMemPath = false;
@@ -312,9 +322,9 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //Initial placeholder bias for preferring the goal we have already set.
-        if ((entity.perceivedPos - currentDest.pos).sqrMagnitude 
+        if (Vector3.SqrMagnitude(entity.perceivedPos - currentDest.pos) 
             < PathOS.Constants.Navigation.GOAL_EPSILON_SQR
-            && (navAgent.transform.position - currentDest.pos).sqrMagnitude 
+            && Vector3.SqrMagnitude(GetPosition() - currentDest.pos)
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
             bias += 1.0f;
 
@@ -332,8 +342,8 @@ public class PathOSAgent : MonoBehaviour
             bias += heuristicScale.scale * entityScoringLookup[key];
         }
 
-        Vector3 toEntity = entity.perceivedPos - navAgent.transform.position;
-        float score = ScoreDirection(toEntity, bias, toEntity.magnitude);
+        Vector3 toEntity = entity.perceivedPos - GetPosition();
+        float score = ScoreDirection(GetPosition(), toEntity, bias, toEntity.magnitude);
 
         if (score > maxScore)
         {
@@ -344,15 +354,15 @@ public class PathOSAgent : MonoBehaviour
     }
 
     //maxScore is updated if the direction achieves a higher score.
-    void ScoreExploreDirection(Vector3 dir, bool visible, ref TargetDest dest, ref float maxScore)
+    void ScoreExploreDirection(Vector3 origin, Vector3 dir, bool visible, ref TargetDest dest, ref float maxScore)
     {
         float distance = 0.0f;
-        Vector3 newDest = navAgent.transform.position;
+        Vector3 newDest = origin;
 
         if(visible)
         {
             //Grab the "extent" of the direction on the navmesh from the perceptual system.
-            NavMeshHit hit = eyes.ExploreVisibilityCheck(dir);
+            NavMeshHit hit = eyes.ExploreVisibilityCheck(GetPosition(), dir);
             distance = hit.distance;
             newDest = hit.position;
         }
@@ -360,11 +370,11 @@ public class PathOSAgent : MonoBehaviour
         {
             //Grab the "extent" of the direction on our memory model of the navmesh.
             PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
-            memory.memoryMap.RaycastMemoryMap(navAgent.transform.position, dir, eyes.navmeshCastDistance, out hit);
+            memory.memoryMap.RaycastMemoryMap(origin, dir, eyes.navmeshCastDistance, out hit);
             distance = hit.distance;
 
             newDest = PathOSNavUtility.GetClosestPointWalkable(
-                navAgent.transform.position + distance * dir, memory.worldBorderMargin);
+                origin + distance * dir, memory.worldBorderMargin);
         }
 
         float bias = (distance / eyes.navmeshCastDistance) 
@@ -376,20 +386,28 @@ public class PathOSAgent : MonoBehaviour
             && (GetPosition() - currentDest.pos).magnitude > exploreSimilarityThreshold)
             bias += 1.0f;
 
-        float score = ScoreDirection(dir, bias, distance);
+        float score = ScoreDirection(origin, dir, bias, distance);
 
         if(score > maxScore)
         {
             maxScore = score;
-            dest.pos = newDest;
+
+            //If we're originating from where we stand, target the "end" point.
+            //Else, target the "start" point, and the agent will re-assess its 
+            //options when it gets there.
+            if (Vector3.SqrMagnitude(origin - GetPosition())
+                < PathOS.Constants.Navigation.EXPLORE_PATH_POS_THRESHOLD)
+                dest.pos = newDest;
+            else
+                dest.pos = origin;
+
             dest.entity = null;
         }
 
-        memory.AddPath(new ExploreMemory(GetPosition(), dir, 
-            Vector3.Distance(GetPosition(), dest.pos)));
+        memory.AddPath(new ExploreMemory(origin, dir, score));
     }
 
-    float ScoreDirection(Vector3 dir, float bias, float maxDistance)
+    float ScoreDirection(Vector3 origin, Vector3 dir, float bias, float maxDistance)
     {
         dir.Normalize();
 
@@ -400,7 +418,7 @@ public class PathOSAgent : MonoBehaviour
         //"fill in our map" as we move in this direction.
         //This is similar to the scaling created by assessing an exploration direction.
         PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
-        memory.memoryMap.RaycastMemoryMap(navAgent.transform.position, dir, maxDistance, out hit);
+        memory.memoryMap.RaycastMemoryMap(origin, dir, maxDistance, out hit);
 
         score += (heuristicScaleLookup[Heuristic.CURIOSITY] 
             + PathOS.Constants.Behaviour.HEURISTIC_EPSILON) 
@@ -414,10 +432,9 @@ public class PathOSAgent : MonoBehaviour
                 continue;
 
             //Vector to the entity.
-            Vector3 entityVec = memory.entities[i].entity.perceivedPos - navAgent.transform.position;
-            float dist2entity = entityVec.magnitude;
+            Vector3 entityVec = memory.entities[i].entity.perceivedPos - origin;
             //Scale our factor by inverse square of distance.
-            float distFactor = 1.0f / (dist2entity * dist2entity);
+            float distFactor = 1.0f / entityVec.sqrMagnitude;
             Vector3 dir2entity = entityVec.normalized;
 
             float dot = Vector3.Dot(dir, dir2entity);
@@ -473,7 +490,7 @@ public class PathOSAgent : MonoBehaviour
             Vector3 curXZ = GetPosition();
             curXZ.y = 0.0f;
 
-            if ((curXZ - memWaypoint).sqrMagnitude
+            if (Vector3.SqrMagnitude(curXZ - memWaypoint)
                 < PathOS.Constants.Navigation.WAYPOINT_EPSILON_SQR)
             {
                 memPathWaypoints.RemoveAt(0);
@@ -510,21 +527,6 @@ public class PathOSAgent : MonoBehaviour
             StartCoroutine(LookAround());
         }
 
-        //Check to see if we've visited something.
-        //This should be shifted to a more elegant trigger mechanism in the future.
-        /*for (int i = 0; i < memory.entities.Count; ++i)
-        {
-            if ((GetPosition() - memory.entities[i].entity.ActualPosition()).sqrMagnitude
-                < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
-            {
-                memory.entities[i].visited = true;
-
-                //whenever the agent reaches an area, there's a check to see if it can go to the final goal, or if there are still goals remaining
-                memory.CheckGoals();
-            }
-        }*/
-
-        
 #if UNITY_EDITOR
 
         //In editor, if we reach the final goal, end the simulation

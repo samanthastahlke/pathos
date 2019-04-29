@@ -31,6 +31,11 @@ namespace PathOS
 
             //How close do we need to be to a waypoint to have crossed it?
             public const float WAYPOINT_EPSILON_SQR = 1.0f;
+
+            //How close do two "path" memories need to be to be considered
+            //equivalent?
+            public const float EXPLORE_PATH_POS_THRESHOLD = 5.0f;
+            public const float EXPLORE_PATH_DEG_THRESHOLD = 15.0f;
         }
 
         struct Behaviour
@@ -61,6 +66,8 @@ namespace PathOS
             public const float FINAL_GOAL_ACHIEVER_PENALTY_FACTOR = 1.0f;
             //Penalty used to reduce score of the end goal for unexplored entities.
             public const float FINAL_GOAL_EXPLORER_PENALTY_FACTOR = 1.0f;
+
+            public const float SCORE_MAX = 10000.0f;
         }
     }
 }

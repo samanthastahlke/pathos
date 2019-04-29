@@ -150,15 +150,21 @@ public class PathOSAgentEyes : MonoBehaviour
     //This should be updated eventually to do a more sophisticated check accounting
     //for *apparent* distance - i.e., by adding a couple of physics raycasts from the 
     //camera.
-    public NavMeshHit ExploreVisibilityCheck(Vector3 dir)
+    public NavMeshHit ExploreVisibilityCheck(Vector3 origin, Vector3 dir)
     {
         NavMeshHit hit = new NavMeshHit();
-        bool result = NavMesh.Raycast(agent.transform.position,
-            agent.transform.position + dir.normalized * navmeshCastDistance + Vector3.up * navmeshCastHeight,
+        bool result = NavMesh.Raycast(origin,
+            origin + dir.normalized * navmeshCastDistance + Vector3.up * navmeshCastHeight,
             out hit, NavMesh.AllAreas);
 
         agent.memory.memoryMap.Fill(hit.position, 
             PathOSNavUtility.NavmeshMemoryMapper.NavmeshMapCode.NM_OBSTACLE);
+
+        PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit memHit = 
+            new PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit();
+
+        agent.memory.memoryMap.RaycastMemoryMap(origin, dir, hit.distance,
+            out memHit, true);
 
         return hit;
     }

@@ -15,6 +15,7 @@ public class PathOSAgentMemory : MonoBehaviour
 
     //Remembered entities.
     public List<EntityMemory> entities { get; set; }
+    private List<EntityMemory> stm;
 
     //Keep track of mandatory goals.
     private List<EntityMemory> finalGoalTracker;
@@ -41,6 +42,8 @@ public class PathOSAgentMemory : MonoBehaviour
     private void Awake()
     {
         entities = new List<EntityMemory>();
+        stm = new List<EntityMemory>();
+
         finalGoalTracker = new List<EntityMemory>();
         paths = new List<ExploreMemory>();
 
@@ -76,7 +79,11 @@ public class PathOSAgentMemory : MonoBehaviour
 
     private void Update()
     {
+        memoryMap.BakeVisualGrid();
+
         Vector3 agentPos = agent.GetPosition();
+
+        stm.Clear();
 
         for(int i = entities.Count - 1; i >= 0; --i)
         {
@@ -86,33 +93,46 @@ public class PathOSAgentMemory : MonoBehaviour
 
             //Flag an entity as visited if we pass by in close range.
             //Inelegant brute-force to prevent "accidental" completion.
-            if ((entity.entity.ActualPosition() - agentPos).sqrMagnitude <
-                PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR
+            if (Vector3.SqrMagnitude(entity.entity.ActualPosition() - agentPos) 
+                < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR
                 && entity.entity.entityType != EntityType.ET_GOAL_COMPLETION)
-                entity.visited = true;
+                entity.Visit();
 
             //Only something which is no longer visible and forgettable
             //can be discarded from memory.
             if (!entity.entity.visible 
-                && entity.forgettable 
-                && !entity.visited 
+                && entity.forgettable
                 && entity.impressionTime >= agent.forgetTime)
                 entities.RemoveAt(i);
+
+            if (!entities[i].ltm
+                && !entities[i].entity.visible)
+                stm.Add(entities[i]);
+        }
+
+        //Forget any non-visible entities that aren't in long-term memory 
+        //over the STM size cap.
+        if(stm.Count > agent.stmSize)
+        {
+            stm.Sort((m1, m2) => m1.impressionTime.CompareTo(m2.impressionTime));
+
+            while (stm.Count > agent.stmSize)
+                stm.RemoveAt(stm.Count - 1);
         }
 
         for(int i = 0; i < finalGoalTracker.Count; ++i)
         {
-            if ((finalGoalTracker[i].entity.ActualPosition() - agentPos).sqrMagnitude <
-                PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
-                finalGoalTracker[i].visited = true;
+            if (Vector3.SqrMagnitude(finalGoalTracker[i].entity.ActualPosition() - agentPos) 
+                < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
+                finalGoalTracker[i].Visit();
         }
 
         //Only mark completion if the agent actively targets the final goal.
         if(agent.IsTargeted(finalGoal.entity)
-            && (finalGoal.entity.ActualPosition() - agentPos).sqrMagnitude
+            && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
             < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
         {
-            finalGoal.visited = true;
+            finalGoal.Visit();
             finalGoalCompleted = true;
         }
 
@@ -135,7 +155,7 @@ public class PathOSAgentMemory : MonoBehaviour
                 entities[i].impressionTime = 0.0f;
                 entities[i].entity.perceivedPos = entity.perceivedPos;
                 return;
-            }             
+            }
         }
 
         entities.Add(new EntityMemory(entity));
@@ -180,38 +200,36 @@ public class PathOSAgentMemory : MonoBehaviour
         return false;
     }
 
-    //Adds a new path to memory
-    public void AddPath(ExploreMemory thePath)
+    //Adds a new path to memory.
+    public void AddPath(ExploreMemory path)
     {
-        if (!CheckIfPathExists(thePath))
-        {
-            paths.Add(new ExploreMemory(thePath.originPoint, thePath.direction, thePath.dEstimate));
-        }
-    }
+        int minScoringIndex = 0;
+        float minScore = PathOS.Constants.Behaviour.SCORE_MAX;
 
-    //Checks to see if the path already exists in memory
-    private bool CheckIfPathExists(ExploreMemory thePath)
-    {
-        for (int i = paths.Count - 1; i > 0; i--)
+        for(int i = 0; i < paths.Count; ++i)
         {
-            if (thePath == paths[i]) return true;
-        }
-        return false;
-    }
+            if (path == paths[i])
+            { 
+                paths[i].UpdateScore(path.score);
+                return;
+            }
 
-    //gets the last traversed path
-    public int GetLastPath()
-    {
-        Vector3 originPoint = paths[paths.Count - 1].originPoint;
-
-        for (int i = paths.Count - 1; i > 0; i--)
-        {
-            if (paths[i].originPoint != originPoint)
+            if (paths[i].score < minScore)
             {
-                return i;
+                minScore = paths[i].score;
+                minScoringIndex = i;
             }
         }
-        return 0;
+
+        if(paths.Count >= agent.stmSize)
+        {
+            if (path.score < minScore)
+                return;
+            else
+                paths.RemoveAt(minScoringIndex);
+        }
+
+        paths.Add(path);
     }
 
     //How many entities is the agent aware of that haven't been visited?
@@ -274,8 +292,8 @@ public class PathOSAgentMemory : MonoBehaviour
                 && (entities[i].entity.entityType == EntityType.ET_HAZARD_ENEMY
                 || entities[i].entity.entityType == EntityType.ET_HAZARD_ENVIRONMENT))
             {
-                if ((entities[i].entity.perceivedPos - pos).sqrMagnitude >
-                    PathOS.Constants.Behaviour.ENEMY_RADIUS_SQR)
+                if (Vector3.SqrMagnitude(entities[i].entity.perceivedPos - pos) 
+                    < PathOS.Constants.Behaviour.ENEMY_RADIUS_SQR)
                     ++hazardCount;
 
                 if (hazardCount >= PathOS.Constants.Behaviour.ENEMY_COUNT_THRESHOLD)
@@ -287,28 +305,5 @@ public class PathOSAgentMemory : MonoBehaviour
             PathOS.Constants.Behaviour.ENEMY_COUNT_THRESHOLD;
 
         return hazardScore;
-    }
-
-    //Chooses path away from the area where the enemies are
-    public Vector3 CalculateNewDirection(Vector3 centerPoint, int startingIndex)
-    {
-        for (int i = startingIndex; i > 0; i--)
-        {
-            //Uses centerpoint of where the enemies are to pick paths that fall outside of that radius
-            if (Vector3.Distance(CalculatePathDestination(i), centerPoint) > (PathOS.Constants.Behaviour.ENEMY_RADIUS))
-            {
-                return CalculatePathDestination(i);
-            }
-        }
-
-        return CalculatePathDestination(0);
-    }
-
-    //Calculates the destination for that path
-    public Vector3 CalculatePathDestination(int pathIndex)
-    {
-        //returns a point on the navmesh that the agent can reach with the chosen path
-       return PathOSNavUtility.GetClosestPointWalkable(
-                agent.transform.position + paths[pathIndex].dEstimate * paths[pathIndex].direction, worldBorderMargin);
     }
 }

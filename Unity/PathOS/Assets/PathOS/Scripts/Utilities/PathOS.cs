@@ -214,7 +214,7 @@ namespace PathOS
         {
             entity = data.entity;
             pos = data.pos;
-        }
+        }   
     }
 
     //How the memory of an object is represented in the agent's world model.
@@ -250,6 +250,14 @@ namespace PathOS
             this.ltm = true;
             this.forgettable = false;
         }
+
+        public void Visit()
+        {
+            this.visited = true;
+            MakeUnforgettable();
+        }
+
+
     }
 
     //How the agent's trace through the world is represented in the agent's world model.
@@ -269,33 +277,38 @@ namespace PathOS
     //Explore memory = POI which doesn't represent an actual game object - "made up" by the player.
     public class ExploreMemory
     {
-        public static float posThreshold = 2.0f;
-        public static float degThreshold = 5.0f;
-
-        public float impressionTime = 0.0f;
+        public float score = 0.0f;
 
         public Vector3 originPoint;
         public Vector3 direction;
-        public float dEstimate;
 
-        public ExploreMemory(Vector3 originPoint, Vector3 direction, float dEstimate)
+        public float impressionTime = 0.0f;
+
+        public ExploreMemory(Vector3 originPoint, Vector3 direction, float score)
         {
             this.originPoint = originPoint;
             this.direction = direction;
-            this.dEstimate = dEstimate;
+            this.score = score;
+        }
+
+        public void UpdateScore(float score)
+        {
+            this.score = score;
         }
 
         private bool EqualsSimilar(ExploreMemory rhs)
         {
-            return (originPoint - rhs.originPoint).magnitude <= posThreshold
-                && Vector3.Angle(direction, rhs.direction) <= degThreshold;
+            return (originPoint - rhs.originPoint).magnitude 
+                <= PathOS.Constants.Navigation.EXPLORE_PATH_POS_THRESHOLD
+                && Vector3.Angle(direction, rhs.direction) 
+                <= PathOS.Constants.Navigation.EXPLORE_PATH_DEG_THRESHOLD;
         }
 
         public static bool operator ==(ExploreMemory lhs, ExploreMemory rhs)
         {
             if (object.ReferenceEquals(lhs, null))
                 return object.ReferenceEquals(rhs, null);
-
+          
             if (object.ReferenceEquals(rhs, null))
                 return object.ReferenceEquals(lhs, null);
 
