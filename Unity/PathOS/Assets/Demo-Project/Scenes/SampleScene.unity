@@ -4327,19 +4327,19 @@ MonoBehaviour:
   experienceScale: 0.468
   heuristicScales:
   - heuristic: 0
-    scale: 0
+    scale: 0.289
   - heuristic: 10
     scale: 0.55
   - heuristic: 15
-    scale: 0.35
+    scale: 0.165
   - heuristic: 20
-    scale: 0.21
-  - heuristic: 25
-    scale: 0
-  - heuristic: 30
     scale: 1
+  - heuristic: 25
+    scale: 0.768
+  - heuristic: 30
+    scale: 0.201
   - heuristic: 35
-    scale: 0
+    scale: 0.442
   routeComputeTime: 0.5
   perceptionComputeTime: 0.1
   exploreDegrees: 5

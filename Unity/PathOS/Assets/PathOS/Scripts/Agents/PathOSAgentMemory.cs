@@ -56,6 +56,8 @@ public class PathOSAgentMemory : MonoBehaviour
         else
             memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, navmeshBounds);
 
+        memoryMap.memory = this;
+
         //Commit any "always-known" entities to memory.
         foreach (PerceivedEntity entity in agent.eyes.perceptionInfo)
         {
@@ -103,7 +105,10 @@ public class PathOSAgentMemory : MonoBehaviour
             if (!entity.entity.visible 
                 && entity.forgettable
                 && entity.impressionTime >= agent.forgetTime)
+            {
                 entities.RemoveAt(i);
+            }
+                
 
             if (!entities[i].ltm
                 && !entities[i].entity.visible)
@@ -117,7 +122,10 @@ public class PathOSAgentMemory : MonoBehaviour
             stm.Sort((m1, m2) => m1.impressionTime.CompareTo(m2.impressionTime));
 
             while (stm.Count > agent.stmSize)
-                stm.RemoveAt(stm.Count - 1);
+            {
+                entities.Remove(stm[stm.Count - 1]);
+                stm.RemoveAt(stm.Count - 1);          
+            }               
         }
 
         for(int i = 0; i < finalGoalTracker.Count; ++i)
@@ -305,5 +313,26 @@ public class PathOSAgentMemory : MonoBehaviour
             PathOS.Constants.Behaviour.ENEMY_COUNT_THRESHOLD;
 
         return hazardScore;
+    }
+
+    public float MovementHazardPenalty(Vector3 pos)
+    {
+        float penalty = 0.0f;
+
+        for (int i = 0; i < entities.Count; ++i)
+        {
+            if(!entities[i].visited 
+                && (entities[i].entity.entityType == EntityType.ET_HAZARD_ENEMY
+                || entities[i].entity.entityType == EntityType.ET_HAZARD_ENVIRONMENT))
+            {
+                penalty += agent.hazardPenalty / Vector3.SqrMagnitude(
+                    entities[i].entity.perceivedPos - pos);
+
+                if (penalty >= PathOS.Constants.Navigation.HAZARD_PENALTY_MAX)
+                    return PathOS.Constants.Navigation.HAZARD_PENALTY_MAX;
+            }
+        }
+
+        return penalty;
     }
 }

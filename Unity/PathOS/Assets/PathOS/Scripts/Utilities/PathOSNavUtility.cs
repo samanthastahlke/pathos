@@ -53,6 +53,7 @@ public class PathOSNavUtility
             public float gScore = 1000.0f;
             public float hScore = 1000.0f;
             public float fScore = 1000.0f;
+            public float penalty = 0.0f;
 
             public AStarTile parent = null;
 
@@ -66,6 +67,13 @@ public class PathOSNavUtility
                 this.parent = parent;           
             }
 
+            public void AddPenalty(float penalty)
+            {
+                this.penalty = penalty;
+
+                RecomputeF();
+            }
+
             public void UpdateScores(AStarTile dest)
             {
                 this.hScore = Mathf.Abs(dest.xCoord - this.xCoord)
@@ -76,12 +84,13 @@ public class PathOSNavUtility
 
             private void RecomputeF()
             {
-                fScore = (hScore == 0) ? -1000.0f : gScore + hScore;
+                fScore = (hScore == 0) ? -PathOS.Constants.Behaviour.SCORE_MAX 
+                    : gScore + hScore + penalty;
             }
 
             public void ChangeParentOptimal(AStarTile parent)
             {
-                if (parent.gScore + 1 < this.gScore)
+                if (parent.fScore + 1 < this.fScore)
                 {
                     this.parent = parent;
                     this.gScore = parent.gScore + 1;
@@ -148,11 +157,13 @@ public class PathOSNavUtility
         public enum NavmeshMapCode
         {
             NM_DNE = -1,
-            NM_UNVISITED = 0,
-            NM_SEEN = 5,
-            NM_OBSTACLE = 10,
+            NM_UNKNOWN = 0,
+            NM_SEEN = 10,
+            NM_OBSTACLE = 50,
             NM_VISITED = 100
         };
+
+        public PathOSAgentMemory memory;
 
         NavmeshBoundsXZ bounds;
         float sampleGridSize;
@@ -198,7 +209,7 @@ public class PathOSNavUtility
             {
                 for (int j = 0; j < sizeZ; ++j)
                 {
-                    visitedGrid[i, j] = NavmeshMapCode.NM_UNVISITED;
+                    visitedGrid[i, j] = NavmeshMapCode.NM_UNKNOWN;
                     visualGrid.SetPixel(i, j, Color.black);
                 }
             }
@@ -304,7 +315,7 @@ public class PathOSNavUtility
             {
                 sample = SampleMap(point);
 
-                if (sample == NavmeshMapCode.NM_UNVISITED
+                if (sample == NavmeshMapCode.NM_UNKNOWN
                     || sample == NavmeshMapCode.NM_SEEN)
                     ++numUnexplored;
                 else if (sample == NavmeshMapCode.NM_OBSTACLE)
@@ -404,24 +415,28 @@ public class PathOSNavUtility
             if (Walkable(left.xCoord, left.zCoord))
             {
                 left.UpdateScores(dest);
+                left.AddPenalty(memory.MovementHazardPenalty(GetPoint(left.xCoord, left.zCoord)));
                 adjacent.Add(left);
             }
                 
             if (Walkable(right.xCoord, right.zCoord))
             {
                 right.UpdateScores(dest);
+                right.AddPenalty(memory.MovementHazardPenalty(GetPoint(right.xCoord, right.zCoord)));
                 adjacent.Add(right);
             }
                 
             if (Walkable(up.xCoord, up.zCoord))
             {
                 up.UpdateScores(dest);
+                up.AddPenalty(memory.MovementHazardPenalty(GetPoint(up.xCoord, up.zCoord)));
                 adjacent.Add(up);
             }
                 
             if (Walkable(down.xCoord, down.zCoord))
             {
                 down.UpdateScores(dest);
+                down.AddPenalty(memory.MovementHazardPenalty(GetPoint(down.xCoord, down.zCoord)));
                 adjacent.Add(down);
             }
         }
@@ -552,7 +567,8 @@ public class PathOSNavUtility
                 || z > visitedGrid.GetLength(1))
                 return false;
 
-            return visitedGrid[x, z] == NavmeshMapCode.NM_VISITED;
+            return visitedGrid[x, z] != NavmeshMapCode.NM_UNKNOWN
+                && visitedGrid[x, z] != NavmeshMapCode.NM_OBSTACLE;
         }
     }
 

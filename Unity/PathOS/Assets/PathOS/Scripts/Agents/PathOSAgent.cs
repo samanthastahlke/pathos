@@ -72,13 +72,11 @@ public class PathOSAgent : MonoBehaviour
     private TargetDest currentDest;
 
     //For backtracking traversal.
+    public float hazardPenalty { get; set; }
     private float memPathChance = PathOS.Constants.Behaviour.BASE_MEMORY_NAV_CHANCE;
     private bool onMemPath = false;
     private List<Vector3> memPathWaypoints;
     private Vector3 memWaypoint = Vector3.zero;
-
-    private bool detour = false; //can apply to a cautious agent backtracking or a reckless one heading towards danger
-    private int currentPath = 0;
 
     private void Awake()
 	{
@@ -107,6 +105,24 @@ public class PathOSAgent : MonoBehaviour
                 entityScoringLookup.Add((curSet.heuristic, curSet.weights[j].entype), curSet.weights[j].weight);
             }
         }
+
+        float avgAggressionScore = 0.5f
+            * (entityScoringLookup[(Heuristic.AGGRESSION, EntityType.ET_HAZARD_ENEMY)]
+            + entityScoringLookup[(Heuristic.AGGRESSION, EntityType.ET_HAZARD_ENVIRONMENT)]);
+
+        float avgAdrenalineScore = 0.5f
+            * (entityScoringLookup[(Heuristic.ADRENALINE, EntityType.ET_HAZARD_ENEMY)]
+            + entityScoringLookup[(Heuristic.ADRENALINE, EntityType.ET_HAZARD_ENVIRONMENT)]);
+
+        float avgCautionScore = 0.5f
+            * (entityScoringLookup[(Heuristic.CAUTION, EntityType.ET_HAZARD_ENEMY)]
+            + entityScoringLookup[(Heuristic.CAUTION, EntityType.ET_HAZARD_ENVIRONMENT)]);
+
+        float hazardScore = heuristicScaleLookup[Heuristic.AGGRESSION] * avgAggressionScore
+            + heuristicScaleLookup[Heuristic.ADRENALINE] * avgAdrenalineScore
+            + heuristicScaleLookup[Heuristic.CAUTION] * avgCautionScore;
+
+        hazardPenalty = -hazardScore;
 
         //Duration of working memory for game entities is scaled by experience level.
         forgetTime = Mathf.Lerp(PathOS.Constants.Memory.FORGET_TIME_MIN,
@@ -253,6 +269,8 @@ public class PathOSAgent : MonoBehaviour
             ScoreExploreDirection(GetPosition(), goalForward, goalVisible, ref dest, ref maxScore);
         }
 
+        bool previousOnMem = onMemPath;
+
         //Only recompute goal routing if our new goal is different
         //from the previous goal.
         if(Vector3.SqrMagnitude(currentDest.pos - dest.pos) 
@@ -282,12 +300,17 @@ public class PathOSAgent : MonoBehaviour
             currentDest = dest;
         }
 
+        /*if(previousOnMem != onMemPath)
+        {
+            if (onMemPath)
+                print("Starting memory path!");
+            else
+                print("Stopping memory path!");
+        }*/
+
         if(verboseDebugging)
             NPDebug.LogMessage("Position: " + navAgent.transform.position + 
                 ", Destination: " + currentDest);
-
-        currentPath = memory.paths.Count - 1; //the most recent path
-
     }
 
     //maxScore is updated if the entity achieves a higher score.

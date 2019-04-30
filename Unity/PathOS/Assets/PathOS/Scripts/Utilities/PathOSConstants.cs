@@ -36,6 +36,11 @@ namespace PathOS
             //equivalent?
             public const float EXPLORE_PATH_POS_THRESHOLD = 5.0f;
             public const float EXPLORE_PATH_DEG_THRESHOLD = 15.0f;
+
+            //How proportionally large should the hazard movement penalty
+            //be when passing next to a hazard while constructing a path from
+            //memory?
+            public const float HAZARD_PENALTY_MAX = 8.0f;
         }
 
         struct Behaviour
