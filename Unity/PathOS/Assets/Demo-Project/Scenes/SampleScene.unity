@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3634738, g: 0.51073116, b: 0.6948261, a: 1}
+  m_IndirectSpecularColor: {r: 0.36347458, g: 0.51073194, b: 0.6948253, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1090,7 +1090,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 6.680726e-30, z: 8.09e-43, w: 6.680726e-30}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -4422,6 +4422,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 626367634}
+  showLegend: 0
   iconSize: 24
   iconExtension: .png
   eyecon: {fileID: 2800000, guid: cc97256feea8747499af671fcfa34f97, type: 3}

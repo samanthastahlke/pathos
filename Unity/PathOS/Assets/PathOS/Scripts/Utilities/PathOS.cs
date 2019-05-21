@@ -39,6 +39,14 @@ namespace PathOS
         EFFICIENCY = 35
     };
 
+    class UI
+    {
+        public static Color mapUnknown = Color.black;
+        public static Color mapSeen = Color.blue;
+        public static Color mapVisited = Color.green;
+        public static Color mapObstacle = Color.red;
+    }
+
     [System.Serializable]
     public class EntityWeight
     {

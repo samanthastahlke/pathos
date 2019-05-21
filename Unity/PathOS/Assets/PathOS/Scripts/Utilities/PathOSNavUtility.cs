@@ -210,7 +210,7 @@ public class PathOSNavUtility
                 for (int j = 0; j < sizeZ; ++j)
                 {
                     visitedGrid[i, j] = NavmeshMapCode.NM_UNKNOWN;
-                    visualGrid.SetPixel(i, j, Color.black);
+                    visualGrid.SetPixel(i, j, PathOS.UI.mapUnknown);
                 }
             }
 
@@ -365,20 +365,20 @@ public class PathOSNavUtility
 
             visitedGrid[gridX, gridZ] = code;
 
-            Color fillColor = Color.black;
+            Color fillColor = PathOS.UI.mapUnknown;
 
             switch(code)
             {
                 case NavmeshMapCode.NM_VISITED:
-                    fillColor = Color.green;
+                    fillColor = PathOS.UI.mapVisited;
                     break;
 
                 case NavmeshMapCode.NM_SEEN:
-                    fillColor = Color.blue;
+                    fillColor = PathOS.UI.mapSeen;
                     break;
 
                 case NavmeshMapCode.NM_OBSTACLE:
-                    fillColor = Color.red;
+                    fillColor = PathOS.UI.mapObstacle;
                     break;
             }
 

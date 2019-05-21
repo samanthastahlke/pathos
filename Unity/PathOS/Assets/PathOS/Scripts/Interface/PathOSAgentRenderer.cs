@@ -13,6 +13,38 @@ public class PathOSAgentRenderer : MonoBehaviour
 {
     public PathOSAgent agent;
 
+    //Legend.
+    public bool showLegend = false;
+
+    private float padding = 8.0f;
+    private float legendSize = 20.0f;
+
+    private List<Rect> mapLegendIcons;
+    private List<Rect> mapLegendLabels;
+
+    private List<Rect> gizmoLegendIcons;
+    private List<Rect> gizmoLegendLabels;
+
+    public static Color[] mapLegendColors =
+    {
+        PathOS.UI.mapUnknown,
+        PathOS.UI.mapSeen,
+        PathOS.UI.mapVisited,
+        PathOS.UI.mapObstacle
+    };
+
+    public static Texture2D[] mapLegendTextures;
+
+    public static string[] mapLegendText =
+    {
+        "Unknown",
+        "Seen",
+        "Visited",
+        "Obstacle"
+    };
+
+    private Texture2D blankLegendTex;
+
     [Header("Icon Gizmos")]
     public float iconSize = 16.0f;
     public string iconExtension = ".png";
@@ -28,6 +60,16 @@ public class PathOSAgentRenderer : MonoBehaviour
     private string visitTex;
     public Texture memoryIcon;
     private string memoryTex;
+
+    private Texture[] gizmoLegendTextures;
+
+    private string[] gizmoLegendText =
+    {
+        "Target",
+        "Visited",
+        "Visible",
+        "In Memory"
+    };
 
     [Header("Map Drawing")]
     //Should we show the navmesh map contained in the agent's memory?
@@ -61,6 +103,12 @@ public class PathOSAgentRenderer : MonoBehaviour
         visitTex = visitedIcon.name + iconExtension;
         memoryTex = memoryIcon.name + iconExtension;
 
+        gizmoLegendTextures = new Texture[4];
+        gizmoLegendTextures[0] = targetIcon;
+        gizmoLegendTextures[1] = visitedIcon;
+        gizmoLegendTextures[2] = eyecon;
+        gizmoLegendTextures[3] = memoryIcon;
+
         //We want to draw the memory "map" in the lower-left corner of the screen.
         //Grab a persistent reference to the texture.
         navmeshMemoryMap = agent.memory.memoryMap.GetVisualGrid();
@@ -83,6 +131,44 @@ public class PathOSAgentRenderer : MonoBehaviour
 
         navmeshMapScreenCoords = new Rect(0.0f, Screen.height - navmeshMapY, navmeshMapX, navmeshMapY);
 
+        //Map legend.
+        Vector2 pos = new Vector2(navmeshMapScreenCoords.x + navmeshMapX + padding, 
+            navmeshMapScreenCoords.y);
+
+        mapLegendIcons = new List<Rect>();
+        mapLegendLabels = new List<Rect>();
+        mapLegendTextures = new Texture2D[mapLegendColors.Length];
+
+        for (int i = 0; i < mapLegendColors.Length; ++i)
+        {
+            mapLegendIcons.Add(new Rect(pos.x, pos.y, legendSize, legendSize));
+            mapLegendLabels.Add(new Rect(pos.x + legendSize + padding, pos.y, 100.0f, legendSize));
+
+            Texture2D colorTex = new Texture2D(1, 1);
+            colorTex.SetPixel(0, 0, mapLegendColors[i]);
+            colorTex.Apply();
+
+            mapLegendTextures[i] = colorTex;
+
+            pos.y += legendSize + padding;
+        }
+
+        //Gizmo legend.
+        pos.x = padding;
+        pos.y = padding;
+
+        gizmoLegendIcons = new List<Rect>();
+        gizmoLegendLabels = new List<Rect>();
+
+        for(int i = 0; i < gizmoLegendText.Length; ++i)
+        {
+            gizmoLegendIcons.Add(new Rect(pos.x, pos.y, legendSize, legendSize));
+            gizmoLegendLabels.Add(new Rect(pos.x + legendSize + padding, pos.y, 100.0f, legendSize));
+
+            pos.y += legendSize + padding;
+        }
+
+        //Player view texture.
         Camera eyesCamera = agent.eyes.cam;
         float eyesAspect = eyesCamera.aspect;
 
@@ -112,6 +198,14 @@ public class PathOSAgentRenderer : MonoBehaviour
             Screen.height - playerViewY, playerViewX, playerViewY);
     }
 
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            showLegend = !showLegend;
+        }
+    }
+
     private void OnGUI()
     {
         if (!sceneInit)
@@ -124,6 +218,21 @@ public class PathOSAgentRenderer : MonoBehaviour
         if (showPlayerView)
             GUI.DrawTexture(playerViewTextureCoords,
                 playerViewTexture, ScaleMode.ScaleToFit, false);
+
+        if(showLegend)
+        {
+            for (int i = 0; i < mapLegendText.Length; ++i)
+            {
+                GUI.DrawTexture(mapLegendIcons[i], mapLegendTextures[i]);
+                GUI.Label(mapLegendLabels[i], mapLegendText[i]);
+            }
+
+            for (int i = 0; i < gizmoLegendText.Length; ++i)
+            {
+                GUI.DrawTexture(gizmoLegendIcons[i], gizmoLegendTextures[i], ScaleMode.ScaleToFit);
+                GUI.Label(gizmoLegendLabels[i], gizmoLegendText[i]);
+            }
+        }
     }
 
     private void OnDrawGizmos()
