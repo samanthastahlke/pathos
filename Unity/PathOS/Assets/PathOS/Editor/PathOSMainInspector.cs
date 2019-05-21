@@ -18,10 +18,17 @@ public class PathOSMainInspector : Editor
     private PathOSManager manager;
     private SerializedObject serial;
 
+    private GUIStyle foldoutStyle = GUIStyle.none;
+
     private SerializedProperty limitSimulationTime;
     private SerializedProperty maxSimulationTime;
     private SerializedProperty endOnCompletionGoal;
     private GUIContent completionLabel;
+
+    private bool showMarkup = false;
+    private bool iconDrag = false;
+    private bool updateSelection = false;
+    private GameObject selection = null;
 
     private SerializedProperty entityList;
     private ReorderableList entityListReorderable;
@@ -37,10 +44,16 @@ public class PathOSMainInspector : Editor
 
     private bool transposeWeightMatrix;
 
+    private Texture2D testIcon;
+    private Texture2D testCursor;
+
     private void OnEnable()
     {
         manager = (PathOSManager)target;
         serial = new SerializedObject(manager);
+
+        testIcon = Resources.Load<Texture2D>("hazard_enemy");
+        testCursor = Resources.Load<Texture2D>("cursor_hazard_enemy");
 
         limitSimulationTime = serial.FindProperty("limitSimulationTime");
         maxSimulationTime = serial.FindProperty("maxSimulationTime");
@@ -81,6 +94,11 @@ public class PathOSMainInspector : Editor
     public override void OnInspectorGUI()
     {
         serial.Update();
+
+        //Placed here since Unity seems to have issues with having these 
+        //styles initialized on enable sometimes.
+        foldoutStyle = EditorStyles.foldout;
+        foldoutStyle.fontStyle = FontStyle.Bold;
 
         EditorGUILayout.PropertyField(limitSimulationTime);
         EditorGUILayout.PropertyField(maxSimulationTime);
@@ -145,16 +163,90 @@ public class PathOSMainInspector : Editor
             }
         }
 
+        showMarkup = EditorGUILayout.Foldout(
+            showMarkup, "Level Markup", foldoutStyle);
+
+        if (showMarkup)
+        {
+            GUIStyle testStyle = new GUIStyle();
+            testStyle.stretchHeight = true;
+            testStyle.stretchWidth = true;
+            testStyle.fixedHeight = 32.0f;
+            testStyle.fixedWidth = 32.0f;
+            
+            GUILayout.Box(testIcon, testStyle);
+            
+            if(GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            {
+                if (Event.current.type == EventType.MouseDown)
+                {
+                    Event.current.Use();
+                    iconDrag = true;
+                    selection = null;
+                }
+            }
+            
+            if(Event.current.type == EventType.MouseUp && iconDrag)
+            {
+                Event.current.Use();
+                iconDrag = false;
+
+                if (selection != null)
+                    manager.levelEntities.Add(new LevelEntity(selection, EntityType.ET_HAZARD_ENEMY));
+
+                selection = null;
+            }
+
+            if (Event.current.type == EventType.MouseDrag)
+                SceneView.RepaintAll();
+        }
+
         //Entity list.
         entityListReorderable.DoLayoutList();
 
         serial.ApplyModifiedProperties();
-        
-        if(GUI.changed && !EditorApplication.isPlaying)
+
+        if (GUI.changed && !EditorApplication.isPlaying)
         {
             EditorUtility.SetDirty(manager);
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-        }       
+        }   
+    }
+
+    private void OnSceneGUI()
+    {
+        selection = null;
+
+        if (iconDrag)
+        {
+            GUI.DrawTexture(new Rect(Event.current.mousePosition.x,
+                Event.current.mousePosition.y, 32.0f, 32.0f), testIcon,
+                ScaleMode.ScaleToFit);
+
+            Cursor.SetCursor(testCursor, Vector2.zero, CursorMode.Auto);
+            EditorGUIUtility.AddCursorRect(new Rect(0.0f, 0.0f, 10000.0f, 10000.0f), MouseCursor.CustomCursor);
+
+            if(EditorWindow.mouseOverWindow.ToString() == " (UnityEditor.SceneView)")
+            {
+                Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit, 100.0f))
+                {
+                    GameObject obj = hit.transform.gameObject;
+                    manager.curMouseover = obj;
+                    selection = obj;
+                }
+
+                //int blocker = GUIUtility.GetControlID(FocusType.Passive);
+                //HandleUtility.AddDefaultControl(blocker);
+                //GUIUtility.hotControl = blocker;
+
+                //manager.curMouseover = HandleUtility.PickGameObject(Event.current.mousePosition, true);
+            }         
+        }
+
+        
     }
 
     private void BuildWeightDictionary()

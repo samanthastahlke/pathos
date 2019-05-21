@@ -83,6 +83,11 @@ public class PathOSAgentInspector : Editor
     {
         serial.Update();
 
+        //Placed here since Unity seems to have issues with having these 
+        //styles initialized on enable sometimes.
+        foldoutStyle = EditorStyles.foldout;
+        foldoutStyle.fontStyle = FontStyle.Bold;
+
         EditorGUILayout.LabelField("General", EditorStyles.boldLabel);
 
         EditorGUILayout.PropertyField(memoryRef);
@@ -90,11 +95,6 @@ public class PathOSAgentInspector : Editor
 
         EditorGUILayout.PropertyField(freezeAgent);
         EditorGUILayout.PropertyField(verboseDebugging);
-
-        //Placed here since Unity seems to have issues with having these 
-        //styles initialized on enable sometimes.
-        foldoutStyle = EditorStyles.foldout;
-        foldoutStyle.fontStyle = FontStyle.Bold;
 
         showPlayerCharacteristics = EditorGUILayout.Foldout(
             showPlayerCharacteristics, "Player Characteristics", foldoutStyle);

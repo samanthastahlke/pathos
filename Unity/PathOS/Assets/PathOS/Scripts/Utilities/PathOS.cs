@@ -110,6 +110,14 @@ namespace PathOS
 
         //Not used yet. Will be used to simulate compass/map availability.
         public bool alwaysKnown;
+
+        public LevelEntity(GameObject objectRef, EntityType entityType)
+        {
+            this.objectRef = objectRef;
+            name = objectRef.name;
+
+            this.entityType = entityType;
+        }
     }
 
     /* PLAYER PERCEPTION */

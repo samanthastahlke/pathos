@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEditor;
 using PathOS;
 
 /*
@@ -19,6 +20,8 @@ public class PathOSManager : NPSingleton<PathOSManager>
     public List<LevelEntity> levelEntities;
 
     public List<HeuristicWeightSet> heuristicWeights;
+
+    public GameObject curMouseover { get; set; }
 
     private Dictionary<EntityType, string> entityGizmoLookup = new Dictionary<EntityType, string>
     {
@@ -69,21 +72,42 @@ public class PathOSManager : NPSingleton<PathOSManager>
                 Gizmos.DrawIcon(entity.objectRef.transform.position,
                    entityGizmoLookup[entity.entityType]);
             }
+
+            if(curMouseover != null)
+            {          
+                Matrix4x4 oldGizmos = Gizmos.matrix;
+                Color oldGizmosColor = Gizmos.color;
+
+                List<Matrix4x4> mouseoverMeshTransforms = new List<Matrix4x4>();
+                List<Mesh> mouseoverMeshes = new List<Mesh>();
+
+                MeshFilter[] filters = curMouseover.GetComponentsInChildren<MeshFilter>();
+                SkinnedMeshRenderer[] renderers = curMouseover.GetComponentsInChildren<SkinnedMeshRenderer>();
+
+                foreach(MeshFilter filter in filters)
+                {
+                    mouseoverMeshes.Add(filter.sharedMesh);
+                    mouseoverMeshTransforms.Add(filter.transform.localToWorldMatrix);
+                }
+
+                foreach(SkinnedMeshRenderer renderer in renderers)
+                {
+                    mouseoverMeshes.Add(renderer.sharedMesh);
+                    mouseoverMeshTransforms.Add(renderer.transform.localToWorldMatrix);
+                }
+
+                for(int i = 0; i < mouseoverMeshes.Count; ++i)
+                {
+                    Gizmos.matrix = mouseoverMeshTransforms[i];
+                    Gizmos.DrawWireMesh(mouseoverMeshes[i]);
+                }
+
+                curMouseover = null;
+                Gizmos.matrix = oldGizmos;
+                Gizmos.color = oldGizmosColor;
+            }           
         }
 #endif
-    }
-
-    //Entity adding/removal (for Inspector).
-    public void AddEntity(int index)
-    {
-        if(index >= 0 && index <= levelEntities.Count)
-            levelEntities.Insert(index, new LevelEntity());
-    }
-
-    public void RemoveEntity(int index)
-    {
-        if (index >= 0 && index < levelEntities.Count)
-            levelEntities.RemoveAt(index);
     }
 
     public void ClearEntities()
