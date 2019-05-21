@@ -20,15 +20,29 @@ public class PathOSManager : NPSingleton<PathOSManager>
 
     public List<HeuristicWeightSet> heuristicWeights;
 
+    private Dictionary<EntityType, string> entityGizmoLookup = new Dictionary<EntityType, string>
+    {
+        {EntityType.ET_NONE, "entity_null.png" },
+        {EntityType.ET_GOAL_OPTIONAL, "goal_optional.png" },
+        {EntityType.ET_GOAL_MANDATORY, "goal_mandatory.png" },
+        {EntityType.ET_GOAL_COMPLETION, "goal_completion.png" },
+        {EntityType.ET_RESOURCE_ACHIEVEMENT, "resource_achievement.png" },
+        {EntityType.ET_RESOURCE_PRESERVATION, "resource_preservation.png" },
+        {EntityType.ET_HAZARD_ENEMY, "hazard_enemy.png" },
+        {EntityType.ET_HAZARD_ENVIRONMENT, "hazard_environment.png" },
+        {EntityType.ET_POI, "poi_environment.png" },
+        {EntityType.ET_POI_NPC, "poi_npc.png" }
+    };
+
     private float simulationTimer = 0.0f;
 
-	private void Awake()
-	{ 
-		for(int i = 0; i < levelEntities.Count; ++i)
+    private void Awake()
+	{
+        for (int i = 0; i < levelEntities.Count; ++i)
         {
             //Grab renderers for object visibility checks by the agent.
             levelEntities[i].rend = levelEntities[i].objectRef.GetComponentInChildren<Renderer>();
-        }
+        }     
 	}
 
     private void Update()
@@ -43,6 +57,20 @@ public class PathOSManager : NPSingleton<PathOSManager>
         }
 #endif
 
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+#if UNITY_EDITOR
+        if(!UnityEditor.EditorApplication.isPlaying)
+        {
+            foreach(LevelEntity entity in levelEntities)
+            {
+                Gizmos.DrawIcon(entity.objectRef.transform.position,
+                   entityGizmoLookup[entity.entityType]);
+            }
+        }
+#endif
     }
 
     //Entity adding/removal (for Inspector).

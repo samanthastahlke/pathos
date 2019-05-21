@@ -154,7 +154,7 @@ public class PathOSMainInspector : Editor
         {
             EditorUtility.SetDirty(manager);
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-        }
+        }       
     }
 
     private void BuildWeightDictionary()
