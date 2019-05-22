@@ -20,20 +20,23 @@ public class PathOSMainInspector : Editor
 
     private GUIStyle foldoutStyle = GUIStyle.none;
 
+    /* Basic Properties */
     private SerializedProperty limitSimulationTime;
     private SerializedProperty maxSimulationTime;
     private SerializedProperty endOnCompletionGoal;
     private GUIContent completionLabel;
 
+    /* Level Markup */
     private bool showMarkup = false;
     private GameObject selection = null;
-    private int hotControlRestore = 0;
 
+    /* Level Entity List */
     private bool showList = false;
     private SerializedProperty entityList;
     private ReorderableList entityListReorderable;
     private SerializedProperty heuristicWeights;
 
+    /* Heuristic Weight Matrix */
     private PathOS.Heuristic weightMatrixRowID;
     private PathOS.EntityType weightMatrixColumnID;
 
@@ -44,9 +47,7 @@ public class PathOSMainInspector : Editor
 
     private bool transposeWeightMatrix;
 
-    private Texture2D testIcon;
-    private Texture2D testCursor;
-
+    //Utility class for level markup toggles.
     private class MarkupToggle
     {
         public static GUIStyle style;
@@ -102,12 +103,11 @@ public class PathOSMainInspector : Editor
 
     private void OnEnable()
     {
+        //Grab references to the serialized version of the manager.
         manager = (PathOSManager)target;
         serial = new SerializedObject(manager);
 
-        testIcon = Resources.Load<Texture2D>("hazard_enemy");
-        testCursor = Resources.Load<Texture2D>("cursor_hazard_enemy");
-
+        //Grab properties.
         limitSimulationTime = serial.FindProperty("limitSimulationTime");
         maxSimulationTime = serial.FindProperty("maxSimulationTime");
         endOnCompletionGoal = serial.FindProperty("endOnCompletionGoal");
@@ -120,6 +120,7 @@ public class PathOSMainInspector : Editor
         entityListReorderable = new ReorderableList(serial.FindProperty("levelEntities"));
         entityListReorderable.elementNameProperty = "Level Entities";
 
+        //Build weight matrix.
         heuristicIndices = new Dictionary<Heuristic, int>();
         entypeIndices = new Dictionary<EntityType, int>();
 
@@ -137,8 +138,15 @@ public class PathOSMainInspector : Editor
         {
             entypeIndices.Add(entype, index);
             ++index;
+        }
 
-            //Set up toggles.
+        weightLookup = new Dictionary<(Heuristic, EntityType), float>();
+
+        BuildWeightDictionary();
+
+        //Set up toggles for level markup.
+        foreach (EntityType entype in System.Enum.GetValues(typeof(EntityType)))
+        {
             markupToggles.Add(new MarkupToggle(entype,
                 manager.entityLabelLookup[entype],
                 Resources.Load<Texture2D>(manager.entityGizmoLookup[entype]),
@@ -149,11 +157,7 @@ public class PathOSMainInspector : Editor
             "Clear Markup (remove from entity list)",
             Resources.Load<Texture2D>("delete"),
             Resources.Load<Texture2D>("cursor_delete"),
-            true));
-
-        weightLookup = new Dictionary<(Heuristic, EntityType), float>();
-
-        BuildWeightDictionary();
+            true));  
     }
 
     public override void OnInspectorGUI()
@@ -165,6 +169,8 @@ public class PathOSMainInspector : Editor
         foldoutStyle = EditorStyles.foldout;
         foldoutStyle.fontStyle = FontStyle.Bold;
 
+
+        //Show basic properties.
         EditorGUILayout.PropertyField(limitSimulationTime);
         EditorGUILayout.PropertyField(maxSimulationTime);
         EditorGUILayout.PropertyField(endOnCompletionGoal, completionLabel);
@@ -182,6 +188,7 @@ public class PathOSMainInspector : Editor
             }
         }
 
+        //Stop using the markup tool if escape is pressed.
         if (Event.current.type == EventType.KeyDown
             && Event.current.keyCode == KeyCode.Escape)
         {
@@ -199,6 +206,7 @@ public class PathOSMainInspector : Editor
         //Heuristic weight matrix.
         if (EditorGUILayout.PropertyField(heuristicWeights))
         {
+            //Sync displayed values with values stored in manager.
             RefreshWeightDictionary();
 
             string transposeButtonText = "View by Entity Type";
@@ -273,9 +281,11 @@ public class PathOSMainInspector : Editor
     {
         if (activeToggle != null)
         {
+            //Use the current markup icon as the cursor.
             Cursor.SetCursor(activeToggle.cursor, Vector2.zero, CursorMode.Auto);
             EditorGUIUtility.AddCursorRect(new Rect(0.0f, 0.0f, 10000.0f, 10000.0f), MouseCursor.CustomCursor);
 
+            //Selection update.
             if (EditorWindow.mouseOverWindow != null &&
                 EditorWindow.mouseOverWindow.ToString() == " (UnityEditor.SceneView)")
             {
@@ -285,11 +295,11 @@ public class PathOSMainInspector : Editor
             else
                 selection = null;
 
+            //Mark up the current selection.
             if (Event.current.type == EventType.MouseDown)
             {
                 Event.current.Use();
 
-                hotControlRestore = GUIUtility.hotControl;
                 int passiveControlId = GUIUtility.GetControlID(FocusType.Passive);
                 GUIUtility.hotControl = passiveControlId;
 
@@ -319,6 +329,8 @@ public class PathOSMainInspector : Editor
                         manager.levelEntities.Add(new LevelEntity(selection, activeToggle.entityType));
                 }
             }
+
+            //Stop using the markup tool if escape is pressed.
             else if (Event.current.type == EventType.KeyDown
             && Event.current.keyCode == KeyCode.Escape)
             {
