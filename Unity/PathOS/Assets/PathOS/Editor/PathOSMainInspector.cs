@@ -26,9 +26,8 @@ public class PathOSMainInspector : Editor
     private GUIContent completionLabel;
 
     private bool showMarkup = false;
-    private bool iconDrag = false;
-    private bool updateSelection = false;
     private GameObject selection = null;
+    private int hotControlRestore = 0;
 
     private SerializedProperty entityList;
     private ReorderableList entityListReorderable;
@@ -46,6 +45,59 @@ public class PathOSMainInspector : Editor
 
     private Texture2D testIcon;
     private Texture2D testCursor;
+
+    private class MarkupToggle
+    {
+        public static GUIStyle style;
+
+        public EntityType entityType;
+        public bool isClear;
+
+        public Texture2D icon;
+        public Texture2D cursor;
+        private GUIContent content;
+
+        public string label;
+
+        public bool active;
+
+        public MarkupToggle(EntityType entityType, string label,
+            Texture2D icon, Texture2D cursor, bool isClear = false)
+        {
+            this.entityType = entityType;
+            this.label = label;
+            this.icon = icon;
+            this.cursor = cursor;
+            this.isClear = isClear;
+
+            content = new GUIContent(icon);
+        }
+
+        public bool Layout()
+        {
+            //Toggle style - should be the same as small Editor buttons.
+            //Check is placed here to avoid Unity not having initialized/
+            //properly referenced the EditorStyles on load.
+            if (null == style)
+            {
+                style = EditorStyles.miniButton;
+                style.fixedHeight = 32.0f;
+                style.fixedWidth = 32.0f;
+            }
+
+            GUILayout.BeginHorizontal();
+
+            active = GUILayout.Toggle(active, content, style);
+            GUILayout.Label(label);
+
+            GUILayout.EndHorizontal();
+
+            return active;
+        }
+    }
+
+    private List<MarkupToggle> markupToggles = new List<MarkupToggle>();
+    private MarkupToggle activeToggle = null;
 
     private void OnEnable()
     {
@@ -84,7 +136,19 @@ public class PathOSMainInspector : Editor
         {
             entypeIndices.Add(entype, index);
             ++index;
+
+            //Set up toggles.
+            markupToggles.Add(new MarkupToggle(entype,
+                manager.entityLabelLookup[entype],
+                Resources.Load<Texture2D>(manager.entityGizmoLookup[entype]),
+                Resources.Load<Texture2D>("cursor_" + manager.entityGizmoLookup[entype])));
         }
+
+        markupToggles.Add(new MarkupToggle(EntityType.ET_NONE,
+            "Clear Markup (remove from entity list)",
+            Resources.Load<Texture2D>("delete"),
+            Resources.Load<Texture2D>("cursor_delete"),
+            true));
 
         weightLookup = new Dictionary<(Heuristic, EntityType), float>();
 
@@ -168,43 +232,18 @@ public class PathOSMainInspector : Editor
 
         if (showMarkup)
         {
-            GUIStyle testStyle = new GUIStyle();
-            testStyle.stretchHeight = true;
-            testStyle.stretchWidth = true;
-            testStyle.fixedHeight = 32.0f;
-            testStyle.fixedWidth = 32.0f;
-            
-            GUILayout.Box(testIcon, testStyle);
-            
-            if(GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            for(int i = 0; i < markupToggles.Count; ++i)
             {
-                if (Event.current.type == EventType.MouseDown)
-                {
-                    Event.current.Use();
-                    iconDrag = true;
-                    selection = null;
-                }
+                if(markupToggles[i].Layout())
+                    ActivateToggle(markupToggles[i]);
             }
-            
-            if(Event.current.type == EventType.MouseUp && iconDrag)
-            {
-                Event.current.Use();
-                iconDrag = false;
-
-                if (selection != null)
-                    manager.levelEntities.Add(new LevelEntity(selection, EntityType.ET_HAZARD_ENEMY));
-
-                selection = null;
-            }
-
-            if (Event.current.type == EventType.MouseDrag)
-                SceneView.RepaintAll();
         }
 
         //Entity list.
         entityListReorderable.DoLayoutList();
 
         serial.ApplyModifiedProperties();
+        SceneView.RepaintAll();
 
         if (GUI.changed && !EditorApplication.isPlaying)
         {
@@ -215,38 +254,63 @@ public class PathOSMainInspector : Editor
 
     private void OnSceneGUI()
     {
-        selection = null;
-
-        if (iconDrag)
+        if (activeToggle != null)
         {
-            GUI.DrawTexture(new Rect(Event.current.mousePosition.x,
-                Event.current.mousePosition.y, 32.0f, 32.0f), testIcon,
-                ScaleMode.ScaleToFit);
-
-            Cursor.SetCursor(testCursor, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(activeToggle.cursor, Vector2.zero, CursorMode.Auto);
             EditorGUIUtility.AddCursorRect(new Rect(0.0f, 0.0f, 10000.0f, 10000.0f), MouseCursor.CustomCursor);
 
-            if(EditorWindow.mouseOverWindow.ToString() == " (UnityEditor.SceneView)")
+            if (EditorWindow.mouseOverWindow != null &&
+                EditorWindow.mouseOverWindow.ToString() == " (UnityEditor.SceneView)")
             {
-                Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-                RaycastHit hit;
+                if (Event.current.type == EventType.MouseMove)
+                    selection = HandleUtility.PickGameObject(Event.current.mousePosition, true);
+            }
+            else
+                selection = null;
 
-                if (Physics.Raycast(ray, out hit, 100.0f))
+            if (Event.current.type == EventType.MouseDown)
+            {
+                Event.current.Use();
+
+                hotControlRestore = GUIUtility.hotControl;
+                int passiveControlId = GUIUtility.GetControlID(FocusType.Passive);
+                GUIUtility.hotControl = passiveControlId;
+
+                if (selection != null)
                 {
-                    GameObject obj = hit.transform.gameObject;
-                    manager.curMouseover = obj;
-                    selection = obj;
+                    Undo.RecordObject(manager, "Edit Level Markup");
+
+                    int selectedID = selection.GetInstanceID();
+
+                    bool addNewEntry = !activeToggle.isClear;
+
+                    for(int i = 0; i < manager.levelEntities.Count; ++i)
+                    {
+                        if (manager.levelEntities[i].objectRef.GetInstanceID() == selectedID)
+                        {
+                            if (activeToggle.isClear)
+                                manager.levelEntities.RemoveAt(i);
+                            else
+                                manager.levelEntities[i].entityType = activeToggle.entityType;
+
+                            addNewEntry = false;
+                            break;
+                        }  
+                    }
+
+                    if(addNewEntry)
+                        manager.levelEntities.Add(new LevelEntity(selection, activeToggle.entityType));
                 }
-
-                //int blocker = GUIUtility.GetControlID(FocusType.Passive);
-                //HandleUtility.AddDefaultControl(blocker);
-                //GUIUtility.hotControl = blocker;
-
-                //manager.curMouseover = HandleUtility.PickGameObject(Event.current.mousePosition, true);
-            }         
+            }
+            else if (Event.current.type == EventType.KeyDown
+            && Event.current.keyCode == KeyCode.Escape)
+            {
+                ActivateToggle(null);
+                Repaint();
+            }
         }
 
-        
+        manager.curMouseover = selection;
     }
 
     private void BuildWeightDictionary()
@@ -261,6 +325,24 @@ public class PathOSMainInspector : Editor
                     manager.heuristicWeights[i].weights[j].entype),
                     manager.heuristicWeights[i].weights[j].weight);
             }
+        }
+    }
+
+    private void ActivateToggle(MarkupToggle toggle)
+    {
+        if(activeToggle != null)
+            activeToggle.active = false;
+
+        activeToggle = toggle;
+
+        if(null == activeToggle)
+        {
+            selection = null;
+            GUIUtility.hotControl = 0;
+        }
+        else
+        {
+            activeToggle.active = true;
         }
     }
 }

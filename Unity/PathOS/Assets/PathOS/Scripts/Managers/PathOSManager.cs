@@ -23,18 +23,32 @@ public class PathOSManager : NPSingleton<PathOSManager>
 
     public GameObject curMouseover { get; set; }
 
-    private Dictionary<EntityType, string> entityGizmoLookup = new Dictionary<EntityType, string>
+    public Dictionary<EntityType, string> entityGizmoLookup = new Dictionary<EntityType, string>
     {
-        {EntityType.ET_NONE, "entity_null.png" },
-        {EntityType.ET_GOAL_OPTIONAL, "goal_optional.png" },
-        {EntityType.ET_GOAL_MANDATORY, "goal_mandatory.png" },
-        {EntityType.ET_GOAL_COMPLETION, "goal_completion.png" },
-        {EntityType.ET_RESOURCE_ACHIEVEMENT, "resource_achievement.png" },
-        {EntityType.ET_RESOURCE_PRESERVATION, "resource_preservation.png" },
-        {EntityType.ET_HAZARD_ENEMY, "hazard_enemy.png" },
-        {EntityType.ET_HAZARD_ENVIRONMENT, "hazard_environment.png" },
-        {EntityType.ET_POI, "poi_environment.png" },
-        {EntityType.ET_POI_NPC, "poi_npc.png" }
+        {EntityType.ET_NONE, "entity_null" },
+        {EntityType.ET_GOAL_OPTIONAL, "goal_optional" },
+        {EntityType.ET_GOAL_MANDATORY, "goal_mandatory" },
+        {EntityType.ET_GOAL_COMPLETION, "goal_completion" },
+        {EntityType.ET_RESOURCE_ACHIEVEMENT, "resource_achievement" },
+        {EntityType.ET_RESOURCE_PRESERVATION, "resource_preservation" },
+        {EntityType.ET_HAZARD_ENEMY, "hazard_enemy" },
+        {EntityType.ET_HAZARD_ENVIRONMENT, "hazard_environment" },
+        {EntityType.ET_POI, "poi_environment" },
+        {EntityType.ET_POI_NPC, "poi_npc" }
+    };
+
+    public Dictionary<EntityType, string> entityLabelLookup = new Dictionary<EntityType, string>
+    {
+        {EntityType.ET_NONE, "Undefined Type (unaffected by agent motives)" },
+        {EntityType.ET_GOAL_OPTIONAL, "Optional Goal" },
+        {EntityType.ET_GOAL_MANDATORY, "Mandatory Goal" },
+        {EntityType.ET_GOAL_COMPLETION, "Final Goal" },
+        {EntityType.ET_RESOURCE_ACHIEVEMENT, "Collectable Item" },
+        {EntityType.ET_RESOURCE_PRESERVATION, "Self-Preservation Item (e.g., health)" },
+        {EntityType.ET_HAZARD_ENEMY, "Enemy Hazard" },
+        {EntityType.ET_HAZARD_ENVIRONMENT, "Environmental Hazard" },
+        {EntityType.ET_POI, "Point-of-Interest (e.g., setpiece)" },
+        {EntityType.ET_POI_NPC, "NPC (non-hostile)" }
     };
 
     private float simulationTimer = 0.0f;
@@ -70,7 +84,7 @@ public class PathOSManager : NPSingleton<PathOSManager>
             foreach(LevelEntity entity in levelEntities)
             {
                 Gizmos.DrawIcon(entity.objectRef.transform.position,
-                   entityGizmoLookup[entity.entityType]);
+                   entityGizmoLookup[entity.entityType] + ".png");
             }
 
             if(curMouseover != null)
