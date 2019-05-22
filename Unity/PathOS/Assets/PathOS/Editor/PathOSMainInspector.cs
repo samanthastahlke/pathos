@@ -239,6 +239,13 @@ public class PathOSMainInspector : Editor
             }
         }
 
+        if (Event.current.type == EventType.KeyDown
+            && Event.current.keyCode == KeyCode.Escape)
+        {
+            ActivateToggle(null);
+            Repaint();
+        }
+
         //Entity list.
         entityListReorderable.DoLayoutList();
 
