@@ -29,6 +29,7 @@ public class PathOSMainInspector : Editor
     private GameObject selection = null;
     private int hotControlRestore = 0;
 
+    private bool showList = false;
     private SerializedProperty entityList;
     private ReorderableList entityListReorderable;
     private SerializedProperty heuristicWeights;
@@ -167,66 +168,8 @@ public class PathOSMainInspector : Editor
         EditorGUILayout.PropertyField(limitSimulationTime);
         EditorGUILayout.PropertyField(maxSimulationTime);
         EditorGUILayout.PropertyField(endOnCompletionGoal, completionLabel);
-
-        //Heuristic weight matrix.
-        if(EditorGUILayout.PropertyField(heuristicWeights))
-        {
-            string transposeButtonText = "View by Entity Type";
-
-            if (transposeWeightMatrix)
-                transposeButtonText = "View by Heuristic";
-
-            if (GUILayout.Button(transposeButtonText))
-                transposeWeightMatrix = !transposeWeightMatrix;
-
-            if (transposeWeightMatrix)
-                weightMatrixColumnID = (PathOS.EntityType)EditorGUILayout.EnumPopup("Selected Entity Type:", weightMatrixColumnID);
-            else
-                weightMatrixRowID = (PathOS.Heuristic)EditorGUILayout.EnumPopup("Selected Heuristic:", weightMatrixRowID);
-
-            Heuristic curHeuristic;
-            EntityType curEntityType;
-
-            System.Type indexType = (transposeWeightMatrix) ? typeof(Heuristic) : typeof(EntityType);
-
-            foreach(var index in System.Enum.GetValues(indexType))
-            {
-                curHeuristic = (transposeWeightMatrix) ? (Heuristic)(index) : weightMatrixRowID;
-                curEntityType = (transposeWeightMatrix) ? weightMatrixColumnID : (EntityType)(index);
-
-                string label = (transposeWeightMatrix) ? curHeuristic.ToString() : curEntityType.ToString();
-
-                if (!weightLookup.ContainsKey((curHeuristic, curEntityType)))
-                    continue;
-
-                weightLookup[(curHeuristic, curEntityType)] = 
-                    EditorGUILayout.FloatField(label, weightLookup[(curHeuristic, curEntityType)]);
-
-                manager.heuristicWeights[heuristicIndices[curHeuristic]].
-                    weights[entypeIndices[curEntityType]].weight =
-                    weightLookup[(curHeuristic, curEntityType)];              
-            }
-
-            if (GUILayout.Button("Refresh Matrix"))
-            {
-                manager.ResizeWeightMatrix();
-                BuildWeightDictionary();
-            }
-
-            if(GUILayout.Button("Export Weights..."))
-            {
-                string exportPath = EditorUtility.SaveFilePanel("Export Weights...", Application.dataPath, "heuristic-weights", "csv");
-                manager.ExportWeights(exportPath);
-            }
-
-            if(GUILayout.Button("Import Weights..."))
-            {
-                string importPath = EditorUtility.OpenFilePanel("Import Weights...", Application.dataPath, "csv");
-                manager.ImportWeights(importPath);
-                BuildWeightDictionary();
-            }
-        }
-
+    
+        //Level markup panel.
         showMarkup = EditorGUILayout.Foldout(
             showMarkup, "Level Markup", foldoutStyle);
 
@@ -247,16 +190,83 @@ public class PathOSMainInspector : Editor
         }
 
         //Entity list.
-        entityListReorderable.DoLayoutList();
+        showList = EditorGUILayout.Foldout(
+            showList, "Level Entity List", foldoutStyle);
+
+        if(showList)
+            entityListReorderable.DoLayoutList();
+
+        //Heuristic weight matrix.
+        if (EditorGUILayout.PropertyField(heuristicWeights))
+        {
+            RefreshWeightDictionary();
+
+            string transposeButtonText = "View by Entity Type";
+
+            if (transposeWeightMatrix)
+                transposeButtonText = "View by Heuristic";
+
+            if (GUILayout.Button(transposeButtonText))
+                transposeWeightMatrix = !transposeWeightMatrix;
+
+            if (transposeWeightMatrix)
+                weightMatrixColumnID = (PathOS.EntityType)EditorGUILayout.EnumPopup("Selected Entity Type:", weightMatrixColumnID);
+            else
+                weightMatrixRowID = (PathOS.Heuristic)EditorGUILayout.EnumPopup("Selected Heuristic:", weightMatrixRowID);
+
+            Heuristic curHeuristic;
+            EntityType curEntityType;
+
+            System.Type indexType = (transposeWeightMatrix) ? typeof(Heuristic) : typeof(EntityType);
+
+            foreach (var index in System.Enum.GetValues(indexType))
+            {
+                curHeuristic = (transposeWeightMatrix) ? (Heuristic)(index) : weightMatrixRowID;
+                curEntityType = (transposeWeightMatrix) ? weightMatrixColumnID : (EntityType)(index);
+
+                string label = (transposeWeightMatrix) ? curHeuristic.ToString() : curEntityType.ToString();
+
+                if (!weightLookup.ContainsKey((curHeuristic, curEntityType)))
+                    continue;
+
+                EditorGUI.BeginChangeCheck();
+
+                float newWeight = EditorGUILayout.FloatField(label, weightLookup[(curHeuristic, curEntityType)]);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(manager, "Change Heuristic Weight");
+
+                    weightLookup[(curHeuristic, curEntityType)] = newWeight;
+
+                    manager.heuristicWeights[heuristicIndices[curHeuristic]].
+                    weights[entypeIndices[curEntityType]].weight =
+                    weightLookup[(curHeuristic, curEntityType)];
+                }
+
+            }
+
+            if (GUILayout.Button("Refresh Matrix"))
+            {
+                manager.ResizeWeightMatrix();
+                BuildWeightDictionary();
+            }
+
+            if (GUILayout.Button("Export Weights..."))
+            {
+                string exportPath = EditorUtility.SaveFilePanel("Export Weights...", Application.dataPath, "heuristic-weights", "csv");
+                manager.ExportWeights(exportPath);
+            }
+
+            if (GUILayout.Button("Import Weights..."))
+            {
+                string importPath = EditorUtility.OpenFilePanel("Import Weights...", Application.dataPath, "csv");
+                manager.ImportWeights(importPath);
+            }
+        }
 
         serial.ApplyModifiedProperties();
         SceneView.RepaintAll();
-
-        if (GUI.changed && !EditorApplication.isPlaying)
-        {
-            EditorUtility.SetDirty(manager);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-        }   
     }
 
     private void OnSceneGUI()
@@ -331,6 +341,19 @@ public class PathOSMainInspector : Editor
                 weightLookup.Add((manager.heuristicWeights[i].heuristic,
                     manager.heuristicWeights[i].weights[j].entype),
                     manager.heuristicWeights[i].weights[j].weight);
+            }
+        }
+    }
+
+    private void RefreshWeightDictionary()
+    {
+        for (int i = 0; i < manager.heuristicWeights.Count; ++i)
+        {
+            for (int j = 0; j < manager.heuristicWeights[i].weights.Count; ++j)
+            {
+                weightLookup[(manager.heuristicWeights[i].heuristic,
+                    manager.heuristicWeights[i].weights[j].entype)] =
+                    manager.heuristicWeights[i].weights[j].weight;
             }
         }
     }
