@@ -48,6 +48,13 @@ namespace PathOS
     }
 
     [System.Serializable]
+    public struct FloatRange
+    {
+        public float min;
+        public float max;
+    }
+
+    [System.Serializable]
     public class EntityWeight
     {
         public EntityType entype;
@@ -95,6 +102,34 @@ namespace PathOS
         {
             heuristic = m_heuristic;
             scale = m_scale;
+        }
+    }
+
+    [System.Serializable]
+    public class HeuristicRange
+    {
+        public Heuristic heuristic;
+        public FloatRange range;
+
+        public HeuristicRange()
+        {
+            heuristic = Heuristic.ACHIEVEMENT;
+            range = new FloatRange
+            {
+                min = 0.0f,
+                max = 1.0f
+            };
+        }
+
+        public HeuristicRange(Heuristic m_heuristic, 
+            float m_min = 0.0f, float m_max = 1.0f)
+        {
+            heuristic = m_heuristic;
+            range = new FloatRange
+            {
+                min = m_min,
+                max = m_max
+            };
         }
     }
 

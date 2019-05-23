@@ -9,6 +9,7 @@ PathOSAgentEyes.cs
 PathOSAgentEyes (c) Nine Penguins (Samantha Stahlke) 2018
 */
 
+[RequireComponent(typeof(PathOSAgent))]
 public class PathOSAgentEyes : MonoBehaviour 
 {
     public PathOSAgent agent;

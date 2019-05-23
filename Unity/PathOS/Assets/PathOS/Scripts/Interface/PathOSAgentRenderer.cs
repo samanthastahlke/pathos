@@ -235,7 +235,7 @@ public class PathOSAgentRenderer : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         if (!sceneInit)
             return;

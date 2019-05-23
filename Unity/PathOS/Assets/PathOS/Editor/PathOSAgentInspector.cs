@@ -22,7 +22,7 @@ public class PathOSAgentInspector : Editor
     private SerializedProperty experienceScale;
     private SerializedProperty heuristicList;
 
-    private bool showPlayerCharacteristics = false;
+    private bool showPlayerCharacteristics = true;
 
     private SerializedProperty memoryRef;
     private SerializedProperty eyeRef;

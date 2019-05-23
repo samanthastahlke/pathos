@@ -10,6 +10,8 @@ PathOSAgent (c) Samantha Stahlke and Atiya Nova 2018
 */
 
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(PathOSAgentMemory))]
+[RequireComponent(typeof(PathOSAgentEyes))]
 public class PathOSAgent : MonoBehaviour 
 {
     /* OBJECT REFERENCES AND DEBUGGING */

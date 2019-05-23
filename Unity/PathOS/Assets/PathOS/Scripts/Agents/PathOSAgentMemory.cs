@@ -8,6 +8,7 @@ PathOSAgentMemory.cs
 PathOSAgentMemory (c) Nine Penguins (Samantha Stahlke) and Atiya Nova 2018
 */
 
+[RequireComponent(typeof(PathOSAgent))]
 public class PathOSAgentMemory : MonoBehaviour 
 {
     public PathOSAgent agent;
