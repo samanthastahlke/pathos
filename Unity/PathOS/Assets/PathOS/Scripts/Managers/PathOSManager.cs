@@ -53,6 +53,8 @@ public class PathOSManager : NPSingleton<PathOSManager>
 
     private float simulationTimer = 0.0f;
 
+    private List<PathOSAgent> agents = new List<PathOSAgent>();
+
     private void Awake()
 	{
         for (int i = 0; i < levelEntities.Count; ++i)
@@ -62,18 +64,42 @@ public class PathOSManager : NPSingleton<PathOSManager>
         }     
 	}
 
+    private void Start()
+    {
+        agents.AddRange(FindObjectsOfType<PathOSAgent>());
+    }
+
     private void Update()
     {
         simulationTimer += Time.deltaTime;
 
 #if UNITY_EDITOR
-        if(limitSimulationTime && simulationTimer > maxSimulationTime
-            && UnityEditor.EditorApplication.isPlaying)
+
+        bool stopSimulation = limitSimulationTime && simulationTimer > maxSimulationTime;
+
+        if (stopSimulation)
         {
             UnityEditor.EditorApplication.isPlaying = false;
+            return;
+        }
+
+        stopSimulation = true;
+
+        for(int i = 0; i < agents.Count; ++i)
+        {
+            if (!agents[i].completed)
+            {
+                stopSimulation = false;
+                break;
+            }
+        }
+
+        if (stopSimulation)
+        {
+            UnityEditor.EditorApplication.isPlaying = false;
+            return;
         }
 #endif
-
     }
 
     private void OnDrawGizmosSelected()

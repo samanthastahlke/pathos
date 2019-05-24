@@ -1004,8 +1004,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1417890926}
-  - {fileID: 130732402}
   - {fileID: 74872218}
+  - {fileID: 130732402}
   - {fileID: 15503857}
   m_Father: {fileID: 72732191}
   m_RootOrder: 2
@@ -3628,9 +3628,9 @@ Transform:
   m_LocalPosition: {x: 10.369707, y: 2.014, z: 11.231333}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 886460819}
   - {fileID: 341286004}
   - {fileID: 1263680426}
+  - {fileID: 886460819}
   m_Father: {fileID: 72732191}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: -1.3460001, y: -74.09801, z: 2.71}
@@ -9200,7 +9200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limitSimulationTime: 1
-  maxSimulationTime: 16
+  maxSimulationTime: 5
   endOnCompletionGoal: 1
   levelEntities:
   - name: Enemy
@@ -11120,6 +11120,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ProxyAgent
       objectReference: {fileID: 0}
+    - target: {fileID: 1088327799159616, guid: 607318e5beb058643a9226e07f881723, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4905807406101670, guid: 607318e5beb058643a9226e07f881723, type: 3}
       propertyPath: m_LocalPosition.x
       value: 14.506544
@@ -11166,53 +11170,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
-      propertyPath: heuristicScales.Array.data[5].scale
-      value: 0.27551514
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: experienceScale
-      value: 0.8958492
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
       propertyPath: heuristicScales.Array.data[0].scale
-      value: 0.46291953
+      value: 0.21467984
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[1].scale
-      value: 0.06646037
+      value: 0.15059817
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[2].scale
-      value: 0.66666424
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[3].scale
-      value: 0.10239816
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[4].scale
-      value: 0.13247943
+      value: 0.13374901
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[6].scale
-      value: 0.24166322
+      value: 0.8639499
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
-      propertyPath: freezeAgent
-      value: 0
+      propertyPath: experienceScale
+      value: 0.60539955
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
-      propertyPath: verboseDebugging
-      value: 0
+      propertyPath: heuristicScales.Array.data[3].scale
+      value: 0.7801212
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 3}
+      propertyPath: heuristicScales.Array.data[4].scale
+      value: 0.726045
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 3}
+      propertyPath: heuristicScales.Array.data[5].scale
+      value: 0.2573859
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 607318e5beb058643a9226e07f881723, type: 3}

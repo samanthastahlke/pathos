@@ -12,7 +12,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
     private const float shortLabelWidth = 24.0f;
     private const float shortFloatfieldWidth = 40.0f;
 
-    private const int filepathLength = 32;
+    private const int pathDisplayLength = 32;
+    private GUIStyle errorStyle = new GUIStyle();
 
     /* Basic Settings */
     [SerializeField]
@@ -30,6 +31,19 @@ public class PathOSAgentBatchingWindow : EditorWindow
     //TODO: Simulating multiple agents simultaneously.
     [SerializeField]
     private bool simultaneous = false;
+
+    [SerializeField]
+    private Vector3 startLocation;
+
+    [SerializeField]
+    private string loadPrefabFile = "--";
+
+    private string shortPrefabFile;
+
+    private bool validPrefabFile = false;
+
+    private List<PathOSAgent> instantiatedAgents = new List<PathOSAgent>();
+    private List<PathOSAgent> existingSceneAgents = new List<PathOSAgent>();
 
     //Max number of agents to be simulated simultaneously.
     private const int MAX_AGENTS_SIMULTANEOUS = 8;
@@ -80,9 +94,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
     //TODO: Implementation for loading a series of agents from a file.
     [SerializeField]
-    private string loadHeuristicsFile;
+    private string loadHeuristicsFile = "--";
 
-    [SerializeField]
     private string shortHeuristicsFile;
 
     /* Simulation Controls */
@@ -157,6 +170,18 @@ public class PathOSAgentBatchingWindow : EditorWindow
             heuristicLabels.Add(heuristic, label);
         }
 
+        if (loadHeuristicsFile == "")
+            loadHeuristicsFile = "--";
+
+        if (loadPrefabFile == "")
+            loadPrefabFile = "--";
+
+        TruncateFilepath(loadHeuristicsFile, ref shortHeuristicsFile);
+        TruncateFilepath(loadPrefabFile, ref shortPrefabFile);
+
+        errorStyle.normal.textColor = Color.red;
+        CheckPrefabFile();
+
         Repaint();
     }
 
@@ -193,6 +218,43 @@ public class PathOSAgentBatchingWindow : EditorWindow
         numAgents = EditorGUILayout.IntField("Number of agents: ", numAgents);
 
         simultaneous = EditorGUILayout.Toggle("Simulate Simultaneously", simultaneous);
+
+        //If simultaneous simulation is selected, draw the prefab selection utility.
+        if(simultaneous)
+        {
+            startLocation = EditorGUILayout.Vector3Field("Starting location: ", startLocation);
+
+            EditorGUILayout.LabelField("Prefab to use: ", shortPrefabFile);
+
+            if (GUILayout.Button("Select Prefab..."))
+            {
+                loadPrefabFile = EditorUtility.OpenFilePanel("Select Prefab...",
+                    Application.dataPath, "prefab");
+
+                TruncateFilepath(loadPrefabFile, ref shortPrefabFile);
+                CheckPrefabFile();
+            }
+
+            if (!validPrefabFile)
+            {
+                EditorGUILayout.LabelField("Error! You must select a Unity prefab" +
+                    " with the PathOSAgent component.", errorStyle);
+            }
+
+            if(GUILayout.Button("Test Instantiation"))
+            {
+                FindSceneAgents();
+                SetSceneAgentsActive(false);
+                InstantiateAgents(4);
+            }
+
+            if(GUILayout.Button("Test Removal"))
+            {
+                DeleteInstantiatedAgents(4);
+                SetSceneAgentsActive(true);
+            }
+
+        }
 
         timeScale = EditorGUILayout.Slider("Timescale: ", timeScale, 1.0f, 8.0f);
 
@@ -269,11 +331,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     loadHeuristicsFile = EditorUtility.OpenFilePanel("Select CSV...",
                         Application.dataPath, "csv");
 
-                    shortHeuristicsFile = loadHeuristicsFile.Substring(
-                    Mathf.Max(0, loadHeuristicsFile.Length - filepathLength));
-
-                    if (loadHeuristicsFile.Length > filepathLength)
-                        shortHeuristicsFile = "..." + shortHeuristicsFile;
+                    TruncateFilepath(loadHeuristicsFile, ref shortHeuristicsFile);
                 }
 
                 break;
@@ -281,7 +339,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         //Apply new heuristic values to the agent.
         if (GUILayout.Button("Apply to agent"))
-            SetHeuristics();
+            ApplyHeuristics();
 
         if(GUILayout.Button("Start"))
         {
@@ -320,7 +378,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     simulationActive = false;
                 else
                 {
-                    SetHeuristics();
+                    ApplyHeuristics();
 
                     //We need to wait one frame to ensure Unity
                     //saves the changes to the agent's heuristic values
@@ -373,7 +431,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
             agentReference = EditorUtility.InstanceIDToObject(agentID) as PathOSAgent;
     }
 
-    private void SetHeuristics()
+    private void ApplyHeuristics()
     {
         GrabAgentReference();
 
@@ -382,35 +440,111 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         Undo.RecordObject(agentReference, "Set Agent Heuristics");
 
-        switch(heuristicMode)
+        SetHeuristics(agentReference);
+    }
+
+    private void TruncateFilepath(string longPath, ref string shortPath)
+    {
+        shortPath = longPath.Substring(
+                    Mathf.Max(0, longPath.Length - pathDisplayLength));
+
+        if (longPath.Length > pathDisplayLength)
+            shortPath = "..." + shortPath;
+    }
+
+    private void SetHeuristics(PathOSAgent agent)
+    {
+        switch (heuristicMode)
         {
             case HeuristicMode.FIXED:
 
                 SyncFixedLookup();
 
-                foreach(PathOS.HeuristicScale scale in agentReference.heuristicScales)
+                foreach (PathOS.HeuristicScale scale in agent.heuristicScales)
                 {
                     scale.scale = fixedLookup[scale.heuristic];
                 }
 
-                agentReference.experienceScale = fixedExp;
+                agent.experienceScale = fixedExp;
                 break;
 
             case HeuristicMode.RANGE:
 
                 SyncRangeLookup();
 
-                foreach(PathOS.HeuristicScale scale in agentReference.heuristicScales)
+                foreach (PathOS.HeuristicScale scale in agent.heuristicScales)
                 {
                     PathOS.FloatRange range = rangeLookup[scale.heuristic];
                     scale.scale = Random.Range(range.min, range.max);
                 }
 
-                agentReference.experienceScale = Random.Range(rangeExp.min, rangeExp.max);
+                agent.experienceScale = Random.Range(rangeExp.min, rangeExp.max);
                 break;
 
             case HeuristicMode.LOAD:
                 break;
+        }
+    }
+
+    private void CheckPrefabFile()
+    {
+        string loadPrefabFileLocal = GetLocalPrefabFile();
+        validPrefabFile = AssetDatabase.LoadAssetAtPath<PathOSAgent>(loadPrefabFileLocal);
+    }
+
+    private string GetLocalPrefabFile()
+    {
+        if (loadPrefabFile.Length < Application.dataPath.Length)
+            return "";
+
+        //PrefabUtility needs paths relative to the project folder.
+        //Application.dataPath gives us the project folder + "/Assets".
+        //We need our string to start with "Assets".
+        //Ergo, we split the string starting at the length of the data path - 6.
+        return loadPrefabFile.Substring(Application.dataPath.Length - 6);
+    }
+
+    private void FindSceneAgents()
+    {
+        existingSceneAgents.Clear();
+        existingSceneAgents.AddRange(FindObjectsOfType<PathOSAgent>());
+    }
+
+    private void SetSceneAgentsActive(bool active)
+    {
+        for(int i = 0; i < existingSceneAgents.Count; ++i)
+        {
+            existingSceneAgents[i].gameObject.SetActive(active);
+        }
+    }
+
+    private void DeleteInstantiatedAgents(int count)
+    {
+        if (count > instantiatedAgents.Count)
+            count = instantiatedAgents.Count;
+
+        for(int i = 0; i < count; ++i)
+        {
+            Object.DestroyImmediate(instantiatedAgents[instantiatedAgents.Count - 1].gameObject);
+            instantiatedAgents.RemoveAt(instantiatedAgents.Count - 1);
+        }
+    }
+
+    private void InstantiateAgents(int count)
+    {
+        if (!validPrefabFile)
+            return;
+
+        PathOSAgent prefab = AssetDatabase.LoadAssetAtPath<PathOSAgent>(GetLocalPrefabFile());
+
+        if (null == prefab)
+            return;
+
+        for (int i = 0; i < count; ++i)
+        {
+            GameObject newAgent = PrefabUtility.InstantiatePrefab(prefab.gameObject) as GameObject;
+            newAgent.transform.position = startLocation;
+            instantiatedAgents.Add(newAgent.GetComponent<PathOSAgent>());
         }
     }
 }

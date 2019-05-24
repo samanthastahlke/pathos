@@ -72,6 +72,7 @@ public class PathOSAgent : MonoBehaviour
 
     //Where is the agent targeting?
     private TargetDest currentDest;
+    public bool completed { get; set; }
 
     //For backtracking traversal.
     public float hazardPenalty { get; set; }
@@ -83,6 +84,7 @@ public class PathOSAgent : MonoBehaviour
     private void Awake()
 	{
         navAgent = GetComponent<NavMeshAgent>();
+        completed = false;
 
         currentDest = new TargetDest();
         currentDest.pos = GetPosition();
@@ -283,6 +285,8 @@ public class PathOSAgent : MonoBehaviour
 
             if (memChanceRoll <= memPathChance)
                 onMemPath = memory.memoryMap.NavigateAStar(GetPosition(), dest.pos, ref memPathWaypoints);
+
+            onMemPath = false;
 
             if (onMemPath)
             {
@@ -486,8 +490,8 @@ public class PathOSAgent : MonoBehaviour
 
 	private void Update() 
 	{
-        //Inactive state toggle for debugging purposes.
-        if (freezeAgent)
+        //Inactive state toggle for debugging purposes (or if the agent is finished).
+        if (freezeAgent || completed)
             return;
 
         //Update spatial memory.
@@ -552,19 +556,13 @@ public class PathOSAgent : MonoBehaviour
             StartCoroutine(LookAround());
         }
 
-#if UNITY_EDITOR
-
-        //In editor, if we reach the final goal, end the simulation
-        //if the relevant setting is enabled.
-        if(manager.endOnCompletionGoal 
-            && memory.FinalGoalCompleted()
-            && UnityEditor.EditorApplication.isPlaying)
+        //Set the agent's completion flag.
+        if (manager.endOnCompletionGoal
+            && memory.FinalGoalCompleted())
         {
-            UnityEditor.EditorApplication.isPlaying = false;
-        }
-
-#endif
-
+            completed = true;
+            gameObject.SetActive(false);
+        }                  
     }
 
     private void PerceptionUpdate()

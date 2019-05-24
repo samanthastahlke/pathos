@@ -1298,7 +1298,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4905807406101670}
-  - component: {fileID: 136109131112024904}
   - component: {fileID: 626367637}
   - component: {fileID: 195686920623355856}
   - component: {fileID: 114084877281343334}
@@ -1319,7 +1318,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1088327799159616}
-  m_LocalRotation: {x: -0, y: -0.37108997, z: -0, w: 0.928597}
+  m_LocalRotation: {x: 0, y: -0.3710924, z: 0, w: 0.92859596}
   m_LocalPosition: {x: 14.506544, y: -0.35800004, z: -21.092281}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1329,20 +1328,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -43.566, z: 0}
---- !u!136 &136109131112024904
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1088327799159616}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.1
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!95 &626367637
 Animator:
   serializedVersion: 3
@@ -1371,7 +1356,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1088327799159616}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.2
+  m_Radius: 0.1
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -1400,22 +1385,22 @@ MonoBehaviour:
   eyes: {fileID: 114839472988384982}
   freezeAgent: 0
   verboseDebugging: 0
-  experienceScale: 0.468
+  experienceScale: 0.8958492
   heuristicScales:
   - heuristic: 0
-    scale: 0.289
+    scale: 0.46291953
   - heuristic: 10
-    scale: 0.55
+    scale: 0.06646037
   - heuristic: 15
-    scale: 0.165
+    scale: 0.66666424
   - heuristic: 20
-    scale: 1
+    scale: 0.10239816
   - heuristic: 25
-    scale: 0.768
+    scale: 0.13247943
   - heuristic: 30
-    scale: 0.201
+    scale: 0.27551514
   - heuristic: 35
-    scale: 0.442
+    scale: 0.24166322
   routeComputeTime: 0.5
   perceptionComputeTime: 0.1
   exploreDegrees: 5
