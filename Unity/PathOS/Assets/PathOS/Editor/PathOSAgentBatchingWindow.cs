@@ -28,8 +28,9 @@ public class PathOSAgentBatchingWindow : EditorWindow
     [SerializeField]
     private int numAgents;
 
-    //TODO: Simulating multiple agents simultaneously.
+    //Simulating multiple agents simultaneously.
     [SerializeField]
+    private bool simultaneousProperty = false;
     private bool simultaneous = false;
 
     [SerializeField]
@@ -42,8 +43,30 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
     private bool validPrefabFile = false;
 
-    private List<PathOSAgent> instantiatedAgents = new List<PathOSAgent>();
-    private List<PathOSAgent> existingSceneAgents = new List<PathOSAgent>();
+    [System.Serializable]
+    private class RuntimeAgentReference
+    {
+        public PathOSAgent agent;
+        public int instanceID;
+
+        public RuntimeAgentReference(PathOSAgent agent)
+        {
+            instanceID = agent.GetInstanceID();
+        }
+
+        public void UpdateReference()
+        {
+            agent = EditorUtility.InstanceIDToObject(instanceID) as PathOSAgent;
+        }
+    }
+
+    [SerializeField]
+    private List<RuntimeAgentReference> instantiatedAgents = 
+        new List<RuntimeAgentReference>();
+
+    [SerializeField]
+    private List<RuntimeAgentReference> existingSceneAgents = 
+        new List<RuntimeAgentReference>();
 
     //Max number of agents to be simulated simultaneously.
     private const int MAX_AGENTS_SIMULTANEOUS = 8;
@@ -101,6 +124,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
     /* Simulation Controls */
     private bool simulationActive = false;
     private bool triggerFrame = false;
+    private bool cleanupWait = false;
+    private bool cleanupFrame = false;
     private bool previousPlaystate = false;
     private int agentsLeft = 0;
 
@@ -196,6 +221,16 @@ public class PathOSAgentBatchingWindow : EditorWindow
     {
         //Reset the timescale.
         Time.timeScale = 1.0f;
+
+        DeleteInstantiatedAgents(instantiatedAgents.Count);
+        SetSceneAgentsActive(true);
+
+        instantiatedAgents.Clear();
+        existingSceneAgents.Clear();
+
+        //Save settings to the editor.
+        string prefsData = JsonUtility.ToJson(this, false);
+        EditorPrefs.SetString(editorPrefsID, prefsData);
     }
 
     private void OnGUI()
@@ -217,10 +252,11 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         numAgents = EditorGUILayout.IntField("Number of agents: ", numAgents);
 
-        simultaneous = EditorGUILayout.Toggle("Simulate Simultaneously", simultaneous);
+        simultaneousProperty = EditorGUILayout.Toggle(
+            "Simulate Simultaneously", simultaneousProperty);
 
         //If simultaneous simulation is selected, draw the prefab selection utility.
-        if(simultaneous)
+        if(simultaneousProperty)
         {
             startLocation = EditorGUILayout.Vector3Field("Starting location: ", startLocation);
 
@@ -343,14 +379,22 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         if(GUILayout.Button("Start"))
         {
+            simultaneous = simultaneousProperty;
             simulationActive = true;
             agentsLeft = numAgents;
+
+            if(simultaneous)
+            {
+                FindSceneAgents();
+                SetSceneAgentsActive(false);
+            }              
         }
 
         if(GUILayout.Button("Stop"))
         {
             simulationActive = false;
             EditorApplication.isPlaying = false;
+            cleanupWait = true;
         }        
     }
 
@@ -375,17 +419,54 @@ public class PathOSAgentBatchingWindow : EditorWindow
             else if (!EditorApplication.isPlaying)
             {
                 if (agentsLeft == 0)
+                {
                     simulationActive = false;
+                    cleanupFrame = true;
+                } 
                 else
                 {
-                    ApplyHeuristics();
+                    if (simultaneous)
+                    {
+                        if (agentsLeft > instantiatedAgents.Count)
+                        {
+                            InstantiateAgents(Mathf.Min(
+                                MAX_AGENTS_SIMULTANEOUS - instantiatedAgents.Count,
+                                agentsLeft - instantiatedAgents.Count));
+                        }
+                        else if (agentsLeft < instantiatedAgents.Count)
+                        {
+                            DeleteInstantiatedAgents(instantiatedAgents.Count - agentsLeft);
+                        }
+
+                        ApplyHeuristicsInstantiated();
+                        agentsLeft -= instantiatedAgents.Count;
+                    }
+                    else
+                    {
+                        ApplyHeuristics();
+                        --agentsLeft;
+                    }
 
                     //We need to wait one frame to ensure Unity
-                    //saves the changes to the agent's heuristic values
+                    //saves the changes to agent heuristic values
                     //in the undo stack.
                     triggerFrame = true;
-                    --agentsLeft;
                 }
+            }
+        }
+        else if(cleanupWait)
+        {
+            cleanupWait = false;
+            cleanupFrame = true;
+        }
+        else if(cleanupFrame)
+        {
+            cleanupFrame = false;
+
+            if (simultaneous)
+            {
+                SetSceneAgentsActive(true);
+                DeleteInstantiatedAgents(instantiatedAgents.Count);
             }
         }
     }
@@ -486,6 +567,17 @@ public class PathOSAgentBatchingWindow : EditorWindow
         }
     }
 
+    private void ApplyHeuristicsInstantiated()
+    {
+        for (int i = 0; i < instantiatedAgents.Count; ++i)
+        {
+            instantiatedAgents[i].UpdateReference();
+
+            EditorUtility.SetDirty(instantiatedAgents[i].agent);
+            SetHeuristics(instantiatedAgents[i].agent);
+        }
+    }
+
     private void CheckPrefabFile()
     {
         string loadPrefabFileLocal = GetLocalPrefabFile();
@@ -507,26 +599,20 @@ public class PathOSAgentBatchingWindow : EditorWindow
     private void FindSceneAgents()
     {
         existingSceneAgents.Clear();
-        existingSceneAgents.AddRange(FindObjectsOfType<PathOSAgent>());
+
+        foreach(PathOSAgent agent in FindObjectsOfType<PathOSAgent>())
+        {
+            existingSceneAgents.Add(new RuntimeAgentReference(agent));
+        }
     }
 
     private void SetSceneAgentsActive(bool active)
     {
         for(int i = 0; i < existingSceneAgents.Count; ++i)
         {
-            existingSceneAgents[i].gameObject.SetActive(active);
-        }
-    }
-
-    private void DeleteInstantiatedAgents(int count)
-    {
-        if (count > instantiatedAgents.Count)
-            count = instantiatedAgents.Count;
-
-        for(int i = 0; i < count; ++i)
-        {
-            Object.DestroyImmediate(instantiatedAgents[instantiatedAgents.Count - 1].gameObject);
-            instantiatedAgents.RemoveAt(instantiatedAgents.Count - 1);
+            existingSceneAgents[i].UpdateReference();
+            existingSceneAgents[i].agent.gameObject.SetActive(active);
+            EditorUtility.SetDirty(existingSceneAgents[i].agent.gameObject);
         }
     }
 
@@ -544,7 +630,28 @@ public class PathOSAgentBatchingWindow : EditorWindow
         {
             GameObject newAgent = PrefabUtility.InstantiatePrefab(prefab.gameObject) as GameObject;
             newAgent.transform.position = startLocation;
-            instantiatedAgents.Add(newAgent.GetComponent<PathOSAgent>());
+            newAgent.name = "Temporary Batch Agent " + 
+                (instantiatedAgents.Count).ToString();
+
+            instantiatedAgents.Add(new RuntimeAgentReference(
+                newAgent.GetComponent<PathOSAgent>()));
+        }
+    }
+
+    private void DeleteInstantiatedAgents(int count)
+    {
+        if (count > instantiatedAgents.Count)
+            count = instantiatedAgents.Count;
+
+        for (int i = 0; i < count; ++i)
+        {      
+            instantiatedAgents[instantiatedAgents.Count - 1].UpdateReference();
+
+            if (instantiatedAgents[instantiatedAgents.Count - 1].agent)
+                Object.DestroyImmediate(
+                    instantiatedAgents[instantiatedAgents.Count - 1].agent.gameObject);
+
+            instantiatedAgents.RemoveAt(instantiatedAgents.Count - 1);
         }
     }
 }
