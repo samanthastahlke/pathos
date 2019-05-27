@@ -1,0 +1,264 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5005646905853620058
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5005646905853620060}
+  - component: {fileID: 5005646905853620061}
+  - component: {fileID: 5005646905853620062}
+  - component: {fileID: 5005646905853620063}
+  m_Layer: 0
+  m_Name: PathOS Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5005646905853620060
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5005646905853620058}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -3.723456, y: 1.162, z: -3.3622823}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5005646905853620061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5005646905853620058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55fbb645fe59ccf4db9d6c8ff55b211c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  limitSimulationTime: 1
+  maxSimulationTime: 20
+  endOnCompletionGoal: 1
+  levelEntities: []
+  heuristicWeights:
+  - heuristic: 0
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 1
+    - entype: 350
+      weight: 1
+  - heuristic: 10
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 1
+    - entype: 110
+      weight: 1
+    - entype: 120
+      weight: 1
+    - entype: 150
+      weight: 1
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 15
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 1
+    - entype: 110
+      weight: 1
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 1
+    - entype: 160
+      weight: 1
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 20
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 1
+    - entype: 250
+      weight: 1
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 25
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 1
+    - entype: 250
+      weight: 1
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 30
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 0
+    - entype: 120
+      weight: 0
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 1
+    - entype: 200
+      weight: -1
+    - entype: 250
+      weight: -1
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+  - heuristic: 35
+    weights:
+    - entype: 0
+      weight: 0
+    - entype: 100
+      weight: 0
+    - entype: 110
+      weight: 1
+    - entype: 120
+      weight: 1
+    - entype: 150
+      weight: 0
+    - entype: 160
+      weight: 0
+    - entype: 200
+      weight: 0
+    - entype: 250
+      weight: 0
+    - entype: 300
+      weight: 0
+    - entype: 350
+      weight: 0
+--- !u!114 &5005646905853620062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5005646905853620058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03c4f1f40e4b545468e93ed92db6d5bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableLogging: 0
+  playerObject: {fileID: 0}
+  logFolder: OGVis/OGLogs
+  playerID: ProxyTestLog
+  sampleRate: 4
+  buttonEvents: 
+--- !u!114 &5005646905853620063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5005646905853620058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00e9724d991506143a99ac2bb9aa98f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logDirectory: OGVis/LBWLogs
+  directoriesLoaded: []
+  aggregateActiveOnly: 0
+  flattenCoordinates: {x: 0, y: 0, z: 0}
+  flattenX: 0
+  flattenY: 0
+  flattenZ: 0
+  showIndividualPaths: 1
+  showAggregatePath: 0
+  displaySampleRate: 3.47
+  aggregateGridEdge: 0.5
+  aggregateEdgeExtents:
+    min: 0
+    max: 0
+  showIndividualInputEvents: 0
+  showAggregateInputEvents: 0
+  allInputEvents: 
+  inputExtents:
+    min: 0
+    max: 0
+  showIndividualGameEvents: 0
+  showAggregateGameEvents: 0
+  allGameEvents: []
+  gameExtents:
+    min: 0
+    max: 0
+  inputClusterRadius: 1
+  gameClusterRadius: 1
