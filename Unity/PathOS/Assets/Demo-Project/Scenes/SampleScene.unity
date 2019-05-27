@@ -9200,7 +9200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limitSimulationTime: 1
-  maxSimulationTime: 10
+  maxSimulationTime: 20
   endOnCompletionGoal: 1
   levelEntities:
   - name: Enemy

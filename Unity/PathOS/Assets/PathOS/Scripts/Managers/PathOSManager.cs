@@ -13,9 +13,14 @@ PathOSManager (c) Nine Penguins (Samantha Stahlke) 2018
 //Simple class for defining entities in the level.
 public class PathOSManager : NPSingleton<PathOSManager>
 {
+    public const string simulationEndedEditorPrefsID = "PathOSSimulationEndFlag";
     public bool limitSimulationTime = false;
+
+    [Tooltip("Maximum runtime in seconds (uses unscaled time)")]
     public float maxSimulationTime = 180.0f;
+
     public bool endOnCompletionGoal = true;
+    public bool simulationEnded { get; set; }
 
     public List<LevelEntity> levelEntities;
 
@@ -57,12 +62,24 @@ public class PathOSManager : NPSingleton<PathOSManager>
 
     private void Awake()
 	{
-        for (int i = 0; i < levelEntities.Count; ++i)
+        for (int i = levelEntities.Count - 1; i >= 0; --i)
         {
+            if(null == levelEntities[i].objectRef)
+            {
+                levelEntities.RemoveAt(i);
+                continue;
+            }
+            
             //Grab renderers for object visibility checks by the agent.
             levelEntities[i].rend = levelEntities[i].objectRef.GetComponentInChildren<Renderer>();
-        }     
-	}
+        }
+
+        simulationEnded = false;
+
+#if UNITY_EDITOR
+        EditorPrefs.SetBool(simulationEndedEditorPrefsID, false);
+#endif
+    }
 
     private void Start()
     {
@@ -71,31 +88,30 @@ public class PathOSManager : NPSingleton<PathOSManager>
 
     private void Update()
     {
-        simulationTimer += Time.deltaTime;
+        simulationTimer += Time.unscaledDeltaTime;
 
 #if UNITY_EDITOR
 
         bool stopSimulation = limitSimulationTime && simulationTimer > maxSimulationTime;
 
-        if (stopSimulation)
+        if (!stopSimulation)
         {
-            UnityEditor.EditorApplication.isPlaying = false;
-            return;
-        }
+            stopSimulation = true;
 
-        stopSimulation = true;
-
-        for(int i = 0; i < agents.Count; ++i)
-        {
-            if (!agents[i].completed)
+            for (int i = 0; i < agents.Count; ++i)
             {
-                stopSimulation = false;
-                break;
+                if (!agents[i].completed)
+                {
+                    stopSimulation = false;
+                    break;
+                }
             }
         }
 
         if (stopSimulation)
         {
+            EditorPrefs.SetBool(simulationEndedEditorPrefsID, true);
+
             UnityEditor.EditorApplication.isPlaying = false;
             return;
         }
@@ -109,8 +125,9 @@ public class PathOSManager : NPSingleton<PathOSManager>
         {
             foreach(LevelEntity entity in levelEntities)
             {
-                Gizmos.DrawIcon(entity.objectRef.transform.position,
-                   entityGizmoLookup[entity.entityType] + ".png");
+                if(entity.objectRef != null)
+                    Gizmos.DrawIcon(entity.objectRef.transform.position,
+                        entityGizmoLookup[entity.entityType] + ".png");
             }
 
             if(curMouseover != null)

@@ -32,6 +32,7 @@ public class PathOSMainInspector : Editor
 
     /* Level Entity List */
     private bool showList = false;
+    private bool warnedEntityNull = false;
     private SerializedProperty entityList;
     private ReorderableList entityListReorderable;
     private SerializedProperty heuristicWeights;
@@ -157,7 +158,9 @@ public class PathOSMainInspector : Editor
             "Clear Markup (remove from entity list)",
             Resources.Load<Texture2D>("delete"),
             Resources.Load<Texture2D>("cursor_delete"),
-            true));  
+            true));
+
+        warnedEntityNull = false;
     }
 
     public override void OnInspectorGUI()
@@ -168,7 +171,6 @@ public class PathOSMainInspector : Editor
         //styles initialized on enable sometimes.
         foldoutStyle = EditorStyles.foldout;
         foldoutStyle.fontStyle = FontStyle.Bold;
-
 
         //Show basic properties.
         EditorGUILayout.PropertyField(limitSimulationTime);
@@ -200,8 +202,28 @@ public class PathOSMainInspector : Editor
         showList = EditorGUILayout.Foldout(
             showList, "Level Entity List", foldoutStyle);
 
+        EditorGUI.BeginChangeCheck();
+
         if(showList)
             entityListReorderable.DoLayoutList();
+
+        if(EditorGUI.EndChangeCheck())
+            warnedEntityNull = false;
+
+        if (!warnedEntityNull)
+        {
+            for (int i = 0; i < manager.levelEntities.Count; ++i)
+            {
+                if (null == manager.levelEntities[i].objectRef)
+                {
+                    NPDebug.LogWarning("One or more level entities in the scene " +
+                        "is null and will be ignored during play.");
+
+                    warnedEntityNull = true;
+                    break;
+                }
+            }
+        }
 
         //Heuristic weight matrix.
         if (EditorGUILayout.PropertyField(heuristicWeights))

@@ -126,7 +126,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
     private bool triggerFrame = false;
     private bool cleanupWait = false;
     private bool cleanupFrame = false;
-    private bool previousPlaystate = false;
+    private bool wasPlaying = false;
     private int agentsLeft = 0;
 
     [MenuItem("Window/PathOS Agent Batching")]
@@ -379,15 +379,21 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         if(GUILayout.Button("Start"))
         {
-            simultaneous = simultaneousProperty;
-            simulationActive = true;
-            agentsLeft = numAgents;
-
-            if(simultaneous)
+            if (PathOSManager.instance != null)
             {
-                FindSceneAgents();
-                SetSceneAgentsActive(false);
-            }              
+                simultaneous = simultaneousProperty;
+                simulationActive = true;
+                agentsLeft = numAgents;
+
+                if (simultaneous)
+                {
+                    FindSceneAgents();
+                    SetSceneAgentsActive(false);
+                }
+            }
+            else
+                NPDebug.LogError("Can't start simulation without a " +
+                    "PathOS manager in the scene!");               
         }
 
         if(GUILayout.Button("Stop"))
@@ -406,11 +412,9 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
     private void Update()
     {
-        previousPlaystate = EditorApplication.isPlaying;
-
         if (simulationActive)
         {
-            if(triggerFrame)
+            if (triggerFrame)
             {
                 EditorApplication.isPlaying = true;
                 Time.timeScale = timeScale;
@@ -418,11 +422,14 @@ public class PathOSAgentBatchingWindow : EditorWindow
             }
             else if (!EditorApplication.isPlaying)
             {
-                if (agentsLeft == 0)
+                if (agentsLeft == 0 || (wasPlaying 
+                    && !EditorPrefs.GetBool(
+                        PathOSManager.simulationEndedEditorPrefsID)))
                 {
+                    agentsLeft = 0;
                     simulationActive = false;
                     cleanupFrame = true;
-                } 
+                }
                 else
                 {
                     if (simultaneous)
@@ -469,6 +476,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
                 DeleteInstantiatedAgents(instantiatedAgents.Count);
             }
         }
+
+        wasPlaying = EditorApplication.isPlaying;
     }
 
     //Grab fixed heuristic values from the agent reference specified.

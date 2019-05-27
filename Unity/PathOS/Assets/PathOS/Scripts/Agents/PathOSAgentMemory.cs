@@ -108,6 +108,7 @@ public class PathOSAgentMemory : MonoBehaviour
                 && entity.impressionTime >= agent.forgetTime)
             {
                 entities.RemoveAt(i);
+                continue;
             }
                 
 
@@ -137,7 +138,8 @@ public class PathOSAgentMemory : MonoBehaviour
         }
 
         //Only mark completion if the agent actively targets the final goal.
-        if(agent.IsTargeted(finalGoal.entity)
+        if(finalGoal != null 
+            && agent.IsTargeted(finalGoal.entity)
             && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
             < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
         {
