@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,42 +22,36 @@ public class OGVisEditor : Editor
     private static bool fileFoldout = false;
     private string lblFileFoldout = "Manage Log Files";
 
+    private const int pathDisplayLength = 32;
+    private GUIStyle errorStyle = new GUIStyle();
+
+    private string logDirectoryDisplay;
+
     private SerializedProperty propLogDirectory;
 
     //Filter/display management.
     private static bool filterFoldout = false;
     private string lblFilterFoldout = "Filtering/Display Options";
 
+    private SerializedProperty propDisplayHeight;
+
     //Path display settings.
     private static bool pathFoldout = false;
-    private string lblPathFoldout = "Player Telemetry";
+    private string lblPathFoldout = "Agent Navigation Data";
 
-    private SerializedProperty propFlattenCoordinates;
-    private SerializedProperty propDisplaySampleRate;
-    private SerializedProperty propAggregateGridSize;
-    private SerializedProperty propAggregateEdgeScale;
+    private SerializedProperty propShowHeatmap;
+    private SerializedProperty propShowIndividual;
+    private SerializedProperty propHeatmapGridSize;
 
     private Texture2D polylinetex;
 
-    //Input event display settings.
-    private static bool inputFoldout = false;
-    private string lblInputFoldout = "Input Events";
-
-    private SerializedProperty propInputClusterRadius;
-    private SerializedProperty propInputLinearScale;
-
-    //Game event display settings.
-    private static bool gameFoldout = false;
-    private string lblGameFoldout = "Game Events";
-
-    private SerializedProperty propGameClusterRadius;
-    private SerializedProperty propGameLinearScale;
+    //Interaction display settings.
+    private static bool interactionFoldout = false;
+    private string lblInteractionFoldout = "Entity Interactions";
 
     //Called when the inspector pane is initialized.
     private void OnEnable()
     {
-        //Debug.Log("Waking OGVisEditor...");
-
         //Grab our sharp line texture - this looks nicer on screen than the default.
         polylinetex = Resources.Load("polylinetex") as Texture2D;
 
@@ -67,15 +62,17 @@ public class OGVisEditor : Editor
         //These serialized properties will let us skip some of the legwork in displaying
         //interactive widgets in the inspector.
         propLogDirectory = serial.FindProperty("logDirectory");
-        propFlattenCoordinates = serial.FindProperty("flattenCoordinates");
-        propDisplaySampleRate = serial.FindProperty("displaySampleRate");
-        propAggregateGridSize = serial.FindProperty("aggregateGridEdge");
-        propAggregateEdgeScale = serial.FindProperty("aggregateEdgeExtents");
 
-        propInputClusterRadius = serial.FindProperty("inputClusterRadius");
-        propGameClusterRadius = serial.FindProperty("gameClusterRadius");
-        propInputLinearScale = serial.FindProperty("inputExtents");
-        propGameLinearScale = serial.FindProperty("gameExtents");
+        propShowIndividual = serial.FindProperty("showIndividualPaths");
+        propShowHeatmap = serial.FindProperty("showHeatmap");
+
+        propDisplayHeight = serial.FindProperty("displayHeight");
+        propHeatmapGridSize = serial.FindProperty("gridSize");
+
+        PathOS.UI.TruncateStringHead(vis.logDirectory,
+            ref logDirectoryDisplay, pathDisplayLength);
+
+        errorStyle.normal.textColor = Color.red;
     }
 
     //Draws the inspector pane itself.
@@ -89,10 +86,31 @@ public class OGVisEditor : Editor
 
         if(fileFoldout)
         {
-            EditorGUILayout.PropertyField(propLogDirectory);
+            EditorGUILayout.LabelField("Load Directory: ", logDirectoryDisplay);
+
+            if(GUILayout.Button("Browse..."))
+            {
+                string defaultDirectory = (Directory.Exists(vis.logDirectory)) ?
+                    vis.logDirectory : Application.dataPath;
+
+                string selectedPath = EditorUtility.OpenFolderPanel("Select Folder...",
+                    defaultDirectory, "");
+
+                if (selectedPath != "")
+                    vis.logDirectory = selectedPath;
+
+                PathOS.UI.TruncateStringHead(vis.logDirectory,
+                    ref logDirectoryDisplay, pathDisplayLength);
+            }
+
+            if(!Directory.Exists(vis.logDirectory))
+            {
+                EditorGUILayout.LabelField("Error! You must choose a " +
+                    "valid folder on this computer.", errorStyle);
+            }
 
             //Log file loading/management.
-            if (GUILayout.Button("Add Files from Assets/" + propLogDirectory.stringValue + "/"))
+            if (GUILayout.Button("Add Files from " + logDirectoryDisplay + "/"))
             {
                 //Add log files, if the provided directory is valid.
                 vis.LoadLogs();
@@ -117,26 +135,18 @@ public class OGVisEditor : Editor
 
             //Chekck for an update to global aggregation settings.
             oldFilter = vis.aggregateActiveOnly;
-            vis.aggregateActiveOnly = GUILayout.Toggle(vis.aggregateActiveOnly, "Aggregate from enabled players only");
+            vis.aggregateActiveOnly = GUILayout.Toggle(vis.aggregateActiveOnly, "Aggregate from enabled agents only");
 
             if (oldFilter != vis.aggregateActiveOnly)
                 refreshFilter = true;
 
-            //Axis flattening settings.
-            EditorGUILayout.PropertyField(propFlattenCoordinates);
-            GUILayout.Label("Enable Axis Flattening");
-            GUILayout.BeginHorizontal();
-            vis.flattenX = GUILayout.Toggle(vis.flattenX, "X");
-            vis.flattenY = GUILayout.Toggle(vis.flattenY, "Y");
-            vis.flattenZ = GUILayout.Toggle(vis.flattenZ, "Z");
-            GUILayout.EndHorizontal();
+            EditorGUILayout.PropertyField(propDisplayHeight);
 
             //If the user wants to commit axis-flattening settings, update the vis
             //accordingly.
-            if (GUILayout.Button("Apply Axis Flattening Settings"))
+            if (GUILayout.Button("Apply Display Height"))
             {
-                vis.ResamplePaths();
-                vis.ReaggregatePath();
+                vis.UpdateDisplayPaths();
                 vis.ReclusterEvents();
             }
 
@@ -146,12 +156,8 @@ public class OGVisEditor : Editor
             if(pathFoldout)
             {
                 //Global path display settings.
-                vis.showIndividualPaths = GUILayout.Toggle(vis.showIndividualPaths, "Show Individual Paths");
-                vis.showAggregatePath = GUILayout.Toggle(vis.showAggregatePath, "Show Aggregate Path");
-
-                EditorGUILayout.PropertyField(propDisplaySampleRate);
-                EditorGUILayout.PropertyField(propAggregateGridSize);
-                EditorGUILayout.PropertyField(propAggregateEdgeScale, true);
+                EditorGUILayout.PropertyField(propShowHeatmap);
+                EditorGUILayout.PropertyField(propShowIndividual);
                 
                 if(vis.pLogs.Count > 0)
                     GUILayout.Label("Filter Data by Player ID:");
@@ -201,97 +207,14 @@ public class OGVisEditor : Editor
             if (refreshFilter)
             {
                 vis.ReclusterEvents();
-                vis.ReaggregatePath();
             }
-
-            //Collapsible pane for managing display of input events.
-            inputFoldout = EditorGUILayout.Foldout(inputFoldout, lblInputFoldout);
-
-            if(inputFoldout)
-            {
-                //Toggle showing input events at all.
-                vis.showIndividualInputEvents = GUILayout.Toggle(vis.showIndividualInputEvents, "Show Individual Input Events");
-                vis.showAggregateInputEvents = GUILayout.Toggle(vis.showAggregateInputEvents, "Show Aggregate Input Events");
-
-                EditorGUILayout.PropertyField(propInputClusterRadius);
-                EditorGUILayout.PropertyField(propInputLinearScale, true);
-
-                //Filters.
-                if (vis.enabledInputEvents.Count > 0)
-                    GUILayout.Label("Filter by Key Code:");
-
-                //Same paradigm as Player ID enabling/colour settings.
-                foreach(KeyCode key in vis.allInputEvents)
-                {
-                    GUILayout.BeginHorizontal();
-
-                    vis.enabledInputEvents[key] = 
-                        GUILayout.Toggle(vis.enabledInputEvents[key], key.ToString());
-                    vis.aggregateInputColors[key] =
-                        EditorGUILayout.ColorField(vis.aggregateInputColors[key]);
-
-                    GUILayout.EndHorizontal();
-                }
-
-                if(GUILayout.Button("Select All"))
-                {
-                    foreach (KeyCode key in vis.allInputEvents)
-                    {
-                        vis.enabledInputEvents[key] = true;
-                    }
-                }
-
-                if(GUILayout.Button("Select None"))
-                {
-                    foreach (KeyCode key in vis.allInputEvents)
-                    {
-                        vis.enabledInputEvents[key] = false;
-                    }
-                }
-            }
-
+            
             //Collapsible pane for managing display of gameplay events.
-            gameFoldout = EditorGUILayout.Foldout(gameFoldout, lblGameFoldout);
+            interactionFoldout = EditorGUILayout.Foldout(interactionFoldout, lblInteractionFoldout);
 
-            if(gameFoldout)
+            if(interactionFoldout)
             {
-                //Toggle showing game events at all.
-                vis.showIndividualGameEvents = GUILayout.Toggle(vis.showIndividualGameEvents, "Show Individual Game Events");
-                vis.showAggregateGameEvents = GUILayout.Toggle(vis.showAggregateGameEvents, "Show Aggregate Game Events");
-                EditorGUILayout.PropertyField(propGameClusterRadius);
-                EditorGUILayout.PropertyField(propGameLinearScale, true);
-
-                if (vis.enabledInputEvents.Count > 0)
-                    GUILayout.Label("Filter by Event ID:");
-
-                //Same paradigm as PID/input filters and colour settings.
-                foreach(string eventID in vis.allGameEvents)
-                {
-                    GUILayout.BeginHorizontal();
-
-                    vis.enabledGameEvents[eventID] =
-                        GUILayout.Toggle(vis.enabledGameEvents[eventID], eventID);
-                    vis.aggregateEventColors[eventID] =
-                        EditorGUILayout.ColorField(vis.aggregateEventColors[eventID]);
-
-                    GUILayout.EndHorizontal();
-                }
-
-                if (GUILayout.Button("Select All"))
-                {
-                    foreach (string eventID in vis.allGameEvents)
-                    {
-                        vis.enabledGameEvents[eventID] = true;
-                    }
-                }
-
-                if (GUILayout.Button("Select None"))
-                {
-                    foreach (string eventID in vis.allGameEvents)
-                    {
-                        vis.enabledGameEvents[eventID] = false;
-                    }
-                }
+                //TODO
 
             }
         }
@@ -307,17 +230,6 @@ public class OGVisEditor : Editor
         if (!vis.enabled)
             return;
 
-        //Draw the aggregate path using the aggregate edges created by the vis.
-        if (vis.showAggregatePath)
-        {
-            Handles.color = Color.white;
-
-            foreach (OGLogVisualizer.PathAggregateEdge edge in vis.aggregatePath)
-            {
-                Handles.DrawAAPolyLine(polylinetex, (float)edge.displayWidth, edge.points);
-            }
-        }
-
         //Draw individual player paths.
         if (vis.showIndividualPaths)
         {
@@ -332,90 +244,7 @@ public class OGVisEditor : Editor
                 }
             }
         } 
-
-        //For input and game events, showing aggregate/individual events are mutually
-        //exclusive operations - to avoid confusion/excessive occlusion with this 
-        //form of representation.
-        if(vis.showIndividualInputEvents)
-        {
-            foreach (KeyValuePair<string, OGLogVisualizer.PlayerLog> pLog in vis.pLogs)
-            {
-                if (pLog.Value.visInclude)
-                {
-                    //Draw input events for enabled player IDs.
-                    foreach(OGLogVisualizer.PlayerLog.InputEvent input in pLog.Value.inputEvents)
-                    {
-                        if (vis.enabledInputEvents[input.key])
-                        {
-                            Handles.color = vis.aggregateInputColors[input.key];
-                            Handles.DrawSolidDisc(input.pos, Vector3.up, OGLogVisualizer.MIN_EVENT_RADIUS);
-                            Handles.Label(input.pos, input.key.ToString());
-                        }
-                    }
-                }
-            }
-        }
-        else if(vis.showAggregateInputEvents)
-        {
-            foreach(KeyValuePair<KeyCode, List<OGLogVisualizer.InputAggregateEvent>>
-                aggregation in vis.aggregateInputEvents)
-            {
-                if(vis.enabledInputEvents[aggregation.Key])
-                {
-                    //Draw aggregates of enabled input event IDs.
-                    foreach(OGLogVisualizer.InputAggregateEvent aggregate in 
-                        aggregation.Value)
-                    {
-                        if (aggregate.displaySize == 0.0f)
-                            continue;
-
-                        Handles.color = vis.aggregateInputColors[aggregation.Key];
-                        Handles.DrawSolidDisc(aggregate.pos, Vector3.up, aggregate.displaySize);
-                        Handles.Label(aggregate.pos, aggregate.key.ToString());
-                    }
-                }
-            }
-        }
-
-        if(vis.showIndividualGameEvents)
-        {
-            foreach (KeyValuePair<string, OGLogVisualizer.PlayerLog> pLog in vis.pLogs)
-            {
-                if (pLog.Value.visInclude)
-                {
-                    //Draw visible input events.
-                    foreach (OGLogVisualizer.PlayerLog.GameEvent gameEvent in pLog.Value.gameEvents)
-                    {
-                        if (vis.enabledGameEvents[gameEvent.eventID])
-                        {
-                            Handles.color = vis.aggregateEventColors[gameEvent.eventID];
-                            Handles.DrawSolidDisc(gameEvent.pos, Vector3.up, OGLogVisualizer.MIN_EVENT_RADIUS);
-                            Handles.Label(gameEvent.pos, gameEvent.eventID);
-                        }
-                    }
-                }
-            }
-        }
-        else if(vis.showAggregateGameEvents)
-        {
-            foreach(KeyValuePair<string, List<OGLogVisualizer.GameAggregateEvent>>
-                aggregation in vis.aggregateGameEvents)
-            {
-                if(vis.enabledGameEvents[aggregation.Key])
-                {
-                    //Draw aggregates of enabled gameplay event IDs.
-                    foreach(OGLogVisualizer.GameAggregateEvent aggregate in 
-                        aggregation.Value)
-                    {
-                        if (aggregate.displaySize == 0.0f)
-                            continue;
-
-                        Handles.color = vis.aggregateEventColors[aggregation.Key];
-                        Handles.DrawSolidDisc(aggregate.pos, Vector3.up, aggregate.displaySize);
-                        Handles.Label(aggregate.pos, aggregate.eventID);
-                    }
-                }
-            }
-        }
+        
+        //TODO rendering of heatmap and interaction events.
     }
 }

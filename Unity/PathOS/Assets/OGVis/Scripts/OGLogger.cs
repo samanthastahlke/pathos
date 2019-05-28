@@ -48,19 +48,6 @@ public class OGLogger : MonoBehaviour
         logOutput.WriteLine(line);
     }
 
-    //Called from manager for custom event hooks.
-    public void LogGameEvent(string eventKey)
-    {
-        string line = OGLogManager.LogItemType.GAME_EVENT + "," +
-            mgr.gameTimer + "," +
-            eventKey + "," +
-            transform.position.x + "," +
-            transform.position.y + "," +
-            transform.position.z;
-
-        logOutput.WriteLine(line);
-    }
-
     //Called from manager for custom GameObject interactions.
     public void LogInteraction(string objectName, Transform location)
     {
@@ -85,19 +72,6 @@ public class OGLogger : MonoBehaviour
             transform.rotation.x + "," +
             transform.rotation.y + "," +
             transform.rotation.z;
-
-        logOutput.WriteLine(line);
-    }
-
-    //Input logging.
-    private void LogInputEvent(KeyCode key)
-    {
-        string line = OGLogManager.LogItemType.INPUT + "," +
-            mgr.gameTimer + "," +
-            key + "," +
-            transform.position.x + "," +
-            transform.position.y + "," +
-            transform.position.z;
 
         logOutput.WriteLine(line);
     }

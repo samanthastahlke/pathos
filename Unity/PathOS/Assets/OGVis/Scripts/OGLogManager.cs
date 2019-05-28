@@ -29,8 +29,6 @@ public class OGLogManager : OGSingleton<OGLogManager>
     public enum LogItemType
     {
         POSITION = 0,
-        INPUT,
-        GAME_EVENT,
         INTERACTION,
         HEADER
     };
@@ -90,6 +88,8 @@ public class OGLogManager : OGSingleton<OGLogManager>
             string filename = logFilePrefix + "-" + fileIndex.ToString() + ".csv";
             logger.logOutput = File.CreateText(logDirectory + filename);
 
+            logger.WriteHeader("SAMPLE " + sampleRate);
+
             loggers.Add(logObjects[i].GetInstanceID(), logger);
 
             ++fileIndex;
@@ -132,18 +132,6 @@ public class OGLogManager : OGSingleton<OGLogManager>
             if (loggers.ContainsKey(instanceID))
                 loggers[instanceID].WriteHeader(header);
         }
-    }
-
-    //Hook for custom game events.
-    public void FireEvent(GameObject caller, string eventKey)
-    {
-        if(enableLogging)
-        {
-            int instanceID = caller.GetInstanceID();
-
-            if (loggers.ContainsKey(instanceID))
-                loggers[instanceID].LogGameEvent(eventKey);
-        } 
     }
 
     //Hook for interaction/visiting objects.

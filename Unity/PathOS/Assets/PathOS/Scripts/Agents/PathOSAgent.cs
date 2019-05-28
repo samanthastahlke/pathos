@@ -170,6 +170,7 @@ public class PathOSAgent : MonoBehaviour
         {
             string header = "";
 
+            header += "HEURISTICS ";
             header += "EXPERIENCE " + experienceScale + ",";
 
             foreach(HeuristicScale scale in heuristicScales)
