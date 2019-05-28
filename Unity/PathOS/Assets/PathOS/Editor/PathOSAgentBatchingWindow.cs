@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+/*
+PathOSAgentBatchingWindow.cs 
+PathOSAgentBatchingWindow (c) Nine Penguins (Samantha Stahlke) 2019
+*/
 public class PathOSAgentBatchingWindow : EditorWindow
 {
     //Used to identify preferences string by Unity.
@@ -201,8 +205,10 @@ public class PathOSAgentBatchingWindow : EditorWindow
         if (loadPrefabFile == "")
             loadPrefabFile = "--";
 
-        TruncateFilepath(loadHeuristicsFile, ref shortHeuristicsFile);
-        TruncateFilepath(loadPrefabFile, ref shortPrefabFile);
+        PathOS.UI.TruncateStringHead(loadHeuristicsFile,
+            ref shortHeuristicsFile, pathDisplayLength);
+        PathOS.UI.TruncateStringHead(loadPrefabFile, 
+            ref shortPrefabFile, pathDisplayLength);
 
         errorStyle.normal.textColor = Color.red;
         CheckPrefabFile();
@@ -267,7 +273,9 @@ public class PathOSAgentBatchingWindow : EditorWindow
                 loadPrefabFile = EditorUtility.OpenFilePanel("Select Prefab...",
                     Application.dataPath, "prefab");
 
-                TruncateFilepath(loadPrefabFile, ref shortPrefabFile);
+                PathOS.UI.TruncateStringHead(loadPrefabFile, 
+                    ref shortPrefabFile, pathDisplayLength);
+
                 CheckPrefabFile();
             }
 
@@ -367,7 +375,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     loadHeuristicsFile = EditorUtility.OpenFilePanel("Select CSV...",
                         Application.dataPath, "csv");
 
-                    TruncateFilepath(loadHeuristicsFile, ref shortHeuristicsFile);
+                    PathOS.UI.TruncateStringHead(loadHeuristicsFile, 
+                        ref shortHeuristicsFile, pathDisplayLength);
                 }
 
                 break;
@@ -531,15 +540,6 @@ public class PathOSAgentBatchingWindow : EditorWindow
         Undo.RecordObject(agentReference, "Set Agent Heuristics");
 
         SetHeuristics(agentReference);
-    }
-
-    private void TruncateFilepath(string longPath, ref string shortPath)
-    {
-        shortPath = longPath.Substring(
-                    Mathf.Max(0, longPath.Length - pathDisplayLength));
-
-        if (longPath.Length > pathDisplayLength)
-            shortPath = "..." + shortPath;
     }
 
     private void SetHeuristics(PathOSAgent agent)

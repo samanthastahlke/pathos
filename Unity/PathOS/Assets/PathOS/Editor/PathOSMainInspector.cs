@@ -33,7 +33,6 @@ public class PathOSMainInspector : Editor
     /* Level Entity List */
     private bool showList = false;
     private bool warnedEntityNull = false;
-    private SerializedProperty entityList;
     private ReorderableList entityListReorderable;
     private SerializedProperty heuristicWeights;
 
@@ -115,7 +114,6 @@ public class PathOSMainInspector : Editor
 
         completionLabel = new GUIContent("Final Goal Triggers End");
 
-        entityList = serial.FindProperty("levelEntities");
         heuristicWeights = serial.FindProperty("heuristicWeights");
 
         entityListReorderable = new ReorderableList(serial.FindProperty("levelEntities"));
@@ -191,8 +189,7 @@ public class PathOSMainInspector : Editor
         }
 
         //Stop using the markup tool if escape is pressed.
-        if (Event.current.type == EventType.KeyDown
-            && Event.current.keyCode == KeyCode.Escape)
+        if (Event.current.type == EventType.KeyDown)
         {
             ActivateToggle(null);
             Repaint();
@@ -320,41 +317,48 @@ public class PathOSMainInspector : Editor
             //Mark up the current selection.
             if (Event.current.type == EventType.MouseDown)
             {
-                Event.current.Use();
-
-                int passiveControlId = GUIUtility.GetControlID(FocusType.Passive);
-                GUIUtility.hotControl = passiveControlId;
-
-                if (selection != null)
+                if (Event.current.button == 0)
                 {
-                    Undo.RecordObject(manager, "Edit Level Markup");
+                    Event.current.Use();
 
-                    int selectedID = selection.GetInstanceID();
+                    int passiveControlId = GUIUtility.GetControlID(FocusType.Passive);
+                    GUIUtility.hotControl = passiveControlId;
 
-                    bool addNewEntry = !activeToggle.isClear;
-
-                    for(int i = 0; i < manager.levelEntities.Count; ++i)
+                    if (selection != null)
                     {
-                        if (manager.levelEntities[i].objectRef.GetInstanceID() == selectedID)
+                        Undo.RecordObject(manager, "Edit Level Markup");
+
+                        int selectedID = selection.GetInstanceID();
+
+                        bool addNewEntry = !activeToggle.isClear;
+
+                        for (int i = 0; i < manager.levelEntities.Count; ++i)
                         {
-                            if (activeToggle.isClear)
-                                manager.levelEntities.RemoveAt(i);
-                            else
-                                manager.levelEntities[i].entityType = activeToggle.entityType;
+                            if (manager.levelEntities[i].objectRef.GetInstanceID() == selectedID)
+                            {
+                                if (activeToggle.isClear)
+                                    manager.levelEntities.RemoveAt(i);
+                                else
+                                    manager.levelEntities[i].entityType = activeToggle.entityType;
 
-                            addNewEntry = false;
-                            break;
-                        }  
+                                addNewEntry = false;
+                                break;
+                            }
+                        }
+
+                        if (addNewEntry)
+                            manager.levelEntities.Add(new LevelEntity(selection, activeToggle.entityType));
                     }
-
-                    if(addNewEntry)
-                        manager.levelEntities.Add(new LevelEntity(selection, activeToggle.entityType));
+                }
+                else
+                {
+                    ActivateToggle(null);
+                    Repaint();
                 }
             }
 
-            //Stop using the markup tool if escape is pressed.
-            else if (Event.current.type == EventType.KeyDown
-            && Event.current.keyCode == KeyCode.Escape)
+            //Stop using the markup tool if a key is pressed.
+            else if (Event.current.type == EventType.KeyDown)
             {
                 ActivateToggle(null);
                 Repaint();

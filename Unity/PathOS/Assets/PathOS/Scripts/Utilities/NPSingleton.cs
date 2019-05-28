@@ -29,7 +29,8 @@ public class NPSingleton<T> : MonoBehaviour where T : MonoBehaviour
                     instanceRef = (T)FindObjectOfType(typeof(T));
 
                     if (null == instanceRef)
-                        NPDebug.LogError("No reference found, but something is trying to access one!", typeof(T));
+                        NPDebug.LogError("No instance found, " +
+                            "but something is trying to access one!", typeof(T));
                 }
 
                 return instanceRef;

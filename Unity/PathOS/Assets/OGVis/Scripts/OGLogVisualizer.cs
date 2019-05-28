@@ -500,7 +500,13 @@ public class OGLogVisualizer : MonoBehaviour
                             Quaternion.Euler(float.Parse(lineContents[5]), float.Parse(lineContents[6]), float.Parse(lineContents[7])));
 
                         break;
-                    
+
+                    //TODO: Interaction with a game object.
+                    case OGLogManager.LogItemType.INTERACTION:
+                        {
+                            break;
+                        }
+
                     //Input events.
                     case OGLogManager.LogItemType.INPUT:
                         {
@@ -554,6 +560,13 @@ public class OGLogVisualizer : MonoBehaviour
 
                             break;
                         }
+                    
+                    //TODO: Header/metadata.
+                    case OGLogManager.LogItemType.HEADER:
+                        {
+                            break;
+                        }
+
                     default:
                         break;
                 }

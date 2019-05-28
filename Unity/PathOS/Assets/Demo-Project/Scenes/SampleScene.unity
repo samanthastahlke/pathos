@@ -9513,11 +9513,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableLogging: 0
-  playerObject: {fileID: 626367630}
-  logFolder: OGVis/OGLogs
-  playerID: ProxyTestLog
+  logDirectory: C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/OGVis/OGLogs
+  logFilePrefix: agent
   sampleRate: 4
-  buttonEvents: 
+  logObjects:
+  - {fileID: 626367630}
 --- !u!1001 &1664538791
 PrefabInstance:
   m_ObjectHideFlags: 0

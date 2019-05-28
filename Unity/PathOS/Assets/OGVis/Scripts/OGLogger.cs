@@ -16,21 +16,15 @@ public class OGLogger : MonoBehaviour
     public const int GLOG_L = 6;
 
     //Output and timers.
-    private StreamWriter logOutput;
-    private float gameTimer = 0.0f;
+    public StreamWriter logOutput { get; set; }
     private float sampleTimer = 1000.0f;
 
-    private OGLogManager mgr;
+    private static OGLogManager mgr;
 
     private void Awake()
     {
-        if (mgr == null)
+        if (null == mgr)
             mgr = OGLogManager.instance;
-    }
-
-    public void RegisterOutput(StreamWriter stream)
-    {
-        logOutput = stream;
     }
 
 	private void Update()
@@ -42,22 +36,23 @@ public class OGLogger : MonoBehaviour
             LogPosition();
         }
 
-        //Check for input events.
-        for(int i = 0; i < mgr.buttonEvents.Count; ++i)
-        {
-            if (Input.GetKeyDown(mgr.buttonEvents[i]))
-                LogInputEvent(mgr.buttonEvents[i]);
-        }
-
-        gameTimer += Time.deltaTime;
         sampleTimer += Time.deltaTime;
+    }
+    
+    //Called from manager to write custom data into log file.
+    public void WriteHeader(string header)
+    {
+        string line = OGLogManager.LogItemType.HEADER + "," +
+            header;
+
+        logOutput.WriteLine(line);
     }
 
     //Called from manager for custom event hooks.
     public void LogGameEvent(string eventKey)
     {
         string line = OGLogManager.LogItemType.GAME_EVENT + "," +
-            gameTimer + "," +
+            mgr.gameTimer + "," +
             eventKey + "," +
             transform.position.x + "," +
             transform.position.y + "," +
@@ -66,11 +61,24 @@ public class OGLogger : MonoBehaviour
         logOutput.WriteLine(line);
     }
 
+    //Called from manager for custom GameObject interactions.
+    public void LogInteraction(string objectName, Transform location)
+    {
+        string line = OGLogManager.LogItemType.INTERACTION + "," +
+            mgr.gameTimer + "," +
+            objectName + "," +
+            location.position.x + "," +
+            location.position.y + "," +
+            location.position.z;
+
+        logOutput.WriteLine(line);
+    }
+
     //Transform logging.
     private void LogPosition()
     {
         string line = OGLogManager.LogItemType.POSITION + "," +
-            gameTimer + "," +
+            mgr.gameTimer + "," +
             transform.position.x + "," +
             transform.position.y + "," +
             transform.position.z + "," +
@@ -85,7 +93,7 @@ public class OGLogger : MonoBehaviour
     private void LogInputEvent(KeyCode key)
     {
         string line = OGLogManager.LogItemType.INPUT + "," +
-            gameTimer + "," +
+            mgr.gameTimer + "," +
             key + "," +
             transform.position.x + "," +
             transform.position.y + "," +

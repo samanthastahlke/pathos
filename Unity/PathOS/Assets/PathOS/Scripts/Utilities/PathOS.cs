@@ -39,14 +39,6 @@ namespace PathOS
         EFFICIENCY = 35
     };
 
-    class UI
-    {
-        public static Color mapUnknown = Color.black;
-        public static Color mapSeen = Color.blue;
-        public static Color mapVisited = Color.green;
-        public static Color mapObstacle = Color.red;
-    }
-
     [System.Serializable]
     public struct FloatRange
     {
@@ -143,7 +135,7 @@ namespace PathOS
         public EntityType entityType;
         public Renderer rend { get; set; }
 
-        //Not used yet. Will be used to simulate compass/map availability.
+        //Simulates compass/map availability.
         public bool alwaysKnown;
 
         public LevelEntity(GameObject objectRef, EntityType entityType)
@@ -302,13 +294,18 @@ namespace PathOS
             this.forgettable = false;
         }
 
-        public void Visit()
+        public void Visit(GameObject caller, OGLogManager logger)
         {
-            this.visited = true;
-            MakeUnforgettable();
+            if(!visited)
+            {
+                MakeUnforgettable();
+
+                if(logger != null)
+                    logger.FireInteractionEvent(caller, entity.entityRef.objectRef);
+            }
+
+            visited = true;
         }
-
-
     }
 
     //How the agent's trace through the world is represented in the agent's world model.
