@@ -294,6 +294,14 @@ namespace PathOS
             this.forgettable = false;
         }
 
+        public void Visit()
+        {
+            if(!visited)
+                MakeUnforgettable();
+
+            visited = true;
+        }
+
         public void Visit(GameObject caller, OGLogManager logger)
         {
             if(!visited)

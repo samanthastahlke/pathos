@@ -23,8 +23,8 @@ public class OGLogManager : OGSingleton<OGLogManager>
     public float sampleRate = 2.0f;
     public float sampleTime { get; set; }
 
-    public List<GameObject> logObjects = new List<GameObject>();
-    public Dictionary<int, OGLogger> loggers = new Dictionary<int, OGLogger>();
+    private List<GameObject> logObjects = new List<GameObject>();
+    private Dictionary<int, OGLogger> loggers = new Dictionary<int, OGLogger>();
 
     public enum LogItemType
     {
@@ -52,7 +52,7 @@ public class OGLogManager : OGSingleton<OGLogManager>
 
         //Create a unique folder inside the logging directory
         //with the current timestamp.
-        logDirectory += System.DateTime.Now.ToString(
+        logDirectory += "/" + System.DateTime.Now.ToString(
             "yyyy'-'MM'-'dd' 'HH'-'mm'-'ss") + "/";
 
         if (!Directory.Exists(logDirectory))
@@ -68,6 +68,11 @@ public class OGLogManager : OGSingleton<OGLogManager>
 
         //Calculate the sampling time for our logger.
         sampleTime = 1.0f / sampleRate;
+
+        foreach(PathOSAgent agent in FindObjectsOfType<PathOSAgent>())
+        {
+            logObjects.Add(agent.gameObject);
+        }
 
         int fileIndex = 0;
 
@@ -93,6 +98,11 @@ public class OGLogManager : OGSingleton<OGLogManager>
         gameTimer = 0.0f;
 	}
 
+    private void Update()
+    {
+        gameTimer += Time.deltaTime;
+    }
+
     public bool LogDirectoryValid()
     {
         return Directory.Exists(logDirectory);
@@ -110,6 +120,18 @@ public class OGLogManager : OGSingleton<OGLogManager>
         }
 
         loggers.Clear();
+    }
+
+    //Hook for writing headers/metadata.
+    public void WriteHeader(GameObject caller, string header)
+    {
+        if(enableLogging)
+        {
+            int instanceID = caller.GetInstanceID();
+
+            if (loggers.ContainsKey(instanceID))
+                loggers[instanceID].WriteHeader(header);
+        }
     }
 
     //Hook for custom game events.

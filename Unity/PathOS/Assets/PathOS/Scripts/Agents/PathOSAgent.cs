@@ -24,6 +24,7 @@ public class PathOSAgent : MonoBehaviour
     public PathOSAgentEyes eyes;
 
     private static PathOSManager manager;
+    public static OGLogManager logger { get; set; }
 
     //Used for testing.
     public bool freezeAgent;
@@ -97,7 +98,10 @@ public class PathOSAgent : MonoBehaviour
         if(null == manager)
             manager = PathOSManager.instance;
 
-        foreach(HeuristicScale curScale in heuristicScales)
+        if (null == logger)
+            logger = OGLogManager.instance;
+
+        foreach (HeuristicScale curScale in heuristicScales)
         {
             heuristicScaleLookup.Add(curScale.heuristic, curScale.scale);
         }
@@ -156,7 +160,25 @@ public class PathOSAgent : MonoBehaviour
 
     private void Start()
     {
+        LogAgentData();
         PerceptionUpdate();
+    }
+
+    private void LogAgentData()
+    {
+        if(logger != null)
+        {
+            string header = "";
+
+            header += "EXPERIENCE " + experienceScale + ",";
+
+            foreach(HeuristicScale scale in heuristicScales)
+            {
+                header += scale.heuristic + " " + scale.scale + ",";
+            }
+
+            logger.WriteHeader(this.gameObject, header);
+        }
     }
 
     public Vector3 GetPosition()
@@ -300,19 +322,13 @@ public class PathOSAgent : MonoBehaviour
                 navAgent.SetDestination(dest.pos);
             }
 
+            //Once something has been selected as a destination,
+            //commit it to long-term memory.
             if (null != dest.entity)
                 memory.CommitLTM(dest.entity);
 
             currentDest = dest;
         }
-
-        /*if(previousOnMem != onMemPath)
-        {
-            if (onMemPath)
-                print("Starting memory path!");
-            else
-                print("Stopping memory path!");
-        }*/
 
         if(verboseDebugging)
             NPDebug.LogMessage("Position: " + navAgent.transform.position + 

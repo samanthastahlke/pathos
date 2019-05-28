@@ -3996,12 +3996,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &626367630 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1088327799159616, guid: 607318e5beb058643a9226e07f881723,
-    type: 3}
-  m_PrefabInstance: {fileID: 283926256733707913}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &626367639 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4905807406101670, guid: 607318e5beb058643a9226e07f881723,
@@ -9200,7 +9194,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limitSimulationTime: 1
-  maxSimulationTime: 20
+  maxSimulationTime: 5
   endOnCompletionGoal: 1
   levelEntities:
   - name: Enemy
@@ -9512,12 +9506,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03c4f1f40e4b545468e93ed92db6d5bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableLogging: 0
+  enableLogging: 1
   logDirectory: C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/OGVis/OGLogs
   logFilePrefix: agent
   sampleRate: 4
-  logObjects:
-  - {fileID: 626367630}
 --- !u!1001 &1664538791
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11171,42 +11163,42 @@ PrefabInstance:
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[0].scale
-      value: 0.21467984
+      value: 0.45663434
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[1].scale
-      value: 0.15059817
+      value: 0.6373607
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[2].scale
-      value: 0.13374901
+      value: 0.7415458
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[6].scale
-      value: 0.8639499
+      value: 0.20478058
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: experienceScale
-      value: 0.60539955
+      value: 0.45242947
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[3].scale
-      value: 0.7801212
+      value: 0.23457325
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[4].scale
-      value: 0.726045
+      value: 0.8183222
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[5].scale
-      value: 0.2573859
+      value: 0.35249716
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 607318e5beb058643a9226e07f881723, type: 3}

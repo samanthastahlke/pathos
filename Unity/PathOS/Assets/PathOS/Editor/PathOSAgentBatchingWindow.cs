@@ -478,6 +478,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
         else if(cleanupFrame)
         {
             cleanupFrame = false;
+            cleanupWait = false;
+            triggerFrame = false;
 
             if (simultaneous)
             {

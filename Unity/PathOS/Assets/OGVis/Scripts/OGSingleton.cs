@@ -29,7 +29,6 @@ public class OGSingleton<T> : MonoBehaviour where T : MonoBehaviour
                         Debug.LogError(string.Format("No instance of {0} found, " +
                             "but something is trying to access it!", typeof(T)));
                 }
-                    
 
                 return instanceRef;
             }

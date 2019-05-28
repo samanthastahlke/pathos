@@ -24,8 +24,6 @@ public class OGLogManagerEditor : Editor
     private SerializedProperty logFilePrefix;
     private SerializedProperty sampleRate;
 
-    private ReorderableList loggerListReorderable;
-
     private void OnEnable()
     {
         manager = (OGLogManager)target;
@@ -34,9 +32,6 @@ public class OGLogManagerEditor : Editor
         enableLogging = serial.FindProperty("enableLogging");
         logFilePrefix = serial.FindProperty("logFilePrefix");
         sampleRate = serial.FindProperty("sampleRate");
-
-        loggerListReorderable = new ReorderableList(serial.FindProperty("logObjects"));
-        loggerListReorderable.elementNameProperty = "Objects to Log";
 
         PathOS.UI.TruncateStringHead(manager.logDirectory,
             ref logDirectoryDisplay, pathDisplayLength);
@@ -74,8 +69,6 @@ public class OGLogManagerEditor : Editor
 
         EditorGUILayout.PropertyField(logFilePrefix);
         EditorGUILayout.PropertyField(sampleRate);
-
-        loggerListReorderable.DoLayoutList();
 
         serial.ApplyModifiedProperties();
     }

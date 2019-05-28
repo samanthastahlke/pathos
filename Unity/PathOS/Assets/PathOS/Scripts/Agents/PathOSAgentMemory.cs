@@ -13,7 +13,6 @@ public class PathOSAgentMemory : MonoBehaviour
 {
     public PathOSAgent agent;
     private static PathOSManager manager;
-    private static OGLogManager logger;
 
     //Remembered entities.
     public List<EntityMemory> entities { get; set; }
@@ -51,9 +50,6 @@ public class PathOSAgentMemory : MonoBehaviour
 
         if (null == manager)
             manager = PathOSManager.instance;
-
-        if (null == logger)
-            logger = OGLogManager.instance;
 
         //Initialize the (blank) model of the agent's internal "map".
         if (autogenerateMapExtents)
@@ -103,7 +99,7 @@ public class PathOSAgentMemory : MonoBehaviour
             if (Vector3.SqrMagnitude(entity.entity.ActualPosition() - agentPos) 
                 < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR
                 && entity.entity.entityType != EntityType.ET_GOAL_COMPLETION)
-                entity.Visit(this.gameObject, logger);
+                entity.Visit(this.gameObject, PathOSAgent.logger);
 
             //Only something which is no longer visible and forgettable
             //can be discarded from memory.
@@ -138,7 +134,7 @@ public class PathOSAgentMemory : MonoBehaviour
         {
             if (Vector3.SqrMagnitude(finalGoalTracker[i].entity.ActualPosition() - agentPos) 
                 < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
-                finalGoalTracker[i].Visit(this.gameObject, logger);             
+                finalGoalTracker[i].Visit();             
         }
 
         //Only mark completion if the agent actively targets the final goal.
@@ -147,7 +143,7 @@ public class PathOSAgentMemory : MonoBehaviour
             && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
             < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
         {
-            finalGoal.Visit(this.gameObject, logger);
+            finalGoal.Visit();
             finalGoalCompleted = true;
         }
 
