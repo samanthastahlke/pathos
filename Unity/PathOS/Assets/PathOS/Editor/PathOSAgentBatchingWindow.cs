@@ -12,10 +12,6 @@ public class PathOSAgentBatchingWindow : EditorWindow
     //Used to identify preferences string by Unity.
     private const string editorPrefsID = "PathOSAgentBatching";
 
-    /* Style Constraints */
-    private const float shortLabelWidth = 24.0f;
-    private const float shortFloatfieldWidth = 40.0f;
-
     private const int pathDisplayLength = 32;
     private GUIStyle errorStyle = new GUIStyle();
 
@@ -332,12 +328,15 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     ref rangeExp.min, ref rangeExp.max, 0.0f, 1.0f);
 
                 rangeExp.min = EditorGUILayout.FloatField(
-                    RoundFloatfield(rangeExp.min), GUILayout.Width(shortFloatfieldWidth));
+                    PathOS.UI.RoundFloatfield(rangeExp.min), 
+                    GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
 
-                EditorGUILayout.LabelField("<->", GUILayout.Width(shortLabelWidth));
+                EditorGUILayout.LabelField("<->", 
+                    GUILayout.Width(PathOS.UI.shortLabelWidth));
 
                 rangeExp.max = EditorGUILayout.FloatField(
-                    RoundFloatfield(rangeExp.max), GUILayout.Width(shortFloatfieldWidth));
+                    PathOS.UI.RoundFloatfield(rangeExp.max), 
+                    GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
 
                 EditorGUILayout.EndHorizontal();
 
@@ -352,14 +351,15 @@ public class PathOSAgentBatchingWindow : EditorWindow
                         0.0f, 1.0f);
 
                     rangeHeuristics[i].range.min = EditorGUILayout.FloatField(
-                        RoundFloatfield(rangeHeuristics[i].range.min), 
-                        GUILayout.Width(shortFloatfieldWidth));
+                        PathOS.UI.RoundFloatfield(rangeHeuristics[i].range.min), 
+                        GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
 
-                    EditorGUILayout.LabelField("<->", GUILayout.Width(shortLabelWidth));
+                    EditorGUILayout.LabelField("<->", 
+                        GUILayout.Width(PathOS.UI.shortLabelWidth));
 
                     rangeHeuristics[i].range.max = EditorGUILayout.FloatField(
-                        RoundFloatfield(rangeHeuristics[i].range.max), 
-                        GUILayout.Width(shortFloatfieldWidth));
+                        PathOS.UI.RoundFloatfield(rangeHeuristics[i].range.max), 
+                        GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
 
                     EditorGUILayout.EndHorizontal();
                 }
@@ -411,12 +411,6 @@ public class PathOSAgentBatchingWindow : EditorWindow
             EditorApplication.isPlaying = false;
             cleanupWait = true;
         }        
-    }
-
-    //Used to truncate floating-point values in input fields.
-    private float RoundFloatfield(float val)
-    {
-        return Mathf.Round(val * 1000.0f) / 1000.0f;
     }
 
     private void Update()

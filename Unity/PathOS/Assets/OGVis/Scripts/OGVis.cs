@@ -108,6 +108,8 @@ namespace OGVis
             interactionEvents = new List<InteractionEvent>();
 
             pathPoints = new List<Vector3>();
+
+            heuristics = new Dictionary<PathOS.Heuristic, float>();
         }
 
         public void AddPosition(float timestamp, Vector3 pos)
@@ -202,6 +204,8 @@ namespace OGVis
 
             displayStartIndex = startEstimate;
             displayEndIndex = endEstimate;
+
+            
         }
 
         public void AddInteractionEvent(float timestamp, Vector3 pos, string objectName)

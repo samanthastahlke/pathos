@@ -20,6 +20,7 @@ public class OGLogVisualizer : MonoBehaviour
 
     public OGLogHeatmap heatmapVisualizer;
     public Gradient heatmapGradient;
+    public Gradient interactionGradient;
 
     private static char[] commaSep = { ',' };
 
@@ -27,11 +28,12 @@ public class OGLogVisualizer : MonoBehaviour
     public bool showIndividualPaths;
     public bool showHeatmap;
     public bool aggregateActiveOnly;
+    public bool aggregateWindowOnly;
 
     public float displayHeight = 1.0f;
 
     public TimeRange displayTimeRange = new TimeRange();
-    private TimeRange fullTimeRange = new TimeRange();
+    public TimeRange fullTimeRange = new TimeRange();
 
     //Used in creating the heatmap.
     private Extents dataExtents = new Extents();
@@ -105,14 +107,6 @@ public class OGLogVisualizer : MonoBehaviour
         }
 
         ClearData();
-
-        dataExtents.min = new Vector3(-20.0f, 0.0f, -20.0f);
-        dataExtents.max = new Vector3(20.0f, 0.0f, 20.0f);
-
-        if(heatmapVisualizer != null)
-        {
-            heatmapVisualizer.Initialize(dataExtents, heatmapGradient, 1.0f, 1.0f);
-        }
     }
 
     public void ApplyDisplayRange()
@@ -121,6 +115,8 @@ public class OGLogVisualizer : MonoBehaviour
         {
             pLogs[i].SliceDisplayPath(displayTimeRange);
         }
+
+        heatmapVisualizer.UpdateData(pLogs, aggregateActiveOnly, aggregateWindowOnly);
     }
     
     //Called when the user requests to load log files from a given directory.
@@ -175,7 +171,21 @@ public class OGLogVisualizer : MonoBehaviour
         print("Loaded " + logsAdded + " logfiles.");
         directoriesLoaded.Add(directoryPath);
 
+        fullTimeRange.max = Mathf.Ceil(fullTimeRange.max);
+        displayTimeRange = fullTimeRange;
+
+        if(heatmapVisualizer != null)
+            heatmapVisualizer.Initialize(dataExtents, heatmapGradient, displayHeight, 4.0f);
+
+        ApplyDisplayHeight();
+        ApplyDisplayRange();
         ReclusterEvents();
+
+        if(heatmapVisualizer != null)
+        {
+            heatmapVisualizer.UpdateData(pLogs, aggregateActiveOnly, aggregateWindowOnly);
+            heatmapVisualizer.SetVisible(showHeatmap);
+        }
     }
 
     private bool LoadLog(string filepath, string pKey)
@@ -289,8 +299,6 @@ public class OGLogVisualizer : MonoBehaviour
         pLog.pathColor = defaultPathColors[cIndex];
         cIndex = Mathf.Clamp(cIndex + 1, 0, defaultPathColors.Length - 1);
 
-        fullTimeRange.max = Mathf.Ceil(fullTimeRange.max);
-
         pLogs.Add(pLog);
         return true;
     }
@@ -341,16 +349,26 @@ public class OGLogVisualizer : MonoBehaviour
 
         //Reset path/event colour defaults.
         cIndex = 0;
+
+        if (heatmapVisualizer != null)
+            heatmapVisualizer.Clear();
     }
     
-    //Resample individual paths.
-    //Updates according to desired time window, display height, etc.
-    public void UpdateDisplayPaths()
+    //Apply changes to display height of the vis.
+    public void ApplyDisplayHeight()
     {
         for(int i = 0; i < pLogs.Count; ++i)
         {
             pLogs[i].UpdateDisplayPath(displayHeight);
         }
+
+        if (heatmapVisualizer != null)
+            heatmapVisualizer.SetDisplayHeight(displayHeight);
+    }
+
+    public void ApplyFilters()
+    {
+
     }
 
     //Re-do event aggregation.

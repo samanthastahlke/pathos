@@ -123,6 +123,7 @@ public class OGVisEditor : Editor
             {
                 //Clear all logs and records from the current session.
                 vis.ClearData();
+                Debug.Log("Cleared all visualization data.");
             }
         }
 
@@ -135,6 +136,30 @@ public class OGVisEditor : Editor
             //If filters are updated, the vis will be refreshed.
             bool refreshFilter = false;
             bool oldFilter = false;
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.MinMaxSlider("Time Range",
+                ref vis.displayTimeRange.min,
+                ref vis.displayTimeRange.max,
+                vis.fullTimeRange.min,
+                vis.fullTimeRange.max);
+
+            vis.displayTimeRange.min = EditorGUILayout.FloatField(
+                PathOS.UI.RoundFloatfield(vis.displayTimeRange.min),
+                GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
+
+            EditorGUILayout.LabelField("<->",
+                    GUILayout.Width(PathOS.UI.shortLabelWidth));
+
+            vis.displayTimeRange.max = EditorGUILayout.FloatField(
+                PathOS.UI.RoundFloatfield(vis.displayTimeRange.max),
+                GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
+
+            EditorGUILayout.EndHorizontal();
+
+            if (GUILayout.Button("Apply Time Range"))
+                vis.ApplyDisplayRange();
 
             //Chekck for an update to global aggregation settings.
             oldFilter = vis.aggregateActiveOnly;
@@ -149,7 +174,7 @@ public class OGVisEditor : Editor
             //accordingly.
             if (GUILayout.Button("Apply Display Height"))
             {
-                vis.UpdateDisplayPaths();
+                vis.ApplyDisplayHeight();
                 vis.ReclusterEvents();
             }
 

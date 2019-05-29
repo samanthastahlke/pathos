@@ -9,6 +9,7 @@ using OGVis;
 public class OGLogHeatmap : MonoBehaviour
 {
     private Gradient gradient;
+    private float alpha = 0.5f;
 
     private Vector3[] vertices;
     private Vector2[] uv;
@@ -67,6 +68,17 @@ public class OGLogHeatmap : MonoBehaviour
         UpdateExtents(extents);
     }
 
+    public void Clear()
+    {
+        ClearTex();
+        SetVisible(false);
+    }
+
+    public void SetVisible(bool visible)
+    {
+        rend.enabled = visible;
+    }
+
     private void UpdateExtents(Extents extents)
     {
         if (tileWidth <= 0)
@@ -103,9 +115,18 @@ public class OGLogHeatmap : MonoBehaviour
         tex.Apply();
     }
 
+    public void SetDisplayHeight(float displayHeight)
+    {
+        this.displayHeight = displayHeight;
+
+        Vector3 pos = transform.position;
+        pos.y = displayHeight;
+        transform.position = pos;
+    }
+
     private void ClearTex()
     {
-        Color32 white = new Color32(255, 255, 255, 128);
+        Color32 white = new Color32(255, 255, 255, (byte)(alpha * 255));
         Color32[] resetArray = tex.GetPixels32();
 
         for(int i = 0; i < resetArray.Length; ++i)
@@ -113,22 +134,15 @@ public class OGLogHeatmap : MonoBehaviour
             resetArray[i] = white;
         }
 
-        int x = 0;
-        int z = 0;
+        //int x = 0;
+        //int z = 0;
 
-        resetArray[(int)(z * gridSize.x + x)] = new Color32(255, 0, 0, 128);
-
-        z = 1;
-        resetArray[(int)(z * gridSize.x + x)] = new Color32(0, 255, 0, 128);
-
-        z = 0;
-        x = 29;
-        resetArray[(int)(z * gridSize.x + x)] = new Color32(0, 0, 255, 128);
+        //resetArray[(int)(z * gridSize.x + x)] = new Color32(255, 0, 0, 128);
 
         tex.SetPixels32(resetArray);
     }
 
-    private void UpdateData(List<PlayerLog> logs, bool enabledOnly, bool windowOnly)
+    public void UpdateData(List<PlayerLog> logs, bool enabledOnly, bool windowOnly)
     {
         float minX = -0.5f * gridSize.x * tileWidth;
         float minZ = -0.5f * gridSize.z * tileWidth;
@@ -181,10 +195,14 @@ public class OGLogHeatmap : MonoBehaviour
 
         for(int i = 0; i < levels; ++i)
         {
-            colors.Add(gradient.Evaluate(i * colorStep));
+            Color current = gradient.Evaluate(i * colorStep);
+            current.a = alpha;
+            colors.Add(current);
         }
 
-        colors.Add(gradient.Evaluate(1.0f));
+        Color final = gradient.Evaluate(1.0f);
+        final.a = alpha;
+        colors.Add(final);
 
         float binSize = (float)maxCount / levels;
         float binSizeFac = 1.0f / binSize;
