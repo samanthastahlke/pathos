@@ -19,38 +19,47 @@ public class OGLogVisualizer : MonoBehaviour
     public List<string> directoriesLoaded;
 
     public OGLogHeatmap heatmapVisualizer;
+
+    //Heatmap settings.
+    public bool showHeatmap;
     public Gradient heatmapGradient;
-    public Gradient interactionGradient;
+    public bool heatmapAggregateActiveOnly = false;
+    public bool heatmapUseTimeSlice = true;
 
     private static char[] commaSep = { ',' };
 
     //Path settings.
     public bool showIndividualPaths;
-    public bool showHeatmap;
+    
+    //Interaction event settings.
     public bool showEntities;
-    public bool aggregateActiveOnly;
-    public bool aggregateWindowOnly;
+    public Gradient interactionGradient;
+    public bool interactionAggregateActiveOnly = false;
+    public bool interactionUseTimeSlice = true;
 
     public bool showIndividualInteractions = true;
     public float displayHeight = 1.0f;
 
+    public TimeRange currentTimeRange = new TimeRange();
     public TimeRange displayTimeRange = new TimeRange();
     public TimeRange fullTimeRange = new TimeRange();
 
     //Used in creating the heatmap.
     private Extents dataExtents = new Extents();
 
-    public Vector3 gridSize = Vector3.zero;
+    public float tileSize = 2.0f;
 
     //Default categorical palettes for paths/events.
     private Color[] defaultPathColors;
     private int cIndex = 0;
 
     private bool colsInit = false;
+    private bool dataInit = false;
 
     //Display (on-screen) scales.
-    public const float MIN_PATH_WIDTH = 2.0f;
-    public const float MAX_PATH_WIDTH = 10.0f;
+    public const float PATH_WIDTH = 2.0f;
+    public const float MIN_ENTITY_RADIUS = 0.1f;
+    public const float MAX_ENTITY_RADIUS = 1.0f;
 
     public List<PlayerLog> pLogs = new List<PlayerLog>();
 
@@ -83,6 +92,14 @@ public class OGLogVisualizer : MonoBehaviour
     {
         if(null == heatmapVisualizer)
             heatmapVisualizer = GetComponentInChildren<OGLogHeatmap>();
+
+        if(null == heatmapVisualizer)
+        {
+            Debug.LogWarning("No heatmap visualizer could be found. " +
+                "Please ensure there is a child object of the OG Log Visualizer " +
+                "with the OG Log Heatmap component attached.\n" +
+                "Then disable and re-enable this component.");
+        }
 
         if(!colsInit)
         {
@@ -130,12 +147,17 @@ public class OGLogVisualizer : MonoBehaviour
 
     public void ApplyDisplayRange()
     {
+        currentTimeRange = displayTimeRange;
+
         for(int i = 0; i < pLogs.Count; ++i)
         {
-            pLogs[i].SliceDisplayPath(displayTimeRange);
+            pLogs[i].SliceDisplayPath(currentTimeRange);
         }
 
-        heatmapVisualizer.UpdateData(pLogs, aggregateActiveOnly, aggregateWindowOnly);
+        if(heatmapVisualizer != null && heatmapUseTimeSlice)
+            heatmapVisualizer.UpdateData(pLogs,
+                heatmapAggregateActiveOnly, 
+                heatmapUseTimeSlice);
     }
     
     //Called when the user requests to load log files from a given directory.
@@ -187,14 +209,21 @@ public class OGLogVisualizer : MonoBehaviour
                 ++logsAdded;          
         }
 
+        if(logsAdded > 0)
+            dataInit = true;
+
         print("Loaded " + logsAdded + " logfiles.");
         directoriesLoaded.Add(directoryPath);
 
         fullTimeRange.max = Mathf.Ceil(fullTimeRange.max);
         displayTimeRange = fullTimeRange;
 
+        if (!dataInit)
+            return;
+
         if(heatmapVisualizer != null)
-            heatmapVisualizer.Initialize(dataExtents, heatmapGradient, displayHeight, 4.0f);
+            heatmapVisualizer.Initialize(
+                dataExtents, heatmapGradient, displayHeight, tileSize);
 
         ApplyDisplayHeight();
         ApplyDisplayRange();
@@ -202,7 +231,10 @@ public class OGLogVisualizer : MonoBehaviour
 
         if(heatmapVisualizer != null)
         {
-            heatmapVisualizer.UpdateData(pLogs, aggregateActiveOnly, aggregateWindowOnly);
+            heatmapVisualizer.UpdateData(pLogs, 
+                heatmapAggregateActiveOnly, 
+                heatmapUseTimeSlice);
+
             heatmapVisualizer.SetVisible(showHeatmap);
         }
     }
@@ -211,6 +243,27 @@ public class OGLogVisualizer : MonoBehaviour
     {
         if (heatmapVisualizer != null)
             heatmapVisualizer.SetVisible(showHeatmap);
+    }
+
+    public void ApplyHeatmapSettings()
+    {
+        if (dataInit && heatmapVisualizer != null)
+        {
+            heatmapVisualizer.SetGradient(heatmapGradient);
+            heatmapVisualizer.UpdateExtents(dataExtents, tileSize);
+        }
+
+        UpdateHeatmap();
+    }
+
+    public void UpdateHeatmap()
+    {
+        if (dataInit && heatmapVisualizer != null)
+        {
+            heatmapVisualizer.UpdateData(pLogs,
+                heatmapAggregateActiveOnly,
+                heatmapUseTimeSlice);
+        }
     }
 
     private bool LoadLog(string filepath, string pKey)
@@ -377,6 +430,8 @@ public class OGLogVisualizer : MonoBehaviour
 
         if (heatmapVisualizer != null)
             heatmapVisualizer.Clear();
+
+        dataInit = false;
     }
     
     //Apply changes to display height of the vis.
@@ -391,11 +446,6 @@ public class OGLogVisualizer : MonoBehaviour
             heatmapVisualizer.SetDisplayHeight(displayHeight);
     }
 
-    public void ApplyFilters()
-    {
-
-    }
-
     //Re-do event aggregation.
     public void ReclusterEvents()
     {
@@ -407,11 +457,20 @@ public class OGLogVisualizer : MonoBehaviour
         {
             PlayerLog pLog = pLogs[i];
 
-            if(pLog.visInclude)
+            if(!interactionAggregateActiveOnly || pLog.visInclude)
             {
                 for(int j = 0; j < pLog.interactionEvents.Count; ++j)
                 {
                     PlayerLog.InteractionEvent curEvent = pLog.interactionEvents[j];
+
+                    if(interactionUseTimeSlice)
+                    {
+                        if (curEvent.timestamp < currentTimeRange.min)
+                            continue;
+                        else if (curEvent.timestamp > currentTimeRange.max)
+                            break;
+                    }
+
                     string key = curEvent.GetStringHash();
 
                     if(!aggregateInteractions.ContainsKey(key))
@@ -439,7 +498,7 @@ public class OGLogVisualizer : MonoBehaviour
 
         for(int i = 0; i < pLogs.Count; ++i)
         {
-            if (pLogs[i].visInclude)
+            if (!interactionAggregateActiveOnly || pLogs[i].visInclude)
                 ++maxInteractionCount;
         }
 
@@ -449,8 +508,10 @@ public class OGLogVisualizer : MonoBehaviour
             float fac = (maxInteractionCount <= 0) ? 0.0f :
                 Mathf.Min(1.0f, (float)interaction.Value.tCount / maxInteractionCount);
 
-            interaction.Value.displaySize = Mathf.Lerp(0.1f, 2.0f, fac);
-            interaction.Value.displayColor = Color.Lerp(Color.white, Color.red, fac);
+            interaction.Value.displaySize = Mathf.Lerp(
+                MIN_ENTITY_RADIUS, MAX_ENTITY_RADIUS, fac);
+
+            interaction.Value.displayColor = interactionGradient.Evaluate(fac);
         }
     }
 

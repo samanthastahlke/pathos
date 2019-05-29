@@ -20,7 +20,7 @@ public class OGVisEditor : Editor
     private SerializedObject serial;
 
     //Logfile management.
-    private static bool fileFoldout = false;
+    private static bool fileFoldout = true;
     private string lblFileFoldout = "Manage Log Files";
 
     private const int pathDisplayLength = 32;
@@ -30,21 +30,27 @@ public class OGVisEditor : Editor
 
     private SerializedProperty propLogDirectory;
 
+    
     //Filter/display management.
     private static bool filterFoldout = false;
     private string lblFilterFoldout = "Filtering/Display Options";
 
     private SerializedProperty propDisplayHeight;
 
+    //Heatmap.
+    private static bool heatmapFoldout = false;
+    private string lblHeatmapFoldout = "Heatmap";
+
+    private SerializedProperty propHeatmapGradient;
+    private SerializedProperty propHeatmapTileSize;
+    private SerializedProperty propHeatmapAggregate;
+    private SerializedProperty propHeatmapTimeSlice;
+
     //Path display settings.
     private static bool pathFoldout = false;
-    private string lblPathFoldout = "Agent Navigation Data";
+    private string lblPathFoldout = "Individual Paths";
 
-    private SerializedProperty propShowHeatmap;
-    private SerializedProperty propHeatmapGradient;
     private SerializedProperty propShowIndividual;
-    private SerializedProperty propHeatmapGridSize;
-
     private Texture2D polylinetex;
 
     //Interaction display settings.
@@ -52,6 +58,9 @@ public class OGVisEditor : Editor
     private string lblInteractionFoldout = "Entity Interactions";
 
     private SerializedProperty propShowEntities;
+    private SerializedProperty propEntityGradient;
+    private SerializedProperty propEntityAggregate;
+    private SerializedProperty propEntityTimeSlice;
 
     //Called when the inspector pane is initialized.
     private void OnEnable()
@@ -67,14 +76,19 @@ public class OGVisEditor : Editor
         //interactive widgets in the inspector.
         propLogDirectory = serial.FindProperty("logDirectory");
 
-        propShowIndividual = serial.FindProperty("showIndividualPaths");
-        propShowHeatmap = serial.FindProperty("showHeatmap");
-        propHeatmapGradient = serial.FindProperty("heatmapGradient");
-
         propDisplayHeight = serial.FindProperty("displayHeight");
-        propHeatmapGridSize = serial.FindProperty("gridSize");
+
+        propHeatmapGradient = serial.FindProperty("heatmapGradient");
+        propHeatmapTileSize = serial.FindProperty("tileSize");
+        propHeatmapAggregate = serial.FindProperty("heatmapAggregateActiveOnly");
+        propHeatmapTimeSlice = serial.FindProperty("heatmapUseTimeSlice");
+
+        propShowIndividual = serial.FindProperty("showIndividualPaths");
 
         propShowEntities = serial.FindProperty("showEntities");
+        propEntityGradient = serial.FindProperty("interactionGradient");
+        propEntityAggregate = serial.FindProperty("interactionAggregateActiveOnly");
+        propEntityTimeSlice = serial.FindProperty("interactionUseTimeSlice");
 
         PathOS.UI.TruncateStringHead(vis.logDirectory,
             ref logDirectoryDisplay, pathDisplayLength);
@@ -136,11 +150,6 @@ public class OGVisEditor : Editor
 
         if(filterFoldout)
         {
-            //Used to see if the player filters have been updated.
-            //If filters are updated, the vis will be refreshed.
-            bool refreshFilter = false;
-            bool oldFilter = false;
-
             EditorGUILayout.BeginHorizontal();
 
             EditorGUILayout.MinMaxSlider("Time Range",
@@ -165,96 +174,111 @@ public class OGVisEditor : Editor
             if (GUILayout.Button("Apply Time Range"))
                 vis.ApplyDisplayRange();
 
-            //Chekck for an update to global aggregation settings.
-            oldFilter = vis.aggregateActiveOnly;
-            vis.aggregateActiveOnly = GUILayout.Toggle(vis.aggregateActiveOnly, "Aggregate from enabled agents only");
-
-            if (oldFilter != vis.aggregateActiveOnly)
-                refreshFilter = true;
-
             EditorGUILayout.PropertyField(propDisplayHeight);
 
-            //If the user wants to commit axis-flattening settings, update the vis
-            //accordingly.
             if (GUILayout.Button("Apply Display Height"))
             {
                 vis.ApplyDisplayHeight();
                 vis.ReclusterEvents();
             }
+        }
 
-            //Collapsible pane for path display settings.
-            pathFoldout = EditorGUILayout.Foldout(pathFoldout, lblPathFoldout);
+        //Collapsible pane for path display settings.
+        heatmapFoldout = EditorGUILayout.Foldout(heatmapFoldout, lblHeatmapFoldout);
 
-            if(pathFoldout)
+        if(heatmapFoldout)
+        {
+            EditorGUI.BeginChangeCheck();
+            vis.showHeatmap = EditorGUILayout.Toggle("Show Heatmap", vis.showHeatmap);
+
+            if (EditorGUI.EndChangeCheck())
+                vis.UpdateHeatmapVisibility();
+
+            EditorGUILayout.PropertyField(propHeatmapGradient);
+            EditorGUILayout.PropertyField(propHeatmapTileSize);
+            EditorGUILayout.PropertyField(propHeatmapAggregate);
+            EditorGUILayout.PropertyField(propHeatmapTimeSlice);
+
+            if (GUILayout.Button("Apply Heatmap Settings"))
+                vis.ApplyHeatmapSettings();
+        }
+
+        //Collapsible pane for path display settings.
+        pathFoldout = EditorGUILayout.Foldout(pathFoldout, lblPathFoldout);
+
+        if (pathFoldout)
+        {
+            bool refreshFilter = false;
+            bool oldFilter = false;
+
+            //Global path display settings.
+            EditorGUILayout.PropertyField(propShowIndividual);
+
+            if (vis.pLogs.Count > 0)
+                GUILayout.Label("Filter Data by Player ID:");
+
+            //Filter options.
+            //Enable/disable players, set path colour by player ID.
+            foreach (PlayerLog pLog in vis.pLogs)
             {
-                //Global path display settings.
-                EditorGUI.BeginChangeCheck();
-                vis.showHeatmap = EditorGUILayout.Toggle("Show Heatmap", vis.showHeatmap);
+                GUILayout.BeginHorizontal();
 
-                if (EditorGUI.EndChangeCheck())
-                    vis.UpdateHeatmapVisibility();
+                oldFilter = pLog.visInclude;
+                pLog.visInclude = GUILayout.Toggle(pLog.visInclude, pLog.playerID);
 
-                EditorGUILayout.PropertyField(propHeatmapGradient);
-                EditorGUILayout.PropertyField(propShowIndividual);
-                
-                if(vis.pLogs.Count > 0)
-                    GUILayout.Label("Filter Data by Player ID:");
+                if (oldFilter != pLog.visInclude)
+                    refreshFilter = true;
 
-                //Filter options.
-                //Enable/disable players, set path colour by player ID.
+                pLog.pathColor = EditorGUILayout.ColorField(pLog.pathColor);
+                GUILayout.EndHorizontal();
+            }
+
+            //Shortcut to enable all PIDs in the vis.
+            if (GUILayout.Button("Select All"))
+            {
                 foreach (PlayerLog pLog in vis.pLogs)
                 {
-                    GUILayout.BeginHorizontal();
-
-                    oldFilter = pLog.visInclude;
-                    pLog.visInclude = GUILayout.Toggle(pLog.visInclude, pLog.playerID);
-
-                    if (oldFilter != pLog.visInclude && vis.aggregateActiveOnly)
-                        refreshFilter = true;
-
-                    pLog.pathColor = EditorGUILayout.ColorField(pLog.pathColor);
-                    GUILayout.EndHorizontal();
-                }
-                
-                //Shortcut to enable all PIDs in the vis.
-                if(GUILayout.Button("Select All"))
-                {
-                    foreach (PlayerLog pLog in vis.pLogs)
-                    {
-                        pLog.visInclude = true;
-                    }
-
-                    if(vis.aggregateActiveOnly)
-                        refreshFilter = true;
+                    pLog.visInclude = true;
                 }
 
-                //Shortcut to exclude all PIDs from the vis.
-                if(GUILayout.Button("Select None"))
-                {
-                    foreach (PlayerLog pLog in vis.pLogs)
-                    {
-                        pLog.visInclude = false;
-                    }
+                refreshFilter = true;
+            }
 
-                    if(vis.aggregateActiveOnly)
-                        refreshFilter = true;
-                }             
+            //Shortcut to exclude all PIDs from the vis.
+            if (GUILayout.Button("Select None"))
+            {
+                foreach (PlayerLog pLog in vis.pLogs)
+                {
+                    pLog.visInclude = false;
+                }
+
+                refreshFilter = true;
             }
 
             //If we've detected a change that requires re-aggregation, do so.
             if (refreshFilter)
             {
+                if (vis.interactionAggregateActiveOnly)
+                    vis.ReclusterEvents();
+
+                if (vis.heatmapAggregateActiveOnly)
+                    vis.UpdateHeatmap();
+            }
+        }
+
+        //Collapsible pane for managing display of entity interactions.
+        interactionFoldout = EditorGUILayout.Foldout(interactionFoldout, lblInteractionFoldout);
+
+        if (interactionFoldout)
+        {
+            EditorGUILayout.PropertyField(propShowEntities);
+
+            EditorGUILayout.PropertyField(propEntityGradient);
+            EditorGUILayout.PropertyField(propEntityAggregate);
+            EditorGUILayout.PropertyField(propEntityTimeSlice);
+
+            if (GUILayout.Button("Apply Interaction Display Settings"))
                 vis.ReclusterEvents();
-            }
-            
-            //Collapsible pane for managing display of gameplay events.
-            interactionFoldout = EditorGUILayout.Foldout(interactionFoldout, lblInteractionFoldout);
-
-            if(interactionFoldout)
-            {
-                EditorGUILayout.PropertyField(propShowEntities);
-
-            }
         }
 
         serial.ApplyModifiedProperties();
@@ -284,7 +308,7 @@ public class OGVisEditor : Editor
                             .ToArray();
 
                         Handles.color = pLog.pathColor;
-                        Handles.DrawAAPolyLine(polylinetex, OGLogVisualizer.MIN_PATH_WIDTH, points);
+                        Handles.DrawAAPolyLine(polylinetex, OGLogVisualizer.PATH_WIDTH, points);
                     }
 
                     if (vis.showIndividualInteractions)
@@ -293,13 +317,13 @@ public class OGVisEditor : Editor
                         {
                             PlayerLog.InteractionEvent curEvent = pLog.interactionEvents[i];
 
-                            if (curEvent.timestamp < vis.displayTimeRange.min)
+                            if (curEvent.timestamp < vis.currentTimeRange.min)
                                 continue;
-                            else if (curEvent.timestamp > vis.displayTimeRange.max)
+                            else if (curEvent.timestamp > vis.currentTimeRange.max)
                                 break;
 
                             Handles.color = Color.white;
-                            Handles.DrawSolidDisc(curEvent.pos, Vector3.up, 0.1f);
+                            Handles.DrawSolidDisc(curEvent.pos, Vector3.up, OGLogVisualizer.MIN_ENTITY_RADIUS);
                             Handles.Label(curEvent.pos, curEvent.objectName);
                         }
                     }

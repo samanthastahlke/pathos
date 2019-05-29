@@ -30,7 +30,7 @@ public class OGLogHeatmap : MonoBehaviour
 
     private int[,] tileCounts;
 
-    public void Initialize(Extents extents, Gradient gradient, float displayHeight, float tileWidth)
+    public void Initialize(Extents extents, Gradient gradient, float displayHeight, float tileSize)
     {
         filter = GetComponent<MeshFilter>();
         rend = GetComponent<MeshRenderer>();
@@ -64,8 +64,12 @@ public class OGLogHeatmap : MonoBehaviour
         triangles = new[] { 0, 1, 2, 0, 2, 3 };
         vertices = new Vector3[4];
 
-        this.tileWidth = tileWidth;
-        UpdateExtents(extents);
+        UpdateExtents(extents, tileSize);
+    }
+
+    public void SetGradient(Gradient gradient)
+    {
+        this.gradient = gradient;
     }
 
     public void Clear()
@@ -79,8 +83,10 @@ public class OGLogHeatmap : MonoBehaviour
         rend.enabled = visible;
     }
 
-    private void UpdateExtents(Extents extents)
+    public void UpdateExtents(Extents extents, float tileSize)
     {
+        tileWidth = tileSize;
+
         if (tileWidth <= 0)
             return;
 
@@ -204,7 +210,7 @@ public class OGLogHeatmap : MonoBehaviour
         final.a = alpha;
         colors.Add(final);
 
-        float binSize = (float)maxCount / levels;
+        float binSize = (float)Mathf.Max(1, maxCount) / levels;
         float binSizeFac = 1.0f / binSize;
 
         Color32[] heatmapArray = tex.GetPixels32();
