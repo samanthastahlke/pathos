@@ -51,6 +51,8 @@ public class OGVisEditor : Editor
     private static bool interactionFoldout = false;
     private string lblInteractionFoldout = "Entity Interactions";
 
+    private SerializedProperty propShowEntities;
+
     //Called when the inspector pane is initialized.
     private void OnEnable()
     {
@@ -71,6 +73,8 @@ public class OGVisEditor : Editor
 
         propDisplayHeight = serial.FindProperty("displayHeight");
         propHeatmapGridSize = serial.FindProperty("gridSize");
+
+        propShowEntities = serial.FindProperty("showEntities");
 
         PathOS.UI.TruncateStringHead(vis.logDirectory,
             ref logDirectoryDisplay, pathDisplayLength);
@@ -184,7 +188,12 @@ public class OGVisEditor : Editor
             if(pathFoldout)
             {
                 //Global path display settings.
-                EditorGUILayout.PropertyField(propShowHeatmap);
+                EditorGUI.BeginChangeCheck();
+                vis.showHeatmap = EditorGUILayout.Toggle("Show Heatmap", vis.showHeatmap);
+
+                if (EditorGUI.EndChangeCheck())
+                    vis.UpdateHeatmapVisibility();
+
                 EditorGUILayout.PropertyField(propHeatmapGradient);
                 EditorGUILayout.PropertyField(propShowIndividual);
                 
@@ -243,7 +252,7 @@ public class OGVisEditor : Editor
 
             if(interactionFoldout)
             {
-                //TODO
+                EditorGUILayout.PropertyField(propShowEntities);
 
             }
         }
@@ -264,20 +273,55 @@ public class OGVisEditor : Editor
         {
             foreach (PlayerLog pLog in vis.pLogs)
             {
-                if (pLog.visInclude && pLog.pathPoints.Count > 0)
+                if(pLog.visInclude)
                 {
-                    //Draw path trace.
-                    Vector3[] points = pLog.pathPoints.GetRange(
-                        pLog.displayStartIndex,
-                        pLog.displayEndIndex - pLog.displayStartIndex + 1)
-                        .ToArray();
+                    if (pLog.pathPoints.Count > 0)
+                    {
+                        //Draw path trace.
+                        Vector3[] points = pLog.pathPoints.GetRange(
+                            pLog.displayStartIndex,
+                            pLog.displayEndIndex - pLog.displayStartIndex + 1)
+                            .ToArray();
 
-                    Handles.color = pLog.pathColor;
-                    Handles.DrawAAPolyLine(polylinetex, OGLogVisualizer.MIN_PATH_WIDTH, points);                 
+                        Handles.color = pLog.pathColor;
+                        Handles.DrawAAPolyLine(polylinetex, OGLogVisualizer.MIN_PATH_WIDTH, points);
+                    }
+
+                    if (vis.showIndividualInteractions)
+                    {
+                        for (int i = 0; i < pLog.interactionEvents.Count; ++i)
+                        {
+                            PlayerLog.InteractionEvent curEvent = pLog.interactionEvents[i];
+
+                            if (curEvent.timestamp < vis.displayTimeRange.min)
+                                continue;
+                            else if (curEvent.timestamp > vis.displayTimeRange.max)
+                                break;
+
+                            Handles.color = Color.white;
+                            Handles.DrawSolidDisc(curEvent.pos, Vector3.up, 0.1f);
+                            Handles.Label(curEvent.pos, curEvent.objectName);
+                        }
+                    }
                 }
             }
         } 
         
-        //TODO rendering of heatmap and interaction events.
+        if(vis.showEntities)
+        {
+            foreach(KeyValuePair<string, OGLogVisualizer.AggregateInteraction> interaction 
+                in vis.aggregateInteractions)
+            {
+                Handles.color = interaction.Value.displayColor;
+                Handles.DrawSolidDisc(interaction.Value.pos, Vector3.up, interaction.Value.displaySize);
+                Handles.Label(interaction.Value.pos, interaction.Value.displayName);
+            }
+
+            foreach (KeyValuePair<string, OGLogVisualizer.AggregateInteraction> interaction
+                in vis.aggregateInteractions)
+            { 
+                Handles.Label(interaction.Value.pos, interaction.Value.displayName);
+            }
+        }
     }
 }

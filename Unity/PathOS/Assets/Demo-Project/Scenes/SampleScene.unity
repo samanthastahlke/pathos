@@ -1281,7 +1281,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 185895896}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1291,7 +1291,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1281627727}
+  - {fileID: 921979832}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5189,6 +5189,31 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 906089555}
   m_PrefabAsset: {fileID: 0}
+--- !u!21 &921979832
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Unlit/Transparent
+  m_Shader: {fileID: 10750, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 1565335158}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1001 &923501510
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6937,31 +6962,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1263680425}
   m_PrefabAsset: {fileID: 0}
---- !u!21 &1281627727
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Unlit/Transparent
-  m_Shader: {fileID: 10750, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 1565335158}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1001 &1288188676
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8900,7 +8900,7 @@ Texture2D:
   m_LightmapFormat: 0
   m_ColorSpace: 0
   image data: 520
-  _typelessdata: ffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffc6c67fff71717fffa9a97fffffff7fffe2e27fff71717fffffff7fffffff7fffc6c67fffe2e27fffa9a97fffa9a97fffe2e27fffffff7fff8d8d7fffc6c67fffffff7fffffff7fffe2e27fffe2e27fffe2e27fffc6c67fffa9a97fffffff7fff38387fffffff7fffffff7fffffff7fffffff7fffe2e27fffffff7fffc6c67fff71717fffe2e27fff54547fffffff7fffffff7fffffff7fffffff7fffe2e27fffffff7fffa9a97fffc6c67fff54547fffe2e27fffffff7fffffff7fffffff7fffffff7fffffff7fffc6c67fffe2e27fffc6c67fff00007fff8d8d7fffc6c67fffc6c67fffffff7fffc6c67fff8d8d7fffc6c67fffe2e27fff54547fffc6c67fffc6c67fff71717fff8d8d7fffffff7fff8d8d7fff8d8d7fffe2e27fffe2e27fff71717fffa9a97fffc6c67fffc6c67fffa9a97fffffff7fffffff7fffffff7fffffff7fff8d8d7fffa9a97fffe2e27fffffff7fffffff7fffffff7fffffff7ffff0f07fffc6c67ffff7f77fffdbdb7fffe9e97fffd3d37fffbebe7fffb0b07ffff0f07fffffff7ffff0f07fffa9a97fff9b9b7fffffff7ffff0f07fffc5c57fffb7b77fff86867fffa2a27fffe2e27fffdbdb7fffa2a27fffd3d37fffdbdb7fffdede7fffcccc7fffd2d27fff9f9f7fffc6c67f
+  _typelessdata: ffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7ffff0f07fffc6c67ffff7f77fffdbdb7fffe9e97fffd3d37fffbebe7fffb0b07ffff0f07fffffff7ffff0f07fffa9a97fff9b9b7fffffff7ffff0f07fffc5c57fffb7b77fff86867fffa2a27fffe2e27fffdbdb7fffa2a27fffd3d37fffdbdb7fffdede7fffcccc7fffd2d27fff9f9f7fffc6c67f
   m_StreamData:
     offset: 0
     size: 0
@@ -9655,9 +9655,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   logDirectory: C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/OGVis/OGLogs/2019-05-29
     10-46-47
-  directoriesLoaded:
-  - C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/OGVis/OGLogs/2019-05-29
-    10-46-47/
+  directoriesLoaded: []
   heatmapVisualizer: {fileID: 185895898}
   heatmapGradient:
     serializedVersion: 2
@@ -9717,17 +9715,19 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  showIndividualPaths: 0
-  showHeatmap: 1
+  showIndividualPaths: 1
+  showHeatmap: 0
+  showEntities: 0
   aggregateActiveOnly: 0
   aggregateWindowOnly: 0
+  showIndividualInteractions: 1
   displayHeight: 1
   displayTimeRange:
     min: 0
-    max: 56
+    max: 0
   fullTimeRange:
     min: 0
-    max: 56
+    max: 0
   gridSize: {x: 0, y: 0, z: 0}
 --- !u!114 &1664526735
 MonoBehaviour:

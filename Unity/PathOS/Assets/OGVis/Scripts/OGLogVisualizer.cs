@@ -27,9 +27,11 @@ public class OGLogVisualizer : MonoBehaviour
     //Path settings.
     public bool showIndividualPaths;
     public bool showHeatmap;
+    public bool showEntities;
     public bool aggregateActiveOnly;
     public bool aggregateWindowOnly;
 
+    public bool showIndividualInteractions = true;
     public float displayHeight = 1.0f;
 
     public TimeRange displayTimeRange = new TimeRange();
@@ -53,10 +55,11 @@ public class OGLogVisualizer : MonoBehaviour
     public List<PlayerLog> pLogs = new List<PlayerLog>();
 
     //For displaying interactions with game objects.
-    public abstract class AggregateInteraction
+    public class AggregateInteraction
     {
         //Used to set radius of the mark displayed on the visualization.
         public float displaySize = 0.0f;
+        public Color displayColor = Color.white;
         //Number of events represented by the aggregate.
         public int tCount = 0;
         //Cluster centre.
@@ -107,6 +110,22 @@ public class OGLogVisualizer : MonoBehaviour
         }
 
         ClearData();
+    }
+
+    private void PopulateManagerEntities()
+    {
+        PathOSManager levelManager = PathOSManager.instance;
+
+        for(int i = 0; i < levelManager.levelEntities.Count; ++i)
+        { 
+            PathOS.LevelEntity entity = levelManager.levelEntities[i];
+            string name = entity.objectRef.name;
+            Vector3 pos = entity.objectRef.transform.position;
+
+            aggregateInteractions.Add(
+                PlayerLog.InteractionEvent.GetStringHash(pos, name), 
+                new AggregateInteraction(name, pos));
+        }
     }
 
     public void ApplyDisplayRange()
@@ -186,6 +205,12 @@ public class OGLogVisualizer : MonoBehaviour
             heatmapVisualizer.UpdateData(pLogs, aggregateActiveOnly, aggregateWindowOnly);
             heatmapVisualizer.SetVisible(showHeatmap);
         }
+    }
+
+    public void UpdateHeatmapVisibility()
+    {
+        if (heatmapVisualizer != null)
+            heatmapVisualizer.SetVisible(showHeatmap);
     }
 
     private bool LoadLog(string filepath, string pKey)
@@ -374,10 +399,8 @@ public class OGLogVisualizer : MonoBehaviour
     //Re-do event aggregation.
     public void ReclusterEvents()
     {
-        foreach(KeyValuePair<string, AggregateInteraction> interaction in aggregateInteractions)
-        {
-            interaction.Value.tCount = 0;
-        }
+        aggregateInteractions.Clear();
+        PopulateManagerEntities();
 
         //Grab active player data for reclustering.
         for (int i = 0; i < pLogs.Count; ++i)
@@ -388,9 +411,19 @@ public class OGLogVisualizer : MonoBehaviour
             {
                 for(int j = 0; j < pLog.interactionEvents.Count; ++j)
                 {
-                    //TODO.
-                }
+                    PlayerLog.InteractionEvent curEvent = pLog.interactionEvents[j];
+                    string key = curEvent.GetStringHash();
 
+                    if(!aggregateInteractions.ContainsKey(key))
+                    { 
+                        Debug.Log("Found new interaction event key!");
+
+                        aggregateInteractions.Add(key, new AggregateInteraction(
+                            curEvent.objectName, curEvent.pos));
+                    }
+
+                    ++aggregateInteractions[key].tCount;
+                }
             }
         }
 
@@ -402,10 +435,22 @@ public class OGLogVisualizer : MonoBehaviour
     {
         //Based on the number of events for active player records,
         //adjust the size of the displayed icons.
+        int maxInteractionCount = 0;
+
+        for(int i = 0; i < pLogs.Count; ++i)
+        {
+            if (pLogs[i].visInclude)
+                ++maxInteractionCount;
+        }
+
         foreach(KeyValuePair<string, AggregateInteraction> interaction in 
             aggregateInteractions)
         {
-            //TODO
+            float fac = (maxInteractionCount <= 0) ? 0.0f :
+                Mathf.Min(1.0f, (float)interaction.Value.tCount / maxInteractionCount);
+
+            interaction.Value.displaySize = Mathf.Lerp(0.1f, 2.0f, fac);
+            interaction.Value.displayColor = Color.Lerp(Color.white, Color.red, fac);
         }
     }
 
