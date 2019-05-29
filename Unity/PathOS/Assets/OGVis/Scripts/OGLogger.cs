@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 /*
@@ -12,12 +13,11 @@ public class OGLogger : MonoBehaviour
 {
     //Expected log row lengths.
     public const int POSLOG_L = 8;
-    public const int INLOG_L = 6;
-    public const int GLOG_L = 6;
+    public const int INTLOG_L = 6;
 
     //Output and timers.
     public StreamWriter logOutput { get; set; }
-    private float sampleTimer = 1000.0f;
+    private float sampleTimer = 0.0f;
 
     private static OGLogManager mgr;
 
@@ -27,12 +27,17 @@ public class OGLogger : MonoBehaviour
             mgr = OGLogManager.instance;
     }
 
-	private void Update()
+    private void Start()
+    {
+        sampleTimer = mgr.sampleTime;
+    }
+
+    private void Update()
 	{
         //Sample position/orientation.
-        if (sampleTimer > mgr.sampleTime)
+        if (sampleTimer >= mgr.sampleTime)
         {
-            sampleTimer = 0.0f;
+            sampleTimer -= mgr.sampleTime;
             LogPosition();
         }
 
@@ -51,6 +56,8 @@ public class OGLogger : MonoBehaviour
     //Called from manager for custom GameObject interactions.
     public void LogInteraction(string objectName, Transform location)
     {
+        objectName = Regex.Replace(objectName, ",", string.Empty);
+
         string line = OGLogManager.LogItemType.INTERACTION + "," +
             mgr.gameTimer + "," +
             objectName + "," +

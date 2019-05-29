@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using OGVis;
 
 /*
 OGLogVisualizer.cs
@@ -17,15 +18,10 @@ public class OGLogVisualizer : MonoBehaviour
     public string logDirectory = "--";
     public List<string> directoriesLoaded;
 
-    private static char[] commaSep = { ',' };
+    public OGLogHeatmap heatmapVisualizer;
+    public Gradient heatmapGradient;
 
-    //Utility class for defining custom scales.
-    [System.Serializable]
-    public struct DataRange
-    {
-        public int min;
-        public int max;
-    }
+    private static char[] commaSep = { ',' };
 
     //Path settings.
     public bool showIndividualPaths;
@@ -34,8 +30,12 @@ public class OGLogVisualizer : MonoBehaviour
 
     public float displayHeight = 1.0f;
 
+    public TimeRange displayTimeRange = new TimeRange();
+    private TimeRange fullTimeRange = new TimeRange();
+
     //Used in creating the heatmap.
-    private Vector3 maxExtents = Vector3.zero;
+    private Extents dataExtents = new Extents();
+
     public Vector3 gridSize = Vector3.zero;
 
     //Default categorical palettes for paths/events.
@@ -48,90 +48,7 @@ public class OGLogVisualizer : MonoBehaviour
     public const float MIN_PATH_WIDTH = 2.0f;
     public const float MAX_PATH_WIDTH = 10.0f;
 
-    //Utility class for loading/storing player logfiles.
-    public class PlayerLog
-    {
-        //Shell class for timestamped events.
-        public abstract class EventRecord
-        {
-            public float timestamp;
-
-            //"Real position" of the event data.
-            public Vector3 realPos;
-
-            //"Display position" updated by path resampling to account for 
-            //axis flattening.
-            public Vector3 pos;
-            
-            public EventRecord(float timestamp, Vector3 pos)
-            {
-                this.timestamp = timestamp;
-                this.realPos = new Vector3(pos.x, pos.y, pos.z);
-                this.pos = new Vector3(pos.x, pos.y, pos.z);
-            }
-        }
-
-        //Interaction events.
-        public class InteractionEvent : EventRecord
-        {
-            public string objectName;
-
-            public InteractionEvent(float timestamp, Vector3 pos, string objectName)
-                : base(timestamp, pos)
-            {
-                this.objectName = objectName;
-            }
-        }
-
-        //Time-series position/orientation data.
-        public List<Vector3> positions;
-        public List<Quaternion> orientations;
-
-        public List<InteractionEvent> interactionEvents;
-
-        public List<Vector3> pathPoints;
-
-        public float sampleRate;
-
-        public int displayStartIndex;
-        public int displayEndIndex;
-
-        public bool visInclude = true;
-        public Color pathColor = Color.white;
-
-        public PlayerLog()
-        {
-            positions = new List<Vector3>();
-            orientations = new List<Quaternion>();
-            interactionEvents = new List<InteractionEvent>();
-
-            pathPoints = new List<Vector3>();
-        }
-
-        public void UpdateDisplayPath(float displayHeight)
-        { 
-            pathPoints.Clear();
-
-            if (positions.Count == 0)
-                return;
-
-            foreach(Vector3 pos in positions)
-            {
-                pathPoints.Add(new Vector3(
-                        pos.x, displayHeight, pos.z));
-            }
-
-            //Resample event positions to account for axis flattening.
-            foreach(InteractionEvent e in interactionEvents)
-            {
-                e.pos.x = e.realPos.x;
-                e.pos.y = displayHeight;
-                e.pos.z = e.realPos.z;
-            }
-        }
-    }
-
-    public Dictionary<string, PlayerLog> pLogs = new Dictionary<string, PlayerLog>();
+    public List<PlayerLog> pLogs = new List<PlayerLog>();
 
     //For displaying interactions with game objects.
     public abstract class AggregateInteraction
@@ -143,8 +60,11 @@ public class OGLogVisualizer : MonoBehaviour
         //Cluster centre.
         public Vector3 pos;
 
-        public AggregateInteraction(Vector3 pos)
+        public string displayName = "";
+
+        public AggregateInteraction(string displayName, Vector3 pos)
         {
+            this.displayName = displayName;
             this.pos = pos;
         }
     }
@@ -156,6 +76,9 @@ public class OGLogVisualizer : MonoBehaviour
     //Simply initialize non-serializable properties, etc.
     private void OnEnable()
     {
+        if(null == heatmapVisualizer)
+            heatmapVisualizer = GetComponentInChildren<OGLogHeatmap>();
+
         if(!colsInit)
         {
             //Palette source:
@@ -182,13 +105,22 @@ public class OGLogVisualizer : MonoBehaviour
         }
 
         ClearData();
+
+        dataExtents.min = new Vector3(-20.0f, 0.0f, -20.0f);
+        dataExtents.max = new Vector3(20.0f, 0.0f, 20.0f);
+
+        if(heatmapVisualizer != null)
+        {
+            heatmapVisualizer.Initialize(dataExtents, heatmapGradient, 1.0f, 1.0f);
+        }
     }
 
-    //Called when the editor detects a change in the object's properties.
-    //Can in theory be called every frame in real-time.
-    private void Update()
+    public void ApplyDisplayRange()
     {
-
+        for(int i = 0; i < pLogs.Count; ++i)
+        {
+            pLogs[i].SliceDisplayPath(displayTimeRange);
+        }
     }
     
     //Called when the user requests to load log files from a given directory.
@@ -235,13 +167,6 @@ public class OGLogVisualizer : MonoBehaviour
 
             pKey = filename.Substring(0, filename.IndexOf('.'));
 
-            //Disallow duplicate simultaneous player IDs.
-            if(pLogs.ContainsKey(pKey))
-            {
-                Debug.LogError(string.Format("Duplicate player ID \"{0}\" found. Skipping logfile.", pKey));
-                continue;
-            }
-
             //Attempt to load the player log.
             if(LoadLog(logFiles[i], pKey))
                 ++logsAdded;          
@@ -255,13 +180,18 @@ public class OGLogVisualizer : MonoBehaviour
 
     private bool LoadLog(string filepath, string pKey)
     {
-        PlayerLog pLog = new PlayerLog();
+        PlayerLog pLog = new PlayerLog(pKey);
 
         StreamReader logReader = new StreamReader(filepath);
         string line = "";
         string[] lineContents;
         int lineNumber = 0;
         OGLogManager.LogItemType itemType;
+
+        float timestamp = 0.0f;
+
+        Vector3 p = Vector3.zero;
+        Quaternion q = Quaternion.identity;
 
         try
         {
@@ -285,45 +215,65 @@ public class OGLogVisualizer : MonoBehaviour
                     case OGLogManager.LogItemType.POSITION:
 
                         if(lineContents.Length < OGLogger.POSLOG_L)
-                            throw new System.Exception(string.Format("Log parsing error on line {0}.", lineNumber));
+                            throw new System.Exception(string.Format(
+                                "Log parsing error on line {0}.", lineNumber));
 
-                        Vector3 p = new Vector3(
+                        timestamp = float.Parse(lineContents[1]);
+
+                        p = new Vector3(
                             float.Parse(lineContents[2]), 
                             float.Parse(lineContents[3]), 
                             float.Parse(lineContents[4]));
 
                         //Store the "extents" of our data - used in heatmap generation.
-                        if (Mathf.Abs(p.x) > maxExtents.x)
-                            maxExtents.x = Mathf.Abs(p.x);
-                        if (Mathf.Abs(p.y) > maxExtents.y)
-                            maxExtents.y = Mathf.Abs(p.y);
-                        if (Mathf.Abs(p.z) > maxExtents.z)
-                            maxExtents.z = Mathf.Abs(p.z);
+                        if (p.x > dataExtents.max.x)
+                            dataExtents.max.x = p.x;
+                        else if (p.x < dataExtents.min.x)
+                            dataExtents.min.x = p.x;
+                        if (p.z > dataExtents.max.z)
+                            dataExtents.max.z = p.z;
+                        else if (p.z < dataExtents.min.z)
+                            dataExtents.min.z = p.z;
 
-                        pLog.positions.Add(p);
+                        pLog.AddPosition(timestamp, p);
 
-                        pLog.orientations.Add(Quaternion.Euler(
+                        q = Quaternion.Euler(
                             float.Parse(lineContents[5]), 
                             float.Parse(lineContents[6]), 
-                            float.Parse(lineContents[7])));
+                            float.Parse(lineContents[7]));
+
+                        pLog.AddOrientation(timestamp, q);
 
                         break;
 
-                    //TODO: Interaction with a game object.
                     case OGLogManager.LogItemType.INTERACTION:
-                        {
-                            break;
-                        }
 
-                    //TODO: Header/metadata.
+                        if(lineContents.Length < OGLogger.INTLOG_L)
+                            throw new System.Exception(string.Format(
+                                "Log parsing error on line {0}.", lineNumber));
+
+                        timestamp = float.Parse(lineContents[1]);
+
+                        p = new Vector3(
+                            float.Parse(lineContents[3]),
+                            float.Parse(lineContents[4]),
+                            float.Parse(lineContents[5]));
+
+                        pLog.AddInteractionEvent(timestamp, p, lineContents[2]);
+
+                        break;
+
                     case OGLogManager.LogItemType.HEADER:
-                        {
-                            break;
-                        }
+
+                        ParseHeader(pLog, lineContents);
+                        break;
 
                     default:
                         break;
                 }
+
+                if (timestamp > fullTimeRange.max)
+                    fullTimeRange.max = timestamp;
             }
         }
         catch(System.Exception e)
@@ -339,8 +289,37 @@ public class OGLogVisualizer : MonoBehaviour
         pLog.pathColor = defaultPathColors[cIndex];
         cIndex = Mathf.Clamp(cIndex + 1, 0, defaultPathColors.Length - 1);
 
-        pLogs.Add(pKey, pLog);
+        fullTimeRange.max = Mathf.Ceil(fullTimeRange.max);
+
+        pLogs.Add(pLog);
         return true;
+    }
+
+    public void ParseHeader(PlayerLog pLog, string[] lineContents)
+    {
+        switch(lineContents[1])
+        {
+            case "SAMPLE":
+
+                pLog.sampleRate = float.Parse(lineContents[2]);
+                break;
+
+            case "HEURISTICS":
+
+                pLog.experience = float.Parse(lineContents[3]);
+
+                for(int i = 4; i < lineContents.Length; i += 2)
+                {
+                    pLog.heuristics.Add(
+                        (PathOS.Heuristic)System.Enum.Parse(typeof(PathOS.Heuristic), lineContents[i]),
+                        float.Parse(lineContents[i + 1]));
+                }
+
+                break;
+
+            default:
+                break;
+        }
     }
 
     //Reset the vis information.
@@ -353,6 +332,13 @@ public class OGLogVisualizer : MonoBehaviour
         //Clear event data.
         aggregateInteractions.Clear();
 
+        //Clear time range data.
+        displayTimeRange.min = displayTimeRange.max = 0.0f;
+        fullTimeRange.min = fullTimeRange.max = 0.0f;
+
+        dataExtents.min = new Vector3(float.MaxValue, 0.0f, float.MaxValue);
+        dataExtents.max = new Vector3(float.MinValue, 0.0f, float.MinValue);
+
         //Reset path/event colour defaults.
         cIndex = 0;
     }
@@ -361,9 +347,9 @@ public class OGLogVisualizer : MonoBehaviour
     //Updates according to desired time window, display height, etc.
     public void UpdateDisplayPaths()
     {
-        foreach (KeyValuePair<string, PlayerLog> pLog in pLogs)
+        for(int i = 0; i < pLogs.Count; ++i)
         {
-            pLog.Value.UpdateDisplayPath(displayHeight);
+            pLogs[i].UpdateDisplayPath(displayHeight);
         }
     }
 
@@ -376,31 +362,17 @@ public class OGLogVisualizer : MonoBehaviour
         }
 
         //Grab active player data for reclustering.
-        List<string> pKeys = new List<string>();
-
-        foreach(KeyValuePair<string, PlayerLog> pLog in pLogs)
+        for (int i = 0; i < pLogs.Count; ++i)
         {
-            if (!pLog.Value.visInclude && aggregateActiveOnly)
-                continue;
+            PlayerLog pLog = pLogs[i];
 
-            pKeys.Add(pLog.Key);
-        }
-        
-        if(pKeys.Count > 0)
-            AddEventsToAggregate(new List<string>(pKeys));
-    }
-
-    //Aggregates all interactions from the given list of player IDs.
-    private void AddEventsToAggregate(List<string> pids)
-    {
-        //Aggregate interaction events.
-        //For every new player log...
-        foreach (string pid in pids)
-        {
-            //For every input event in that player log...
-            foreach (PlayerLog.InteractionEvent inputEvent in pLogs[pid].interactionEvents)
+            if(pLog.visInclude)
             {
-                //TODO: Place into the corresponding global event.
+                for(int j = 0; j < pLog.interactionEvents.Count; ++j)
+                {
+                    //TODO.
+                }
+
             }
         }
 

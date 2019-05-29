@@ -19,7 +19,7 @@ public class OGLogManager : OGSingleton<OGLogManager>
 
     //Sample rate (for position/orientation data).
     [Range(0.1f, 60.0f)]
-    [Tooltip("How often position/orientation should be recorded (every X seconds)")]
+    [Tooltip("How often position/orientation should be recorded (per second)")]
     public float sampleRate = 2.0f;
     public float sampleTime { get; set; }
 
@@ -88,7 +88,7 @@ public class OGLogManager : OGSingleton<OGLogManager>
             string filename = logFilePrefix + "-" + fileIndex.ToString() + ".csv";
             logger.logOutput = File.CreateText(logDirectory + filename);
 
-            logger.WriteHeader("SAMPLE " + sampleRate);
+            logger.WriteHeader("SAMPLE," + sampleRate);
 
             loggers.Add(logObjects[i].GetInstanceID(), logger);
 

@@ -143,7 +143,7 @@ public class PathOSAgentMemory : MonoBehaviour
             && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
             < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
         {
-            finalGoal.Visit();
+            finalGoal.Visit(this.gameObject, PathOSAgent.logger);
             finalGoalCompleted = true;
         }
 

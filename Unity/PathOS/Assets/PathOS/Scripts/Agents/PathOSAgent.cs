@@ -170,12 +170,12 @@ public class PathOSAgent : MonoBehaviour
         {
             string header = "";
 
-            header += "HEURISTICS ";
-            header += "EXPERIENCE " + experienceScale + ",";
+            header += "HEURISTICS,";
+            header += "EXPERIENCE," + experienceScale + ",";
 
             foreach(HeuristicScale scale in heuristicScales)
             {
-                header += scale.heuristic + " " + scale.scale + ",";
+                header += scale.heuristic + "," + scale.scale + ",";
             }
 
             logger.WriteHeader(this.gameObject, header);

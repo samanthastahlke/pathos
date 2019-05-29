@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using OGVis;
 
 /*
 OGVisEditor.cs
@@ -40,6 +41,7 @@ public class OGVisEditor : Editor
     private string lblPathFoldout = "Agent Navigation Data";
 
     private SerializedProperty propShowHeatmap;
+    private SerializedProperty propHeatmapGradient;
     private SerializedProperty propShowIndividual;
     private SerializedProperty propHeatmapGridSize;
 
@@ -65,6 +67,7 @@ public class OGVisEditor : Editor
 
         propShowIndividual = serial.FindProperty("showIndividualPaths");
         propShowHeatmap = serial.FindProperty("showHeatmap");
+        propHeatmapGradient = serial.FindProperty("heatmapGradient");
 
         propDisplayHeight = serial.FindProperty("displayHeight");
         propHeatmapGridSize = serial.FindProperty("gridSize");
@@ -157,6 +160,7 @@ public class OGVisEditor : Editor
             {
                 //Global path display settings.
                 EditorGUILayout.PropertyField(propShowHeatmap);
+                EditorGUILayout.PropertyField(propHeatmapGradient);
                 EditorGUILayout.PropertyField(propShowIndividual);
                 
                 if(vis.pLogs.Count > 0)
@@ -164,26 +168,26 @@ public class OGVisEditor : Editor
 
                 //Filter options.
                 //Enable/disable players, set path colour by player ID.
-                foreach (KeyValuePair<string, OGLogVisualizer.PlayerLog> pLog in vis.pLogs)
+                foreach (PlayerLog pLog in vis.pLogs)
                 {
                     GUILayout.BeginHorizontal();
 
-                    oldFilter = pLog.Value.visInclude;
-                    pLog.Value.visInclude = GUILayout.Toggle(pLog.Value.visInclude, pLog.Key);
+                    oldFilter = pLog.visInclude;
+                    pLog.visInclude = GUILayout.Toggle(pLog.visInclude, pLog.playerID);
 
-                    if (oldFilter != pLog.Value.visInclude && vis.aggregateActiveOnly)
+                    if (oldFilter != pLog.visInclude && vis.aggregateActiveOnly)
                         refreshFilter = true;
 
-                    pLog.Value.pathColor = EditorGUILayout.ColorField(pLog.Value.pathColor);
+                    pLog.pathColor = EditorGUILayout.ColorField(pLog.pathColor);
                     GUILayout.EndHorizontal();
                 }
                 
                 //Shortcut to enable all PIDs in the vis.
                 if(GUILayout.Button("Select All"))
                 {
-                    foreach (KeyValuePair<string, OGLogVisualizer.PlayerLog> pLog in vis.pLogs)
+                    foreach (PlayerLog pLog in vis.pLogs)
                     {
-                        pLog.Value.visInclude = true;
+                        pLog.visInclude = true;
                     }
 
                     if(vis.aggregateActiveOnly)
@@ -193,9 +197,9 @@ public class OGVisEditor : Editor
                 //Shortcut to exclude all PIDs from the vis.
                 if(GUILayout.Button("Select None"))
                 {
-                    foreach (KeyValuePair<string, OGLogVisualizer.PlayerLog> pLog in vis.pLogs)
+                    foreach (PlayerLog pLog in vis.pLogs)
                     {
-                        pLog.Value.visInclude = false;
+                        pLog.visInclude = false;
                     }
 
                     if(vis.aggregateActiveOnly)
@@ -233,13 +237,17 @@ public class OGVisEditor : Editor
         //Draw individual player paths.
         if (vis.showIndividualPaths)
         {
-            foreach (KeyValuePair<string, OGLogVisualizer.PlayerLog> pLog in vis.pLogs)
+            foreach (PlayerLog pLog in vis.pLogs)
             {
-                if (pLog.Value.visInclude)
+                if (pLog.visInclude && pLog.pathPoints.Count > 0)
                 {
                     //Draw path trace.
-                    Vector3[] points = pLog.Value.pathPoints.ToArray();
-                    Handles.color = pLog.Value.pathColor;
+                    Vector3[] points = pLog.pathPoints.GetRange(
+                        pLog.displayStartIndex,
+                        pLog.displayEndIndex - pLog.displayStartIndex + 1)
+                        .ToArray();
+
+                    Handles.color = pLog.pathColor;
                     Handles.DrawAAPolyLine(polylinetex, OGLogVisualizer.MIN_PATH_WIDTH, points);                 
                 }
             }
