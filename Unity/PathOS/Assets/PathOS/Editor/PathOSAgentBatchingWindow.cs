@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,6 +15,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
     private const int pathDisplayLength = 32;
     private GUIStyle errorStyle = new GUIStyle();
+
+    private static char[] commaSep = { ',' };
 
     /* Basic Settings */
     [SerializeField]
@@ -121,6 +124,24 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
     private string shortHeuristicsFile;
 
+    private bool validHeuristicsFile;
+
+    [System.Serializable]
+    private class HeuristicSet
+    {
+        public float exp;
+        public List<PathOS.HeuristicScale> scales = 
+            new List<PathOS.HeuristicScale>();
+
+        public Dictionary<PathOS.Heuristic, float> heuristics
+            = new Dictionary<PathOS.Heuristic, float>();
+    }
+
+    private List<HeuristicSet> loadedHeuristics =
+        new List<HeuristicSet>();
+
+    private int loadAgentIndex = 0;
+
     /* Simulation Controls */
     private bool simulationActive = false;
     private bool triggerFrame = false;
@@ -208,6 +229,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         errorStyle.normal.textColor = Color.red;
         CheckPrefabFile();
+        CheckHeuristicsFile();
 
         Repaint();
     }
@@ -377,6 +399,14 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
                     PathOS.UI.TruncateStringHead(loadHeuristicsFile, 
                         ref shortHeuristicsFile, pathDisplayLength);
+
+                    CheckHeuristicsFile();
+                }
+
+                if (!validHeuristicsFile)
+                {
+                    EditorGUILayout.LabelField("Error! You must select a " +
+                        ".csv file on this computer.", errorStyle);
                 }
 
                 break;
@@ -390,14 +420,24 @@ public class PathOSAgentBatchingWindow : EditorWindow
         {
             if (PathOSManager.instance != null)
             {
-                simultaneous = simultaneousProperty;
-                simulationActive = true;
-                agentsLeft = numAgents;
-
-                if (simultaneous)
+                if(heuristicMode == HeuristicMode.LOAD
+                    && !LoadHeuristics())
                 {
-                    FindSceneAgents();
-                    SetSceneAgentsActive(false);
+                    NPDebug.LogError("Can't start simulation in this mode without " +
+                        "a valid heuristics file containing at least one agent profile!");
+                }
+                else
+                {
+                    simultaneous = simultaneousProperty;
+                    simulationActive = true;
+                    agentsLeft = numAgents;
+                    loadAgentIndex = 0;
+
+                    if (simultaneous)
+                    {
+                        FindSceneAgents();
+                        SetSceneAgentsActive(false);
+                    }
                 }
             }
             else
@@ -485,6 +525,70 @@ public class PathOSAgentBatchingWindow : EditorWindow
         wasPlaying = EditorApplication.isPlaying;
     }
 
+    private bool LoadHeuristics()
+    {
+        loadedHeuristics.Clear();
+
+        StreamReader s = new StreamReader(loadHeuristicsFile);
+        string line = "";
+        string[] lineContents;
+        int lineNumber = 0;
+
+        try
+        {
+            //Consume the header.
+            if (!s.EndOfStream)
+                line = s.ReadLine();
+
+            List<PathOS.Heuristic> heuristics = new List<PathOS.Heuristic>();
+
+            foreach(PathOS.Heuristic heuristic in 
+                System.Enum.GetValues(typeof(PathOS.Heuristic)))
+            {
+                heuristics.Add(heuristic);
+            }
+
+            //Each line should have a value for experience followed by one for 
+            //each heuristic, in the same order as they are defined.
+            int lineLength = 1 + heuristics.Count;
+
+            while(!s.EndOfStream)
+            {
+                ++lineNumber;
+                line = s.ReadLine();
+
+                lineContents = line.Split(commaSep, System.StringSplitOptions.RemoveEmptyEntries);
+
+                if (lineContents.Length != lineLength)
+                {
+                    NPDebug.LogWarning(string.Format("Incorrect number of entries on line {0} while " +
+                        "loading heuristics from {1}.", lineNumber, loadHeuristicsFile));
+
+                    continue;
+                }
+
+                HeuristicSet newSet = new HeuristicSet();
+
+                newSet.exp = float.Parse(lineContents[0]);
+
+                for(int i = 0; i < heuristics.Count; ++i)
+                {
+                    newSet.scales.Add(new PathOS.HeuristicScale(
+                        heuristics[i], float.Parse(lineContents[i + 1])));
+                }
+
+                loadedHeuristics.Add(newSet);             
+            }
+        }
+        catch(System.Exception e)
+        {
+            NPDebug.LogError(string.Format("Exception raised loading heuristics from " +
+                "{0} on line {1}: {2}", loadHeuristicsFile, lineNumber, e.Message));
+        }
+
+        return loadedHeuristics.Count >= 1;
+    }
+
     //Grab fixed heuristic values from the agent reference specified.
     private void LoadHeuristicsFromAgent()
     {
@@ -568,6 +672,23 @@ public class PathOSAgentBatchingWindow : EditorWindow
                 break;
 
             case HeuristicMode.LOAD:
+
+                int ind = loadAgentIndex % loadedHeuristics.Count;
+                loadedHeuristics[ind].heuristics.Clear();
+
+                foreach(PathOS.HeuristicScale scale in loadedHeuristics[ind].scales)
+                {
+                    loadedHeuristics[ind].heuristics.Add(scale.heuristic, scale.scale);
+                }
+
+                agent.experienceScale = loadedHeuristics[ind].exp;
+
+                foreach(PathOS.HeuristicScale scale in agent.heuristicScales)
+                {
+                    scale.scale = loadedHeuristics[ind].heuristics[scale.heuristic];
+                }
+
+                ++loadAgentIndex;
                 break;
         }
     }
@@ -587,6 +708,13 @@ public class PathOSAgentBatchingWindow : EditorWindow
     {
         string loadPrefabFileLocal = GetLocalPrefabFile();
         validPrefabFile = AssetDatabase.LoadAssetAtPath<PathOSAgent>(loadPrefabFileLocal);
+    }
+
+    private void CheckHeuristicsFile()
+    {
+        validHeuristicsFile = File.Exists(loadHeuristicsFile)
+            && loadHeuristicsFile.Substring(Mathf.Max(0, loadHeuristicsFile.Length - 3))
+            == "csv";
     }
 
     private string GetLocalPrefabFile()

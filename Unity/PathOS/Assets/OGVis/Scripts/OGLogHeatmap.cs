@@ -74,12 +74,17 @@ public class OGLogHeatmap : MonoBehaviour
 
     public void Clear()
     {
-        ClearTex();
+        if(tex != null)
+            ClearTex();
+
         SetVisible(false);
     }
 
     public void SetVisible(bool visible)
     {
+        if (null == rend)
+            rend = GetComponent<MeshRenderer>();
+
         rend.enabled = visible;
     }
 
@@ -124,10 +129,9 @@ public class OGLogHeatmap : MonoBehaviour
     public void SetDisplayHeight(float displayHeight)
     {
         this.displayHeight = displayHeight;
+        origin.y = displayHeight;
 
-        Vector3 pos = transform.position;
-        pos.y = displayHeight;
-        transform.position = pos;
+        transform.position = origin;
     }
 
     private void ClearTex()
@@ -140,12 +144,14 @@ public class OGLogHeatmap : MonoBehaviour
             resetArray[i] = white;
         }
 
-        //int x = 0;
-        //int z = 0;
-
-        //resetArray[(int)(z * gridSize.x + x)] = new Color32(255, 0, 0, 128);
-
         tex.SetPixels32(resetArray);
+    }
+
+    private void OnApplicationQuit()
+    {
+        DestroyImmediate(tex);
+        DestroyImmediate(mat);
+        DestroyImmediate(mesh);
     }
 
     public void UpdateData(List<PlayerLog> logs, bool enabledOnly, bool windowOnly)
