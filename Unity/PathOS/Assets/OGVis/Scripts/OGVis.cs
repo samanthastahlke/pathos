@@ -97,6 +97,7 @@ namespace OGVis
         public float sampleRate = -1.0f;
 
         public bool visInclude = true;
+        public bool showDetail = false;
         public Color pathColor = Color.white;
 
         public PlayerLog(string playerID)

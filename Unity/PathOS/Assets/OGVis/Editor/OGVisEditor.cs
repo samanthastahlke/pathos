@@ -30,12 +30,15 @@ public class OGVisEditor : Editor
 
     private SerializedProperty propLogDirectory;
 
-    
     //Filter/display management.
     private static bool filterFoldout = false;
     private string lblFilterFoldout = "Filtering/Display Options";
 
     private SerializedProperty propDisplayHeight;
+
+    private GUIStyle expansionToggleStyle;
+    private GUIContent expansionLabel = new GUIContent("...", "Show agent profile");
+    private GUIContent noContent = new GUIContent("");
 
     //Heatmap.
     private static bool heatmapFoldout = false;
@@ -49,6 +52,9 @@ public class OGVisEditor : Editor
     //Path display settings.
     private static bool pathFoldout = false;
     private string lblPathFoldout = "Individual Paths";
+
+    private PathOSAgent agentReference;
+    private List<PathOS.Heuristic> heuristics = new List<PathOS.Heuristic>();
 
     private SerializedProperty propShowIndividual;
     private Texture2D polylinetex;
@@ -94,6 +100,14 @@ public class OGVisEditor : Editor
             ref logDirectoryDisplay, pathDisplayLength);
 
         errorStyle.normal.textColor = Color.red;
+
+        if(expansionToggleStyle != null)
+        {
+            expansionToggleStyle.fixedHeight = 16.0f;
+            expansionToggleStyle.fixedWidth = 32.0f;
+        }
+
+        heuristics.Clear();
     }
 
     //Draws the inspector pane itself.
@@ -181,47 +195,29 @@ public class OGVisEditor : Editor
                 vis.ApplyDisplayHeight();
                 vis.ReclusterEvents();
             }
-        }
 
-        //Collapsible pane for path display settings.
-        heatmapFoldout = EditorGUILayout.Foldout(heatmapFoldout, lblHeatmapFoldout);
-
-        if(heatmapFoldout)
-        {
-            EditorGUI.BeginChangeCheck();
-            vis.showHeatmap = EditorGUILayout.Toggle("Show Heatmap", vis.showHeatmap);
-
-            if (EditorGUI.EndChangeCheck())
-                vis.UpdateHeatmapVisibility();
-
-            EditorGUILayout.PropertyField(propHeatmapGradient);
-            EditorGUILayout.PropertyField(propHeatmapTileSize);
-            EditorGUILayout.PropertyField(propHeatmapAggregate);
-            EditorGUILayout.PropertyField(propHeatmapTimeSlice);
-
-            if (GUILayout.Button("Apply Heatmap Settings"))
-                vis.ApplyHeatmapSettings();
-        }
-
-        //Collapsible pane for path display settings.
-        pathFoldout = EditorGUILayout.Foldout(pathFoldout, lblPathFoldout);
-
-        if (pathFoldout)
-        {
             bool refreshFilter = false;
             bool oldFilter = false;
 
-            //Global path display settings.
-            EditorGUILayout.PropertyField(propShowIndividual);
+            if (null == expansionToggleStyle)
+            {
+                expansionToggleStyle = EditorStyles.miniButton;
+                expansionToggleStyle.fixedHeight = 16.0f;
+                expansionToggleStyle.fixedWidth = 32.0f;
+            }
 
             if (vis.pLogs.Count > 0)
                 GUILayout.Label("Filter Data by Player ID:");
 
+
             //Filter options.
-            //Enable/disable players, set path colour by player ID.
+            //Enable/disable players.
             foreach (PlayerLog pLog in vis.pLogs)
             {
                 GUILayout.BeginHorizontal();
+
+                pLog.pathColor = EditorGUILayout.ColorField(noContent, 
+                    pLog.pathColor, false, false, false, GUILayout.Width(16.0f));
 
                 oldFilter = pLog.visInclude;
                 pLog.visInclude = GUILayout.Toggle(pLog.visInclude, pLog.playerID);
@@ -229,8 +225,44 @@ public class OGVisEditor : Editor
                 if (oldFilter != pLog.visInclude)
                     refreshFilter = true;
 
-                pLog.pathColor = EditorGUILayout.ColorField(pLog.pathColor);
+                pLog.showDetail = GUILayout.Toggle(pLog.showDetail, expansionLabel, expansionToggleStyle);
+
                 GUILayout.EndHorizontal();
+
+                if (pLog.showDetail)
+                {
+                    agentReference = EditorGUILayout.ObjectField("Agent to update: ",
+                        agentReference, typeof(PathOSAgent), true) as PathOSAgent;
+
+                    if (GUILayout.Button("Copy heuristics to agent")
+                        && agentReference != null)
+                    {
+                        Undo.RecordObject(agentReference, "Copy heuristics to agent");
+
+                        agentReference.experienceScale = pLog.experience;
+
+                        foreach (PathOS.HeuristicScale scale in agentReference.heuristicScales)
+                        {
+                            if (pLog.heuristics.ContainsKey(scale.heuristic))
+                                scale.scale = pLog.heuristics[scale.heuristic];
+                        }
+                    }
+
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Experience:", GUILayout.Width(84.0f));
+                    EditorGUILayout.LabelField(pLog.experience.ToString());
+                    EditorGUILayout.EndHorizontal();
+
+                    foreach (KeyValuePair<PathOS.Heuristic, float> stat in pLog.heuristics)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField(PathOS.UI.heuristicLabels[stat.Key] + ":",
+                            GUILayout.Width(84.0f));
+                        EditorGUILayout.LabelField(stat.Value.ToString());
+                        EditorGUILayout.EndHorizontal();
+                    }
+
+                }
             }
 
             //Shortcut to enable all PIDs in the vis.
@@ -263,6 +295,54 @@ public class OGVisEditor : Editor
 
                 if (vis.heatmapAggregateActiveOnly)
                     vis.UpdateHeatmap();
+            }
+
+
+        }
+
+        //Collapsible pane for path display settings.
+        heatmapFoldout = EditorGUILayout.Foldout(heatmapFoldout, lblHeatmapFoldout);
+
+        if(heatmapFoldout)
+        {
+            EditorGUI.BeginChangeCheck();
+            vis.showHeatmap = EditorGUILayout.Toggle("Show Heatmap", vis.showHeatmap);
+
+            if (EditorGUI.EndChangeCheck())
+                vis.UpdateHeatmapVisibility();
+
+            EditorGUILayout.PropertyField(propHeatmapGradient);
+            EditorGUILayout.PropertyField(propHeatmapTileSize);
+            EditorGUILayout.PropertyField(propHeatmapAggregate);
+            EditorGUILayout.PropertyField(propHeatmapTimeSlice);
+
+            if (GUILayout.Button("Apply Heatmap Settings"))
+                vis.ApplyHeatmapSettings();
+        }
+
+        //Collapsible pane for path display settings.
+        pathFoldout = EditorGUILayout.Foldout(pathFoldout, lblPathFoldout);
+
+        if (pathFoldout)
+        {
+            //Global path display settings.
+            EditorGUILayout.PropertyField(propShowIndividual);
+
+            if (vis.pLogs.Count > 0)
+                GUILayout.Label("Agent Colors:");
+
+            //Filter options.
+            //Enable/disable players, set path colour by player ID.
+            foreach (PlayerLog pLog in vis.pLogs)
+            {
+                GUILayout.BeginHorizontal();
+
+                EditorGUILayout.LabelField(pLog.playerID);
+                pLog.pathColor = EditorGUILayout.ColorField(pLog.pathColor);
+
+                
+
+                GUILayout.EndHorizontal();
             }
         }
 

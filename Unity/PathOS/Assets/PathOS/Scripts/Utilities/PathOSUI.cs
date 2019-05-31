@@ -37,5 +37,17 @@ namespace PathOS
         {
             return Mathf.Round(val * 1000.0f) / 1000.0f;
         }
+
+        public static Dictionary<PathOS.Heuristic, string> heuristicLabels =
+            new Dictionary<Heuristic, string>()
+            {
+                { Heuristic.ACHIEVEMENT, "Achievement" },
+                { Heuristic.ADRENALINE, "Adrenaline" },
+                { Heuristic.AGGRESSION, "Aggression" },
+                { Heuristic.CAUTION, "Caution" },
+                { Heuristic.COMPLETION, "Completion" },
+                { Heuristic.CURIOSITY, "Curiosity" },
+                { Heuristic.EFFICIENCY, "Efficiency" }
+            };
     }
 }
