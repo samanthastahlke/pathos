@@ -15,6 +15,8 @@ public class PathOSWorldCamera : MonoBehaviour
     private Vector3 mouseDelta;
     private Vector3 lastCursor;
 
+    private bool regainedFocus = false;
+
     private void Start()
     {
         lastCursor = Input.mousePosition;
@@ -23,6 +25,12 @@ public class PathOSWorldCamera : MonoBehaviour
     void Update() 
 	{
         Vector3 delta = Vector3.zero;
+
+        if (regainedFocus)
+        {
+            regainedFocus = false;
+            lastCursor = Input.mousePosition; 
+        }
 
         if (Input.GetMouseButton(0))
             mouseDelta = Input.mousePosition - lastCursor;
@@ -37,4 +45,9 @@ public class PathOSWorldCamera : MonoBehaviour
 
         transform.position = transform.position + delta;
 	}
+
+    private void OnApplicationFocus(bool focus)
+    {
+        regainedFocus = focus;
+    }
 }

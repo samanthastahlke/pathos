@@ -22,6 +22,7 @@ public class PathOSManager : NPSingleton<PathOSManager>
     public bool endOnCompletionGoal = true;
     public bool simulationEnded { get; set; }
 
+    public bool showLevelMarkup = true;
     public List<LevelEntity> levelEntities;
 
     public List<HeuristicWeightSet> heuristicWeights;
@@ -123,13 +124,16 @@ public class PathOSManager : NPSingleton<PathOSManager>
 #if UNITY_EDITOR
         if(!UnityEditor.EditorApplication.isPlaying)
         {
-            foreach(LevelEntity entity in levelEntities)
+            if(showLevelMarkup)
             {
-                if(entity.objectRef != null)
-                    Gizmos.DrawIcon(entity.objectRef.transform.position,
-                        entityGizmoLookup[entity.entityType] + ".png");
+                foreach (LevelEntity entity in levelEntities)
+                {
+                    if (entity.objectRef != null)
+                        Gizmos.DrawIcon(entity.objectRef.transform.position,
+                            entityGizmoLookup[entity.entityType] + ".png");
+                }
             }
-
+            
             if(curMouseover != null)
             {          
                 Matrix4x4 oldGizmos = Gizmos.matrix;

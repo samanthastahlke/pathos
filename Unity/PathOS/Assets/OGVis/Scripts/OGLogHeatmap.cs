@@ -30,13 +30,14 @@ public class OGLogHeatmap : MonoBehaviour
 
     private int[,] tileCounts;
 
-    public void Initialize(Extents extents, Gradient gradient, float displayHeight, float tileSize)
+    public void Initialize(Extents extents, Gradient gradient, float alpha, float displayHeight, float tileSize)
     {
         filter = GetComponent<MeshFilter>();
         rend = GetComponent<MeshRenderer>();
 
         this.displayHeight = displayHeight;
         this.gradient = gradient;
+        this.alpha = alpha;
         
         if(null == mesh)
             mesh = new Mesh();
@@ -65,6 +66,11 @@ public class OGLogHeatmap : MonoBehaviour
         vertices = new Vector3[4];
 
         UpdateExtents(extents, tileSize);
+    }
+
+    public void SetAlpha(float alpha)
+    {
+        this.alpha = alpha;
     }
 
     public void SetGradient(Gradient gradient)

@@ -23,6 +23,10 @@ public class OGLogVisualizer : MonoBehaviour
     //Heatmap settings.
     public bool showHeatmap;
     public Gradient heatmapGradient;
+
+    [Range(0.0f, 1.0f)]
+    public float heatmapAlpha;
+
     public bool heatmapAggregateActiveOnly = false;
     public bool heatmapUseTimeSlice = true;
 
@@ -223,7 +227,7 @@ public class OGLogVisualizer : MonoBehaviour
 
         if(heatmapVisualizer != null)
             heatmapVisualizer.Initialize(
-                dataExtents, heatmapGradient, displayHeight, tileSize);
+                dataExtents, heatmapGradient, heatmapAlpha, displayHeight, tileSize);
 
         ApplyDisplayHeight();
         ApplyDisplayRange();
@@ -250,6 +254,7 @@ public class OGLogVisualizer : MonoBehaviour
         if (dataInit && heatmapVisualizer != null)
         {
             heatmapVisualizer.SetGradient(heatmapGradient);
+            heatmapVisualizer.SetAlpha(heatmapAlpha);
             heatmapVisualizer.UpdateExtents(dataExtents, tileSize);
         }
 

@@ -45,6 +45,7 @@ public class OGVisEditor : Editor
     private string lblHeatmapFoldout = "Heatmap";
 
     private SerializedProperty propHeatmapGradient;
+    private SerializedProperty propHeatmapAlpha;
     private SerializedProperty propHeatmapTileSize;
     private SerializedProperty propHeatmapAggregate;
     private SerializedProperty propHeatmapTimeSlice;
@@ -85,6 +86,7 @@ public class OGVisEditor : Editor
         propDisplayHeight = serial.FindProperty("displayHeight");
 
         propHeatmapGradient = serial.FindProperty("heatmapGradient");
+        propHeatmapAlpha = serial.FindProperty("heatmapAlpha");
         propHeatmapTileSize = serial.FindProperty("tileSize");
         propHeatmapAggregate = serial.FindProperty("heatmapAggregateActiveOnly");
         propHeatmapTimeSlice = serial.FindProperty("heatmapUseTimeSlice");
@@ -312,6 +314,7 @@ public class OGVisEditor : Editor
                 vis.UpdateHeatmapVisibility();
 
             EditorGUILayout.PropertyField(propHeatmapGradient);
+            EditorGUILayout.PropertyField(propHeatmapAlpha);
             EditorGUILayout.PropertyField(propHeatmapTileSize);
             EditorGUILayout.PropertyField(propHeatmapAggregate);
             EditorGUILayout.PropertyField(propHeatmapTimeSlice);
