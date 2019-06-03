@@ -291,7 +291,10 @@ public class PathOSMainInspector : Editor
             if (GUILayout.Button("Import Weights..."))
             {
                 string importPath = EditorUtility.OpenFilePanel("Import Weights...", Application.dataPath, "csv");
+
+                Undo.RecordObject(manager, "Import Heuristic Weights");
                 manager.ImportWeights(importPath);
+               
             }
         }
 

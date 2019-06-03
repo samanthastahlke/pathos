@@ -213,6 +213,15 @@ public class PathOSManager : NPSingleton<PathOSManager>
 
     public void ImportWeights(string filename)
     {
+        if (!File.Exists(filename) || filename.Substring(filename.Length - 3) != "csv")
+        {
+            NPDebug.LogError("Could not load heuristic weights! " +
+                "PathOS heuristic weights can only be imported from a " +
+                "valid local .csv file.");
+
+            return;
+        }
+            
         Dictionary<(Heuristic, EntityType), float> weights =
             new Dictionary<(Heuristic, EntityType), float>();
 
