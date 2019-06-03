@@ -315,8 +315,7 @@ public class PathOSNavUtility
             {
                 sample = SampleMap(point);
 
-                if (sample == NavmeshMapCode.NM_UNKNOWN
-                    || sample == NavmeshMapCode.NM_SEEN)
+                if (sample == NavmeshMapCode.NM_UNKNOWN)
                     ++numUnexplored;
                 else if (sample == NavmeshMapCode.NM_OBSTACLE)
                     ++obstacleCount;

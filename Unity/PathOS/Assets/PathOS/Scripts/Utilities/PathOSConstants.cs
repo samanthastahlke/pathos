@@ -53,7 +53,7 @@ namespace PathOS
             public const float ENEMY_RADIUS_SQR = ENEMY_RADIUS * ENEMY_RADIUS;
             public const int ENEMY_COUNT_THRESHOLD = 4;
 
-            public const float HEURISTIC_EPSILON = 0.1f;
+            public const float HEURISTIC_EPSILON = 0.01f;
 
             //How many tiles must a "memory path" to a goal cover to be
             //used instead of regular NavMeshAgent navigation?
