@@ -58,6 +58,7 @@ public class OGVisEditor : Editor
     private List<PathOS.Heuristic> heuristics = new List<PathOS.Heuristic>();
 
     private SerializedProperty propShowIndividual;
+    private SerializedProperty propShowIndividualInteractions;
     private Texture2D polylinetex;
 
     //Interaction display settings.
@@ -92,6 +93,7 @@ public class OGVisEditor : Editor
         propHeatmapTimeSlice = serial.FindProperty("heatmapUseTimeSlice");
 
         propShowIndividual = serial.FindProperty("showIndividualPaths");
+        propShowIndividualInteractions = serial.FindProperty("showIndividualInteractions");
 
         propShowEntities = serial.FindProperty("showEntities");
         propEntityGradient = serial.FindProperty("interactionGradient");
@@ -298,8 +300,6 @@ public class OGVisEditor : Editor
                 if (vis.heatmapAggregateActiveOnly)
                     vis.UpdateHeatmap();
             }
-
-
         }
 
         //Collapsible pane for path display settings.
@@ -331,6 +331,8 @@ public class OGVisEditor : Editor
             //Global path display settings.
             EditorGUILayout.PropertyField(propShowIndividual);
 
+            EditorGUILayout.PropertyField(propShowIndividualInteractions);
+
             if (vis.pLogs.Count > 0)
                 GUILayout.Label("Agent Colors:");
 
@@ -342,8 +344,6 @@ public class OGVisEditor : Editor
 
                 EditorGUILayout.LabelField(pLog.playerID);
                 pLog.pathColor = EditorGUILayout.ColorField(pLog.pathColor);
-
-                
 
                 GUILayout.EndHorizontal();
             }
