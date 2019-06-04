@@ -177,6 +177,17 @@ namespace PathOS
             return entityRef.objectRef.transform.position;
         }
 
+        public static bool SameEntity(PerceivedEntity lhs, EntityMemory rhs)
+        {
+            if (object.ReferenceEquals(lhs, null))
+                return object.ReferenceEquals(rhs, null);
+
+            if (object.ReferenceEquals(rhs, null))
+                return object.ReferenceEquals(lhs, null);
+
+            return lhs.instanceID == rhs.entity.instanceID;
+        }
+
         //Equality operators are overriden to make array search/comparison easier.
         public static bool operator==(PerceivedEntity lhs, PerceivedEntity rhs)
         {
@@ -189,17 +200,6 @@ namespace PathOS
             return lhs.instanceID == rhs.instanceID;
         }
 
-        public static bool operator ==(PerceivedEntity lhs, EntityMemory rhs)
-        {
-            if (object.ReferenceEquals(lhs, null))
-                return object.ReferenceEquals(rhs, null);
-
-            if (object.ReferenceEquals(rhs, null))
-                return object.ReferenceEquals(lhs, null);
-
-            return lhs.instanceID == rhs.entity.instanceID;
-        }
-
         public static bool operator!=(PerceivedEntity lhs, PerceivedEntity rhs)
         {
             if (object.ReferenceEquals(lhs, null))
@@ -209,17 +209,6 @@ namespace PathOS
                 return !object.ReferenceEquals(lhs, null);
 
             return lhs.instanceID != rhs.instanceID;
-        }
-
-        public static bool operator !=(PerceivedEntity lhs, EntityMemory rhs)
-        {
-            if (object.ReferenceEquals(lhs, null))
-                return !object.ReferenceEquals(rhs, null);
-
-            if (object.ReferenceEquals(rhs, null))
-                return !object.ReferenceEquals(lhs, null);
-
-            return lhs.instanceID != rhs.entity.instanceID;
         }
 
         public override bool Equals(object obj)

@@ -53,8 +53,6 @@ namespace PathOS
             public const float ENEMY_RADIUS_SQR = ENEMY_RADIUS * ENEMY_RADIUS;
             public const int ENEMY_COUNT_THRESHOLD = 4;
 
-            public const float HEURISTIC_EPSILON = 0.01f;
-
             //How many tiles must a "memory path" to a goal cover to be
             //used instead of regular NavMeshAgent navigation?
             public const int MIN_A_STAR_MEMORY_LENGTH = 3;
@@ -64,6 +62,18 @@ namespace PathOS
             public const float BASE_MEMORY_NAV_CHANCE = 0.5f;
             public const float MEMORY_NAV_CHANCE_MIN = 0.0f;
             public const float MEMORY_NAV_CHANCE_MAX = 1.0f;
+
+            //Bias for preferring the existing goal.
+            public const float EXISTING_GOAL_BIAS = 0.5f;
+
+            //Bias for preferring entities as destinations.
+            //(Only applied when the entity has a positive score.)
+            public const float ENTITY_GOAL_BIAS = 0.5f;
+
+            //Adjustment factor for calculating the role of distance in 
+            //entity scoring.
+            public const float DIST_SCORE_FACTOR = 2.0f;
+            public const float DIST_SCORE_FACTOR_SQR = DIST_SCORE_FACTOR * DIST_SCORE_FACTOR;
 
             //Govern the "ending" behaviour of the agent.
             public const float FINAL_GOAL_BONUS_FACTOR = 5.0f;

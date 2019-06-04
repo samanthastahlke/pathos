@@ -161,7 +161,7 @@ public class PathOSAgentMemory : MonoBehaviour
     {
         for(int i = 0; i < entities.Count; ++i)
         {
-            if (entity == entities[i])
+            if (PerceivedEntity.SameEntity(entity, entities[i]))
             {
                 entities[i].impressionTime = 0.0f;
                 entities[i].entity.perceivedPos = entity.perceivedPos;
@@ -176,7 +176,7 @@ public class PathOSAgentMemory : MonoBehaviour
     {
         for(int i = 0; i < entities.Count; ++i)
         {
-            if(entity == entities[i])
+            if(PerceivedEntity.SameEntity(entity, entities[i]))
             {
                 entities[i].ltm = true;
                 return;
@@ -191,7 +191,7 @@ public class PathOSAgentMemory : MonoBehaviour
     {
         for(int i = 0; i < entities.Count; ++i)
         {
-            if(entity == entities[i])
+            if(PerceivedEntity.SameEntity(entity, entities[i]))
             {
                 entities[i].MakeUnforgettable();
                 return;
@@ -204,7 +204,7 @@ public class PathOSAgentMemory : MonoBehaviour
     {
         for(int i = 0; i < entities.Count; ++i)
         {
-            if (entity == entities[i])
+            if (PerceivedEntity.SameEntity(entity, entities[i]))
                 return entities[i].visited;
         }
 

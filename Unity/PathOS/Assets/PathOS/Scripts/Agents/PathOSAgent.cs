@@ -372,10 +372,10 @@ public class PathOSAgent : MonoBehaviour
             < PathOS.Constants.Navigation.GOAL_EPSILON_SQR
             && Vector3.SqrMagnitude(GetPosition() - currentDest.pos)
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
-            bias += 1.0f;
+            bias += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
 
         //Weighted scoring function.
-        foreach(HeuristicScale heuristicScale in heuristicScales)
+        foreach (HeuristicScale heuristicScale in heuristicScales)
         {
             (Heuristic, EntityType) key = (heuristicScale.heuristic, entity.entityType);
 
@@ -390,6 +390,9 @@ public class PathOSAgent : MonoBehaviour
 
         Vector3 toEntity = entity.perceivedPos - GetPosition();
         float score = ScoreDirection(GetPosition(), toEntity, bias, toEntity.magnitude);
+
+        if (score >= 0.0f)
+            score += PathOS.Constants.Behaviour.ENTITY_GOAL_BIAS;
 
         if (score > maxScore)
         {
@@ -424,13 +427,13 @@ public class PathOSAgent : MonoBehaviour
         }
 
         float bias = (distance / eyes.navmeshCastDistance) 
-            * (heuristicScaleLookup[Heuristic.CURIOSITY] + 0.1f);
+            * (heuristicScaleLookup[Heuristic.CURIOSITY]);
 
         //Initial placeholder bias for preferring the goal we have already set.
         //(If we haven't reached it already.)
         if ((newDest - currentDest.pos).magnitude < exploreSimilarityThreshold
             && (GetPosition() - currentDest.pos).magnitude > exploreSimilarityThreshold)
-            bias += 1.0f;
+            bias += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
 
         float score = ScoreDirection(origin, dir, bias, distance);
 
@@ -466,8 +469,7 @@ public class PathOSAgent : MonoBehaviour
         PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit hit;
         memory.memoryMap.RaycastMemoryMap(origin, dir, maxDistance, out hit);
 
-        score += (heuristicScaleLookup[Heuristic.CURIOSITY] 
-            + PathOS.Constants.Behaviour.HEURISTIC_EPSILON) 
+        score += (heuristicScaleLookup[Heuristic.CURIOSITY]) 
             * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples;
 
         //Enumerate over all entities the agent knows about, and use them
@@ -480,7 +482,7 @@ public class PathOSAgent : MonoBehaviour
             //Vector to the entity.
             Vector3 entityVec = memory.entities[i].entity.perceivedPos - origin;
             //Scale our factor by inverse square of distance.
-            float distFactor = 1.0f / entityVec.sqrMagnitude;
+            float distFactor = PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR / entityVec.sqrMagnitude;
             Vector3 dir2entity = entityVec.normalized;
 
             float dot = Vector3.Dot(dir, dir2entity);
