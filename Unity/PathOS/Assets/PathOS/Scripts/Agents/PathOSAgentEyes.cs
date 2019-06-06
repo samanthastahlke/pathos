@@ -92,7 +92,10 @@ public class PathOSAgentEyes : MonoBehaviour
                 && RaycastVisibilityCheck(entity.entityRef.rend.bounds, entityPos);
 
             if (wasVisible != entity.visible)
+            {
                 entity.visibilityTimer = 0.0f;
+                entity.impressionMade = false;     
+            }
 
             //Keep track of how long the object has been in the current visibility state.
             entity.visibilityTimer = entity.visibilityTimer + perceptionTimer;
@@ -103,6 +106,14 @@ public class PathOSAgentEyes : MonoBehaviour
 
                 if (entity.visibilityTimer >= PathOS.Constants.Memory.IMPRESSION_TIME_MIN)
                 {
+                    if(!entity.impressionMade)
+                    {
+                        entity.impressionMade = true;
+
+                        if (entity.impressionCount < PathOS.Constants.Memory.IMPRESSIONS_MAX)
+                            ++entity.impressionCount;
+                    }
+
                     entity.perceivedPos = entityPos;
                     agent.memory.Memorize(entity);
 
@@ -110,8 +121,8 @@ public class PathOSAgentEyes : MonoBehaviour
                     if (entity.entityType == EntityType.ET_GOAL_MANDATORY
                         || entity.entityType == EntityType.ET_GOAL_COMPLETION)
                         agent.memory.CommitUnforgettable(entity);
-                    else if (entity.visibilityTimer >= PathOS.Constants.Memory.IMPRESSION_CONVERT_LTM)
-                        agent.memory.CommitLTM(entity);
+
+                    agent.memory.TryCommitLTM(entity);
                 }  
             }          
         }
@@ -175,7 +186,7 @@ public class PathOSAgentEyes : MonoBehaviour
         perceptionTimer += Time.deltaTime;
 
         //Visual processing update.
-        if (perceptionTimer >= agent.perceptionComputeTime)
+        if (perceptionTimer >= PathOS.Constants.Perception.PERCEPTION_COMPUTE_TIME)
         {
             ProcessPerception();
         }

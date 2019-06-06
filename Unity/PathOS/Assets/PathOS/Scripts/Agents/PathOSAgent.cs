@@ -41,19 +41,14 @@ public class PathOSAgent : MonoBehaviour
 
     /* NAVIGATION PROPERTIES */
 
-    //How often will the agent re-assess available goals?
-    public float routeComputeTime = 1.0f;
-    //How often will the agent's "visual system" process information?
-    public float perceptionComputeTime = 0.25f;
+    //How close does the agent have to get to a goal to mark it as visited?
+    public float visitThreshold = 1.0f;
     //How narrow are the bands checked for "explorability"?
     public float exploreDegrees = 5.0f;
     //How narrow are the bands out-of-view checked for "explorability"?
     public float invisibleExploreDegrees = 30.0f;
     //How many degrees do we sway to either side when looking around?
     public float lookDegrees = 60.0f;
-    //How long does it take to look around?
-    //How close does the agent have to get to a goal to mark it as visited?
-    public float visitThreshold = 1.0f;
     //How close do two "exploration" goals have to be to be considered the same?
     public float exploreSimilarityThreshold = 2.0f;
 
@@ -162,6 +157,9 @@ public class PathOSAgent : MonoBehaviour
     {
         LogAgentData();
         PerceptionUpdate();
+
+        //Stochastic initialization of look time.
+        lookTimer = Random.Range(0.0f, lookTime);
     }
 
     private void LogAgentData()
@@ -200,6 +198,12 @@ public class PathOSAgent : MonoBehaviour
             Mathf.Lerp(PathOS.Constants.Behaviour.LOOK_TIME_MAX,
             PathOS.Constants.Behaviour.LOOK_TIME_MIN_CAUTION,
             lookTimeScale));
+    }
+    
+    private float RouteComputeTimeCalculated()
+    {
+        return PathOS.Constants.Navigation.ROUTE_COMPUTE_BASE
+            + PathOS.Constants.Memory.RETRIEVAL_TIME * memory.entities.Count;
     }
 
     //Used by the Inspector to ensure scale widgets will appear for all defined heuristics.
@@ -531,11 +535,9 @@ public class PathOSAgent : MonoBehaviour
             lookTimer += Time.deltaTime;
 
         //Rerouting update.
-        if (routeTimer >= routeComputeTime)
+        if (routeTimer >= RouteComputeTimeCalculated())
         {
             routeTimer = 0.0f;
-            perceptionTimer = 0.0f;
-            eyes.ProcessPerception();
             ComputeNewDestination();
         }
 
@@ -568,7 +570,7 @@ public class PathOSAgent : MonoBehaviour
         //This will allow the agent's eyes to "process" nearby entities
         //and also update the time threshold for looking around based 
         //on nearby hazards.
-        if(perceptionTimer >= perceptionComputeTime)
+        if(perceptionTimer >= PathOS.Constants.Perception.PERCEPTION_COMPUTE_TIME)
         {
             perceptionTimer = 0.0f;
             PerceptionUpdate();
@@ -593,7 +595,6 @@ public class PathOSAgent : MonoBehaviour
 
     private void PerceptionUpdate()
     {
-        eyes.ProcessPerception();
         UpdateLookTime();
     }
 

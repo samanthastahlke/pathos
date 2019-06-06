@@ -181,6 +181,7 @@ namespace PathOS
         public float visibilityTimer = 0.0f;
 
         public int impressionCount = 0;
+        public bool impressionMade = false;
 
         public PerceivedEntity(LevelEntity entityRef)
         {

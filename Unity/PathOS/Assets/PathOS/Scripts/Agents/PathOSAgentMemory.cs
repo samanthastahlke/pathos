@@ -187,6 +187,33 @@ public class PathOSAgentMemory : MonoBehaviour
         entities[entities.Count - 1].ltm = true;
     }
 
+    public void TryCommitLTM(PerceivedEntity entity)
+    {
+        EntityMemory memory = null;
+
+        for(int i = 0; i < entities.Count; ++i)
+        {
+            if(PerceivedEntity.SameEntity(entity, entities[i]))
+            {
+                memory = entities[i];
+                break;
+            }
+        }
+
+        if(null == memory)
+        {
+            memory = new EntityMemory(entity);
+            entities.Add(memory);
+        }
+
+        if(!memory.ltm)
+        {
+            if (entity.visibilityTimer >= PathOS.Constants.Memory.IMPRESSION_TIME_CONVERT_LTM
+                || entity.impressionCount >= PathOS.Constants.Memory.IMPRESSIONS_CONVERT_LTM)
+                memory.ltm = true;  
+        }
+    }
+
     public void CommitUnforgettable(PerceivedEntity entity)
     {
         for(int i = 0; i < entities.Count; ++i)

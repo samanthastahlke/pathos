@@ -32,8 +32,6 @@ public class PathOSAgentInspector : Editor
 
     private bool showNavCharacteristics = false;
 
-    private SerializedProperty routeComputeTime;
-    private SerializedProperty perceptionComputeTime;
     private SerializedProperty exploreDegrees;
     private SerializedProperty invisibleExploreDegrees;
     private SerializedProperty lookDegrees;
@@ -57,8 +55,6 @@ public class PathOSAgentInspector : Editor
         freezeAgent = serial.FindProperty("freezeAgent");
         verboseDebugging = serial.FindProperty("verboseDebugging");
 
-        routeComputeTime = serial.FindProperty("routeComputeTime");
-        perceptionComputeTime = serial.FindProperty("perceptionComputeTime");
         exploreDegrees = serial.FindProperty("exploreDegrees");
         invisibleExploreDegrees = serial.FindProperty("invisibleExploreDegrees");
         lookDegrees = serial.FindProperty("lookDegrees");
@@ -116,8 +112,6 @@ public class PathOSAgentInspector : Editor
 
         if(showNavCharacteristics)
         {
-            EditorGUILayout.PropertyField(routeComputeTime);
-            EditorGUILayout.PropertyField(perceptionComputeTime);
             EditorGUILayout.PropertyField(exploreDegrees);
             EditorGUILayout.PropertyField(invisibleExploreDegrees);
             EditorGUILayout.PropertyField(lookDegrees);

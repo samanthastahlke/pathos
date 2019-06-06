@@ -7,10 +7,18 @@ namespace PathOS
 {
     namespace Constants
     {
+        struct Perception
+        {
+            //How often does the agent's "visual system" update?
+            public const float PERCEPTION_COMPUTE_TIME = 0.1f;
+        }
+
         struct Memory
         {
-            public const float IMPRESSION_TIME_MIN = 0.5f;
-            public const float IMPRESSION_CONVERT_LTM = 5.0f;
+            public const float IMPRESSION_TIME_MIN = 0.1f;
+            public const float IMPRESSION_TIME_CONVERT_LTM = 5.0f;
+            public const int IMPRESSIONS_MAX = 16;
+            public const int IMPRESSIONS_CONVERT_LTM = 4;
 
             public const float FORGET_TIME_MIN = 15.0f;
             public const float FORGET_TIME_MAX = 30.0f;
@@ -23,10 +31,17 @@ namespace PathOS
             //The radius with which to vary the remembered position of
             //entities not in view.
             public const float POS_VARIANCE = 3.0f;
+
+            //The time taken to "retrieve" an object from memory.
+            //Used to help scale goal recompute time.
+            public const float RETRIEVAL_TIME = 0.03f;
         }
 
         struct Navigation
         {
+            //What should the base minimum time for recomputing a destination be?
+            public const float ROUTE_COMPUTE_BASE = 0.5f;
+
             //How close need the agent pass by an entity to consider it visited?
             public const float VISIT_THRESHOLD_SQR = 1.0f;
 
