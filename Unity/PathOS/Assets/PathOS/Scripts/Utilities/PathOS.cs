@@ -147,6 +147,24 @@ namespace PathOS
         }
     }
 
+    public class ScoringUtility
+    {
+        //Returns true if the goal with newScore should usurp the goal 
+        //with oldMaxScore.
+        public static bool UpdateScore(float newScore, float oldMaxScore)
+        {
+            float diff = Mathf.Abs(newScore - oldMaxScore);
+
+            if (diff >= PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD)
+                return newScore > oldMaxScore;
+
+            float max = (newScore > oldMaxScore) ?
+                0.5f * diff : PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_HALF - 0.5f * diff;
+
+            return Random.Range(0.0f, PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD) < max;
+        }
+    }
+
     /* PLAYER PERCEPTION */
     //How an entity is represented in the agent's world model.
     public class PerceivedEntity
@@ -303,18 +321,25 @@ namespace PathOS
 
             visited = true;
         }
-    }
 
-    //How the agent's trace through the world is represented in the agent's world model.
-    public class WaypointMemory
-    {
-        public Vector3 pos;
-        public bool wasTarget = false;
-
-        public WaypointMemory(Vector3 pos, bool wasTarget = false)
+        public Vector3 RecallPos()
         {
-            this.pos = pos;
-            this.wasTarget = wasTarget;
+            Vector3 pos = entity.perceivedPos;
+
+            //Add noise to position recall if the object is not in sight 
+            //and not always known.
+            if(!entity.visible && !entity.entityRef.alwaysKnown)
+            {
+                float rGen = Mathf.Sqrt(Random.Range(0.0f, 1.0f)) 
+                    * PathOS.Constants.Memory.POS_VARIANCE;
+
+                float thetaGen = Random.Range(0.0f, 1.0f) * 2.0f * Mathf.PI;
+
+                pos.x += rGen * Mathf.Cos(thetaGen);
+                pos.z += rGen * Mathf.Sin(thetaGen);
+            }
+
+            return pos;
         }
     }
 

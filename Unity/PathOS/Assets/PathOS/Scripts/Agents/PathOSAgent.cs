@@ -237,7 +237,7 @@ public class PathOSAgent : MonoBehaviour
         //Potential entity goals.
         for(int i = 0; i < memory.entities.Count; ++i)
         {
-            ScoreEntity(memory.entities[i].entity, ref dest, ref maxScore);
+            ScoreEntity(memory.entities[i], ref dest, ref maxScore);
         }
 
         //Potential directional goals.
@@ -337,13 +337,13 @@ public class PathOSAgent : MonoBehaviour
     }
 
     //maxScore is updated if the entity achieves a higher score.
-    private void ScoreEntity(PerceivedEntity entity, ref TargetDest dest, ref float maxScore)
+    private void ScoreEntity(EntityMemory memory, ref TargetDest dest, ref float maxScore)
     {
         //A previously visited entity shouldn't be targeted.
-        if (memory.Visited(entity)) 
+        if (memory.visited) 
             return;
 
-        bool isFinalGoal = entity.entityType == EntityType.ET_GOAL_COMPLETION;
+        bool isFinalGoal = memory.entity.entityType == EntityType.ET_GOAL_COMPLETION;
 
         //Initial bias added to account for object's type.
         float bias = 0.0f;
@@ -353,22 +353,22 @@ public class PathOSAgent : MonoBehaviour
         if (isFinalGoal)
         {
             //If mandatory goals remain, the final goal can't be targeted.
-            if (memory.MandatoryGoalsLeft())
+            if (this.memory.MandatoryGoalsLeft())
                 return;
 
             bias += PathOS.Constants.Behaviour.FINAL_GOAL_BONUS_FACTOR;
 
             //Number of "unvisited" entities reduced by one to account for 
             //the goal itself - which shouldn't add to its penalty.
-            bias -= Mathf.Min(memory.UnvisitedRemaining() - 1, 0)
+            bias -= Mathf.Min(this.memory.UnvisitedRemaining() - 1, 0)
                 * PathOS.Constants.Behaviour.FINAL_GOAL_EXPLORER_PENALTY_FACTOR;
 
-            bias -= memory.AchievementGoalsLeft()
+            bias -= this.memory.AchievementGoalsLeft()
                 * PathOS.Constants.Behaviour.FINAL_GOAL_ACHIEVER_PENALTY_FACTOR;
         }
 
         //Initial placeholder bias for preferring the goal we have already set.
-        if (Vector3.SqrMagnitude(entity.perceivedPos - currentDest.pos) 
+        if (Vector3.SqrMagnitude(memory.entity.perceivedPos - currentDest.pos) 
             < PathOS.Constants.Navigation.GOAL_EPSILON_SQR
             && Vector3.SqrMagnitude(GetPosition() - currentDest.pos)
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
@@ -377,7 +377,7 @@ public class PathOSAgent : MonoBehaviour
         //Weighted scoring function.
         foreach (HeuristicScale heuristicScale in heuristicScales)
         {
-            (Heuristic, EntityType) key = (heuristicScale.heuristic, entity.entityType);
+            (Heuristic, EntityType) key = (heuristicScale.heuristic, memory.entity.entityType);
 
             if(!entityScoringLookup.ContainsKey(key))
             {
@@ -388,17 +388,22 @@ public class PathOSAgent : MonoBehaviour
             bias += heuristicScale.scale * entityScoringLookup[key];
         }
 
-        Vector3 toEntity = entity.perceivedPos - GetPosition();
+        Vector3 toEntity = memory.RecallPos() - GetPosition();
         float score = ScoreDirection(GetPosition(), toEntity, bias, toEntity.magnitude);
 
         if (score >= 0.0f)
             score += PathOS.Constants.Behaviour.ENTITY_GOAL_BIAS;
 
-        if (score > maxScore)
+        //Stochasticity introduced to goal update.
+        if(PathOS.ScoringUtility.UpdateScore(score, maxScore))
         {
-            maxScore = score;
-            dest.entity = entity;
-            dest.pos = entity.perceivedPos;
+            //Only update maxScore if the new score is actually higher.
+            //(Prevent over-accumulation of error.)
+            if (score > maxScore)
+                maxScore = score;
+
+            dest.entity = memory.entity;
+            dest.pos = memory.entity.perceivedPos;
         }
     }
 
@@ -437,9 +442,11 @@ public class PathOSAgent : MonoBehaviour
 
         float score = ScoreDirection(origin, dir, bias, distance);
 
-        if(score > maxScore)
+        //Same stochasticity logic as for entity goals.
+        if(PathOS.ScoringUtility.UpdateScore(score, maxScore))
         {
-            maxScore = score;
+            if(score > maxScore)
+                maxScore = score;
 
             //If we're originating from where we stand, target the "end" point.
             //Else, target the "start" point, and the agent will re-assess its 
@@ -480,7 +487,7 @@ public class PathOSAgent : MonoBehaviour
                 continue;
 
             //Vector to the entity.
-            Vector3 entityVec = memory.entities[i].entity.perceivedPos - origin;
+            Vector3 entityVec = memory.entities[i].RecallPos() - origin;
             //Scale our factor by inverse square of distance.
             float distFactor = PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR / entityVec.sqrMagnitude;
             Vector3 dir2entity = entityVec.normalized;

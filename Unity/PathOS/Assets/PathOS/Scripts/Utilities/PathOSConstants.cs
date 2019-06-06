@@ -19,6 +19,10 @@ namespace PathOS
             //Limitations of short-term memory for basic recall tasks.
             public const int MEM_CAPACITY_MIN = 3;
             public const int MEM_CAPACITY_MAX = 5;
+
+            //The radius with which to vary the remembered position of
+            //entities not in view.
+            public const float POS_VARIANCE = 3.0f;
         }
 
         struct Navigation
@@ -83,6 +87,8 @@ namespace PathOS
             public const float FINAL_GOAL_EXPLORER_PENALTY_FACTOR = 1.0f;
 
             public const float SCORE_MAX = 10000.0f;
+            public const float SCORE_UNCERTAINTY_THRESHOLD = 0.1f;
+            public const float SCORE_UNCERTAINTY_HALF = 0.5f * SCORE_UNCERTAINTY_THRESHOLD;
         }
     }
 }
