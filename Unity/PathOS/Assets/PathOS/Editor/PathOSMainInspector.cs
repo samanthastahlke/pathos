@@ -39,7 +39,11 @@ public class PathOSMainInspector : Editor
 
     /* Heuristic Weight Matrix */
     private PathOS.Heuristic weightMatrixRowID;
+    private int entityPopupId = 0;
+    private string[] entityLabelList;
     private PathOS.EntityType weightMatrixColumnID;
+    private int heuristicPopupId = 0;
+    private string[] heuristicLabelList;
 
     private Dictionary<Heuristic, int> heuristicIndices;
     private Dictionary<EntityType, int> entypeIndices;
@@ -145,6 +149,18 @@ public class PathOSMainInspector : Editor
 
         BuildWeightDictionary();
 
+        entityLabelList = new string[UI.entityLabels.Count];
+        for(int i = 0; i < UI.entityLabels.Count; ++i)
+        {
+            entityLabelList[i] = UI.entityLabels.Values[i];
+        }
+
+        heuristicLabelList = new string[UI.heuristicLabels.Count];
+        for(int i = 0; i < UI.heuristicLabels.Count; ++i)
+        {
+            heuristicLabelList[i] = UI.heuristicLabels.Values[i];
+        }
+
         //Set up toggles for level markup.
         foreach (EntityType entype in System.Enum.GetValues(typeof(EntityType)))
         {
@@ -240,9 +256,15 @@ public class PathOSMainInspector : Editor
                 transposeWeightMatrix = !transposeWeightMatrix;
 
             if (transposeWeightMatrix)
-                weightMatrixColumnID = (PathOS.EntityType)EditorGUILayout.EnumPopup("Selected Entity Type:", weightMatrixColumnID);
+            {
+                entityPopupId = EditorGUILayout.Popup("Entity type: ", entityPopupId, entityLabelList);
+                weightMatrixColumnID = UI.entityLookup[entityLabelList[entityPopupId]];
+            }
             else
-                weightMatrixRowID = (PathOS.Heuristic)EditorGUILayout.EnumPopup("Selected Heuristic:", weightMatrixRowID);
+            {
+                heuristicPopupId = EditorGUILayout.Popup("Heuristic: ", heuristicPopupId, heuristicLabelList);
+                weightMatrixRowID = UI.heuristicLookup[heuristicLabelList[heuristicPopupId]];
+            }
 
             Heuristic curHeuristic;
             EntityType curEntityType;
@@ -254,7 +276,9 @@ public class PathOSMainInspector : Editor
                 curHeuristic = (transposeWeightMatrix) ? (Heuristic)(index) : weightMatrixRowID;
                 curEntityType = (transposeWeightMatrix) ? weightMatrixColumnID : (EntityType)(index);
 
-                string label = (transposeWeightMatrix) ? curHeuristic.ToString() : curEntityType.ToString();
+                string label = (transposeWeightMatrix) ? 
+                    PathOS.UI.heuristicLabels[curHeuristic] : 
+                    PathOS.UI.entityLabels[curEntityType];
 
                 if (!weightLookup.ContainsKey((curHeuristic, curEntityType)))
                     continue;

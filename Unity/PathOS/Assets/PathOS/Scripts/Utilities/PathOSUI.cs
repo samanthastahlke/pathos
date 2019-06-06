@@ -38,16 +38,58 @@ namespace PathOS
             return Mathf.Round(val * 1000.0f) / 1000.0f;
         }
 
-        public static Dictionary<PathOS.Heuristic, string> heuristicLabels =
-            new Dictionary<Heuristic, string>()
+        public static SortedList<Heuristic, string> heuristicLabels =
+            new SortedList<Heuristic, string>()
             {
-                { Heuristic.ACHIEVEMENT, "Achievement" },
-                { Heuristic.ADRENALINE, "Adrenaline" },
-                { Heuristic.AGGRESSION, "Aggression" },
-                { Heuristic.CAUTION, "Caution" },
-                { Heuristic.COMPLETION, "Completion" },
-                { Heuristic.CURIOSITY, "Curiosity" },
-                { Heuristic.EFFICIENCY, "Efficiency" }
+                { Heuristic.ACHIEVEMENT,    "Achievement" },
+                { Heuristic.ADRENALINE,     "Adrenaline" },
+                { Heuristic.AGGRESSION,     "Aggression" },
+                { Heuristic.CAUTION,        "Caution" },
+                { Heuristic.COMPLETION,     "Completion" },
+                { Heuristic.CURIOSITY,      "Curiosity" },
+                { Heuristic.EFFICIENCY,     "Efficiency" }
+            };
+
+        public static Dictionary<string, Heuristic> heuristicLookup =
+            new Dictionary<string, Heuristic>()
+            {
+                { "Achievement",    Heuristic.ACHIEVEMENT },
+                { "Adrenaline",     Heuristic.ADRENALINE },
+                { "Aggression",     Heuristic.AGGRESSION },
+                { "Caution",        Heuristic.CAUTION    },
+                { "Completion",     Heuristic.COMPLETION },
+                { "Curiosity",      Heuristic.CURIOSITY  },
+                { "Efficiency",     Heuristic.EFFICIENCY }
+            };
+
+        public static SortedList<EntityType, string> entityLabels =
+            new SortedList<EntityType, string>()
+            {
+                { EntityType.ET_NONE,                   "Null Type" },
+                { EntityType.ET_GOAL_OPTIONAL,          "Optional Goal" },
+                { EntityType.ET_GOAL_MANDATORY,         "Mandatory Goal" },
+                { EntityType.ET_GOAL_COMPLETION,        "Final Goal" },
+                { EntityType.ET_RESOURCE_ACHIEVEMENT,   "Collectable" },
+                { EntityType.ET_RESOURCE_PRESERVATION,  "Self-Preservation" },
+                { EntityType.ET_HAZARD_ENEMY,           "Enemy" },
+                { EntityType.ET_HAZARD_ENVIRONMENT,     "Environment Hazard" },
+                { EntityType.ET_POI,                    "POI" },
+                { EntityType.ET_POI_NPC,                "NPC" }
+            };
+
+        public static Dictionary<string, EntityType> entityLookup =
+            new Dictionary<string, EntityType>()
+            {
+                { "Null Type",          EntityType.ET_NONE },
+                { "Optional Goal",      EntityType.ET_GOAL_OPTIONAL },
+                { "Mandatory Goal",     EntityType.ET_GOAL_MANDATORY },
+                { "Final Goal",         EntityType.ET_GOAL_COMPLETION },
+                { "Collectable",        EntityType.ET_RESOURCE_ACHIEVEMENT },
+                { "Self-Preservation",  EntityType.ET_RESOURCE_PRESERVATION },
+                { "Enemy",              EntityType.ET_HAZARD_ENEMY },
+                { "Environment Hazard", EntityType.ET_HAZARD_ENVIRONMENT },
+                { "POI",                EntityType.ET_POI },
+                { "NPC",                EntityType.ET_POI_NPC }
             };
     }
 }

@@ -47,8 +47,14 @@ public class OGVisEditor : Editor
     private SerializedProperty propHeatmapGradient;
     private SerializedProperty propHeatmapAlpha;
     private SerializedProperty propHeatmapTileSize;
+
     private SerializedProperty propHeatmapAggregate;
+    private GUIContent toggleAggregateLabel = new GUIContent("Active Agents Only",
+                "Only include data from agents\nchecked in the filtering tab");
+
     private SerializedProperty propHeatmapTimeSlice;
+    private GUIContent toggleTimeSliceLabel = new GUIContent("Use Time Range",
+                "Only include data within the range\nspecified in the filtering tab");
 
     //Path display settings.
     private static bool pathFoldout = false;
@@ -59,6 +65,9 @@ public class OGVisEditor : Editor
 
     private SerializedProperty propShowIndividual;
     private SerializedProperty propShowIndividualInteractions;
+    private GUIContent individualInteractionsLabel = new GUIContent("Individual Interactions",
+                "Show visited entities along\nindividual agent paths");
+
     private Texture2D polylinetex;
 
     //Interaction display settings.
@@ -316,8 +325,8 @@ public class OGVisEditor : Editor
             EditorGUILayout.PropertyField(propHeatmapGradient);
             EditorGUILayout.PropertyField(propHeatmapAlpha);
             EditorGUILayout.PropertyField(propHeatmapTileSize);
-            EditorGUILayout.PropertyField(propHeatmapAggregate);
-            EditorGUILayout.PropertyField(propHeatmapTimeSlice);
+            EditorGUILayout.PropertyField(propHeatmapAggregate, toggleAggregateLabel);
+            EditorGUILayout.PropertyField(propHeatmapTimeSlice, toggleTimeSliceLabel);
 
             if (GUILayout.Button("Apply Heatmap Settings"))
                 vis.ApplyHeatmapSettings();
@@ -331,7 +340,8 @@ public class OGVisEditor : Editor
             //Global path display settings.
             EditorGUILayout.PropertyField(propShowIndividual);
 
-            EditorGUILayout.PropertyField(propShowIndividualInteractions);
+            EditorGUILayout.PropertyField(propShowIndividualInteractions, 
+                individualInteractionsLabel);
 
             if (vis.pLogs.Count > 0)
                 GUILayout.Label("Agent Colors:");
@@ -357,8 +367,8 @@ public class OGVisEditor : Editor
             EditorGUILayout.PropertyField(propShowEntities);
 
             EditorGUILayout.PropertyField(propEntityGradient);
-            EditorGUILayout.PropertyField(propEntityAggregate);
-            EditorGUILayout.PropertyField(propEntityTimeSlice);
+            EditorGUILayout.PropertyField(propEntityAggregate, toggleAggregateLabel);
+            EditorGUILayout.PropertyField(propEntityTimeSlice, toggleTimeSliceLabel);
 
             if (GUILayout.Button("Apply Interaction Display Settings"))
                 vis.ReclusterEvents();
