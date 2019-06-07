@@ -24,9 +24,6 @@ public class PathOSAgentInspector : Editor
 
     private bool showPlayerCharacteristics = true;
 
-    private SerializedProperty memoryRef;
-    private SerializedProperty eyeRef;
-
     private SerializedProperty freezeAgent;
     private SerializedProperty verboseDebugging;
 
@@ -36,8 +33,8 @@ public class PathOSAgentInspector : Editor
     private SerializedProperty invisibleExploreDegrees;
     private SerializedProperty lookDegrees;
     private SerializedProperty visitThreshold;
-    private SerializedProperty exploreSimilarityThreshold;
-    private SerializedProperty forgetTime;
+    private SerializedProperty exploreThreshold;
+    private SerializedProperty exploreTargetMargin;
 
     private Dictionary<Heuristic, string> heuristicLabels;
 
@@ -49,9 +46,6 @@ public class PathOSAgentInspector : Editor
         experienceScale = serial.FindProperty("experienceScale");
         heuristicList = serial.FindProperty("heuristicScales");
 
-        memoryRef = serial.FindProperty("memory");
-        eyeRef = serial.FindProperty("eyes");
-
         freezeAgent = serial.FindProperty("freezeAgent");
         verboseDebugging = serial.FindProperty("verboseDebugging");
 
@@ -59,8 +53,8 @@ public class PathOSAgentInspector : Editor
         invisibleExploreDegrees = serial.FindProperty("invisibleExploreDegrees");
         lookDegrees = serial.FindProperty("lookDegrees");
         visitThreshold = serial.FindProperty("visitThreshold");
-        exploreSimilarityThreshold = serial.FindProperty("exploreSimilarityThreshold");
-        forgetTime = serial.FindProperty("forgetTime");
+        exploreThreshold = serial.FindProperty("exploreThreshold");
+        exploreTargetMargin = serial.FindProperty("exploreTargetMargin");
 
         agent.RefreshHeuristicList();
 
@@ -85,9 +79,6 @@ public class PathOSAgentInspector : Editor
         foldoutStyle.fontStyle = FontStyle.Bold;
 
         EditorGUILayout.LabelField("General", EditorStyles.boldLabel);
-
-        EditorGUILayout.PropertyField(memoryRef);
-        EditorGUILayout.PropertyField(eyeRef);
 
         EditorGUILayout.PropertyField(freezeAgent);
         EditorGUILayout.PropertyField(verboseDebugging);
@@ -116,7 +107,8 @@ public class PathOSAgentInspector : Editor
             EditorGUILayout.PropertyField(invisibleExploreDegrees);
             EditorGUILayout.PropertyField(lookDegrees);
             EditorGUILayout.PropertyField(visitThreshold);
-            EditorGUILayout.PropertyField(exploreSimilarityThreshold);
+            EditorGUILayout.PropertyField(exploreThreshold);
+            EditorGUILayout.PropertyField(exploreTargetMargin);
         }
         
         serial.ApplyModifiedProperties();

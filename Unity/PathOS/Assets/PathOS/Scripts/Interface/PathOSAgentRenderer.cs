@@ -46,20 +46,14 @@ public class PathOSAgentRenderer : MonoBehaviour
     private Texture2D blankLegendTex;
 
     [Header("Icon Gizmos")]
-    public float iconSize = 16.0f;
-    public string iconExtension = ".png";
+    public float iconSize = 24.0f;
+    private string iconExtension = ".png";
 
-    //Haha, eye-con, get it? Thank you, thank you.
-    //I'll be here all week. Well, for another four years. Well, hopefully longer.
-    //I'm going to die at this damn school, aren't I? D:
-    public Texture eyecon;
-    private string eyeTex;
-    public Texture targetIcon;
-    private string targetTex;
-    public Texture visitedIcon;
-    private string visitTex;
-    public Texture memoryIcon;
-    private string memoryTex;
+    //Gizmo/legend textures.
+    private string eyeTex = "eyecon";
+    private string targetTex = "target";
+    private string visitTex = "visited";
+    private string memoryTex = "brain";
 
     private Texture[] gizmoLegendTextures;
 
@@ -78,14 +72,20 @@ public class PathOSAgentRenderer : MonoBehaviour
     //and severity of mistakes I make whilst programming.
     //Second, in the release version of the framework, it helps in understanding the 
     //agent's behaviour and contributes to improved transparency.
-    public bool showNavmeshMemoryMap = true;
-    public float navmeshMapScreenMaxSize = 128;
+    public bool showMemoryMap = true;
+
+    [Tooltip("The maximum size of the memory map on screen (in pixels)")]
+    public float mapScreenSize = 128;
+
     private Texture navmeshMemoryMap;
     private Rect navmeshMapScreenCoords;
 
     [Header("Player View")]
     public bool showPlayerView = true;
-    public float playerViewScreenMaxSize = 128;
+
+    [Tooltip("The maximum size of the player view on screen (in pixels)")]
+    public float viewScreenSize = 128;
+
     private RenderTexture playerViewTexture;
     private Rect playerViewTextureCoords;
 
@@ -98,16 +98,11 @@ public class PathOSAgentRenderer : MonoBehaviour
         transformCam = Camera.main;
         sceneInit = true;
 
-        eyeTex = eyecon.name + iconExtension;
-        targetTex = targetIcon.name + iconExtension;
-        visitTex = visitedIcon.name + iconExtension;
-        memoryTex = memoryIcon.name + iconExtension;
-
         gizmoLegendTextures = new Texture[4];
-        gizmoLegendTextures[0] = targetIcon;
-        gizmoLegendTextures[1] = visitedIcon;
-        gizmoLegendTextures[2] = eyecon;
-        gizmoLegendTextures[3] = memoryIcon;
+        gizmoLegendTextures[0] = Resources.Load<Texture2D>(targetTex);
+        gizmoLegendTextures[1] = Resources.Load<Texture2D>(visitTex);
+        gizmoLegendTextures[2] = Resources.Load<Texture2D>(eyeTex);
+        gizmoLegendTextures[3] = Resources.Load<Texture2D>(memoryTex);
 
         //We want to draw the memory "map" in the lower-left corner of the screen.
         //Grab a persistent reference to the texture.
@@ -120,12 +115,12 @@ public class PathOSAgentRenderer : MonoBehaviour
 
         if(navmeshMapAsp > 1.0f)
         {
-            navmeshMapX = navmeshMapScreenMaxSize;
+            navmeshMapX = mapScreenSize;
             navmeshMapY = navmeshMapX / navmeshMapAsp;
         }
         else
         {
-            navmeshMapY = navmeshMapScreenMaxSize;
+            navmeshMapY = mapScreenSize;
             navmeshMapX = navmeshMapY * navmeshMapAsp;
         }
 
@@ -176,12 +171,12 @@ public class PathOSAgentRenderer : MonoBehaviour
 
         if(eyesAspect > 1.0f)
         {
-            playerViewX = playerViewScreenMaxSize;
+            playerViewX = viewScreenSize;
             playerViewY = playerViewX / eyesAspect;
         }
         else
         {
-            playerViewY = playerViewScreenMaxSize;
+            playerViewY = viewScreenSize;
             playerViewX = playerViewY * eyesAspect;
         }
 
@@ -206,12 +201,22 @@ public class PathOSAgentRenderer : MonoBehaviour
         }
     }
 
+    private void OnApplicationQuit()
+    {
+        Destroy(playerViewTexture);
+
+        for(int i = 0; i < mapLegendTextures.Length; ++i)
+        {
+            Destroy(mapLegendTextures[i]);
+        }
+    }
+
     private void OnGUI()
     {
         if (!sceneInit)
             return;
 
-        if (showNavmeshMemoryMap)
+        if (showMemoryMap)
             GUI.DrawTexture(navmeshMapScreenCoords,
                 navmeshMemoryMap, ScaleMode.ScaleToFit, false);
 
@@ -256,7 +261,6 @@ public class PathOSAgentRenderer : MonoBehaviour
         if (Camera.current != null)
             transformCam = Camera.current;
 
-        //List<PathOS.PerceivedEntity> visible = agent.GetPerceivedEntities();
         Vector3 targetPos = agent.GetTargetPosition();
 
         List<PathOS.EntityMemory> memory = agent.memory.entities;
@@ -273,14 +277,14 @@ public class PathOSAgentRenderer : MonoBehaviour
 
             //Draw the visited, memorized, or visible icon as appropriate.
             if (memory[i].visited)
-                Gizmos.DrawIcon(GetGizmoIconPos(pos), visitTex);
+                Gizmos.DrawIcon(GetGizmoIconPos(pos), visitTex + iconExtension);
             else if (memory[i].entity.visible)
-                Gizmos.DrawIcon(GetGizmoIconPos(pos), eyeTex);
+                Gizmos.DrawIcon(GetGizmoIconPos(pos), eyeTex + iconExtension);
             else
-                Gizmos.DrawIcon(GetGizmoIconPos(pos), memoryTex);
+                Gizmos.DrawIcon(GetGizmoIconPos(pos), memoryTex + iconExtension);
         }
 
-        Gizmos.DrawIcon(GetGizmoIconPos(agent.GetTargetPosition()), targetTex);
+        Gizmos.DrawIcon(GetGizmoIconPos(agent.GetTargetPosition()), targetTex + iconExtension);
 
         transformCam = Camera.main;
     }

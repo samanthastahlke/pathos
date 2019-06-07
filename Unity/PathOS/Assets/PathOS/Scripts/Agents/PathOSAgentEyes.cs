@@ -12,14 +12,27 @@ PathOSAgentEyes (c) Nine Penguins (Samantha Stahlke) 2018
 [RequireComponent(typeof(PathOSAgent))]
 public class PathOSAgentEyes : MonoBehaviour 
 {
-    public PathOSAgent agent;
+    private PathOSAgent agent;
     private static PathOSManager manager;
 
-    public float navmeshCastDistance = 50.0f;
-    public float navmeshCastHeight = 5.0f;
-
     //The agent's "eyes" - i.e., the camera the player would use.
+    [DisplayName("Player Camera")]
+    [Tooltip("The camera representing the player's view (agent's \"eyes\")")]
     public Camera cam;
+
+    [Header("Navmesh \"Sight\"")]
+
+    [DisplayName("Raycast Distance")]
+    [Tooltip("How far the agent \"looks\" over the navmesh " +
+        "when scanning for obstacles/exploration targets.")]
+
+    public float navmeshCastDistance = 50.0f;
+
+    [DisplayName("Raycast Height")]
+    [Tooltip("The y-value at which the agent \"looks\" for " +
+        "obstacles/navigation targets.")]
+
+    public float navmeshCastHeight = 5.0f;
 
     //What can the agent "see" currently?
     public List<PerceivedEntity> visible { get; set; }
@@ -36,6 +49,8 @@ public class PathOSAgentEyes : MonoBehaviour
 
 	void Awake()
 	{
+        agent = GetComponent<PathOSAgent>();
+
         visible = new List<PerceivedEntity>();
         perceptionInfo = new List<PerceivedEntity>();
 

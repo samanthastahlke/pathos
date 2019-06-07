@@ -17,12 +17,12 @@ public class OGLogHeatmap : MonoBehaviour
 
     private float displayHeight;
 
-    private Mesh mesh;
+    public Mesh mesh { get; private set; }
     private MeshFilter filter;
     private MeshRenderer rend;
 
-    private Material mat;
-    private Texture2D tex;
+    public Material mat { get; private set; }
+    public Texture2D tex { get; private set; }
 
     private Vector3 origin;
     private Vector3 gridSize;
@@ -45,13 +45,14 @@ public class OGLogHeatmap : MonoBehaviour
         filter.mesh = mesh;
 
         DestroyImmediate(mat);
-
         mat = new Material(Shader.Find("Unlit/Transparent"));
 
         if (null == tex)
             tex = new Texture2D(0, 0);
 
         tex.filterMode = FilterMode.Point;
+        tex.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+
         mat.mainTexture = tex;
         rend.material = mat;
 
@@ -80,9 +81,7 @@ public class OGLogHeatmap : MonoBehaviour
 
     public void Clear()
     {
-        if(tex != null)
-            ClearTex();
-
+        ClearTex();
         SetVisible(false);
     }
 
@@ -142,6 +141,9 @@ public class OGLogHeatmap : MonoBehaviour
 
     private void ClearTex()
     {
+        if (null == tex || tex.width == 0 || tex.height == 0)
+            return;
+
         Color32 white = new Color32(255, 255, 255, (byte)(alpha * 255));
         Color32[] resetArray = tex.GetPixels32();
 
@@ -151,6 +153,7 @@ public class OGLogHeatmap : MonoBehaviour
         }
 
         tex.SetPixels32(resetArray);
+        tex.Apply();
     }
 
     private void OnApplicationQuit()

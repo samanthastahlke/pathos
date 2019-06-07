@@ -19,9 +19,9 @@ public class PathOSAgent : MonoBehaviour
     private NavMeshAgent navAgent;
 
     //The agent's memory/internal world model.
-    public PathOSAgentMemory memory;
+    public PathOSAgentMemory memory { get; set; }
     //The agent's eyes/perception model.
-    public PathOSAgentEyes eyes;
+    public PathOSAgentEyes eyes { get; set; }
 
     private static PathOSManager manager;
     public static OGLogManager logger { get; set; }
@@ -41,16 +41,30 @@ public class PathOSAgent : MonoBehaviour
 
     /* NAVIGATION PROPERTIES */
 
-    //How close does the agent have to get to a goal to mark it as visited?
+    [Tooltip("How close (in units) does the agent have to get " +
+        "to a goal to mark it as visited?")]
     public float visitThreshold = 1.0f;
-    //How narrow are the bands checked for "explorability"?
+
+    [Tooltip("How many degrees should separate lines of " +
+        "sight checked for \"explorability\" by the agent?")]
     public float exploreDegrees = 5.0f;
-    //How narrow are the bands out-of-view checked for "explorability"?
+    
+    [DisplayName("Explore Degrees (Back)")]
+    [Tooltip("How many degrees should separate paths checked for " +
+        "\"explorability\" behind (out of sight of) the agent?")]
     public float invisibleExploreDegrees = 30.0f;
-    //How many degrees do we sway to either side when looking around?
+
+    [Tooltip("How many degrees should the agent sway to either " +
+        "side when looking around?")]
     public float lookDegrees = 60.0f;
-    //How close do two "exploration" goals have to be to be considered the same?
-    public float exploreSimilarityThreshold = 2.0f;
+    
+    [Tooltip("How close do two \"exploration\" goals have to " +
+        "be to be considered the same?")]
+    public float exploreThreshold = 2.0f;
+
+    [Tooltip("What's the search radius for finding a point on the navmesh when " +
+        "setting an exploration target?")]
+    public float exploreTargetMargin = 25.0f;
 
     /* MEMORY STATS */
     //How quickly does the agent forget something in its memory?
@@ -79,6 +93,9 @@ public class PathOSAgent : MonoBehaviour
 
     private void Awake()
 	{
+        eyes = GetComponent<PathOSAgentEyes>();
+        memory = GetComponent<PathOSAgentMemory>();
+
         navAgent = GetComponent<NavMeshAgent>();
         completed = false;
 
@@ -432,7 +449,7 @@ public class PathOSAgent : MonoBehaviour
             distance = hit.distance;
 
             newDest = PathOSNavUtility.GetClosestPointWalkable(
-                origin + distance * dir, memory.worldBorderMargin);
+                origin + distance * dir, exploreTargetMargin);
         }
 
         float bias = (distance / eyes.navmeshCastDistance) 
@@ -440,8 +457,8 @@ public class PathOSAgent : MonoBehaviour
 
         //Initial placeholder bias for preferring the goal we have already set.
         //(If we haven't reached it already.)
-        if ((newDest - currentDest.pos).magnitude < exploreSimilarityThreshold
-            && (GetPosition() - currentDest.pos).magnitude > exploreSimilarityThreshold)
+        if ((newDest - currentDest.pos).magnitude < exploreThreshold
+            && (GetPosition() - currentDest.pos).magnitude > exploreThreshold)
             bias += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
 
         float score = ScoreDirection(origin, dir, bias, distance);

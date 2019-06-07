@@ -11,7 +11,7 @@ PathOSAgentMemory (c) Nine Penguins (Samantha Stahlke) and Atiya Nova 2018
 [RequireComponent(typeof(PathOSAgent))]
 public class PathOSAgentMemory : MonoBehaviour 
 {
-    public PathOSAgent agent;
+    private PathOSAgent agent;
     private static PathOSManager manager;
 
     //Remembered entities.
@@ -28,12 +28,15 @@ public class PathOSAgentMemory : MonoBehaviour
 
     //The agent's memory model of the complete navmesh.
     [Header("Navmesh Memory Model")]
-    public bool autogenerateMapExtents = true;
+    [Tooltip("The edge length of a tile in the memory map (in units)")]
+    public float gridSampleSize = 2.0f;
     public PathOSNavUtility.NavmeshBoundsXZ navmeshBounds;
-    public float worldExtentRadius = 200.0f;
-    public float worldBorderMargin = 25.0f;
-    public float gridSampleSize = 1.0f;
-    public float gridSampleElevation = 10.0f;
+
+    //For automatic memory map generation.
+    //Limiting to user-specified for this version.
+    private bool autogenerateMapExtents = false;
+    private float gridSampleElevation = 8.0f;
+    private float worldExtentRadius = 200.0f;
 
     public PathOSNavUtility.NavmeshMemoryMapper memoryMap { get; set; }
 
@@ -42,6 +45,8 @@ public class PathOSAgentMemory : MonoBehaviour
 
     private void Awake()
     {
+        agent = GetComponent<PathOSAgent>();
+
         entities = new List<EntityMemory>();
         stm = new List<EntityMemory>();
 
