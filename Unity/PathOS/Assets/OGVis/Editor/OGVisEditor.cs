@@ -417,7 +417,7 @@ public class OGVisEditor : Editor
 
                             Handles.color = Color.white;
                             Handles.DrawSolidDisc(curEvent.pos, Vector3.up, OGLogVisualizer.MIN_ENTITY_RADIUS);
-                            Handles.Label(curEvent.pos, curEvent.objectName);
+                            Handles.Label(curEvent.pos, curEvent.objectName, GUI.skin.textArea);
                         }
                     }
                 }
@@ -430,14 +430,10 @@ public class OGVisEditor : Editor
                 in vis.aggregateInteractions)
             {
                 Handles.color = interaction.Value.displayColor;
-                Handles.DrawSolidDisc(interaction.Value.pos, Vector3.up, interaction.Value.displaySize);
-                Handles.Label(interaction.Value.pos, interaction.Value.displayName);
-            }
-
-            foreach (KeyValuePair<string, OGLogVisualizer.AggregateInteraction> interaction
-                in vis.aggregateInteractions)
-            { 
-                Handles.Label(interaction.Value.pos, interaction.Value.displayName);
+                Handles.DrawSolidDisc(interaction.Value.pos, Vector3.up, 
+                    interaction.Value.displaySize);
+                Handles.Label(interaction.Value.pos, 
+                    interaction.Value.displayName, GUI.skin.textArea);
             }
         }
     }

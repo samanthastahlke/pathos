@@ -63,7 +63,7 @@ public class OGLogVisualizer : MonoBehaviour
     //Display (on-screen) scales.
     public const float PATH_WIDTH = 2.0f;
     public const float MIN_ENTITY_RADIUS = 0.1f;
-    public const float MAX_ENTITY_RADIUS = 1.0f;
+    public const float MAX_ENTITY_RADIUS = 2.0f;
 
     public List<PlayerLog> pLogs = new List<PlayerLog>();
 

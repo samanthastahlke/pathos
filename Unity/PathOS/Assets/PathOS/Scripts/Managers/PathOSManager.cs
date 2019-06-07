@@ -124,7 +124,7 @@ public class PathOSManager : NPSingleton<PathOSManager>
 #if UNITY_EDITOR
         if(!UnityEditor.EditorApplication.isPlaying)
         {
-            if(showLevelMarkup)
+            if (showLevelMarkup)
             {
                 foreach (LevelEntity entity in levelEntities)
                 {
