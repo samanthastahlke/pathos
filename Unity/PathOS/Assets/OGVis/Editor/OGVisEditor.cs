@@ -114,12 +114,6 @@ public class OGVisEditor : Editor
 
         errorStyle.normal.textColor = Color.red;
 
-        if(expansionToggleStyle != null)
-        {
-            expansionToggleStyle.fixedHeight = 16.0f;
-            expansionToggleStyle.fixedWidth = 32.0f;
-        }
-
         heuristics.Clear();
     }
 
@@ -212,12 +206,9 @@ public class OGVisEditor : Editor
             bool refreshFilter = false;
             bool oldFilter = false;
 
-            if (null == expansionToggleStyle)
-            {
-                expansionToggleStyle = EditorStyles.miniButton;
-                expansionToggleStyle.fixedHeight = 16.0f;
-                expansionToggleStyle.fixedWidth = 32.0f;
-            }
+            expansionToggleStyle = EditorStyles.miniButton;
+            expansionToggleStyle.fixedHeight = 16.0f;
+            expansionToggleStyle.fixedWidth = 32.0f;
 
             if (vis.pLogs.Count > 0)
                 GUILayout.Label("Filter Data by Player ID:");
@@ -247,10 +238,10 @@ public class OGVisEditor : Editor
                     agentReference = EditorGUILayout.ObjectField("Agent to update: ",
                         agentReference, typeof(PathOSAgent), true) as PathOSAgent;
 
-                    if (GUILayout.Button("Copy heuristics to agent")
+                    if (GUILayout.Button("Copy motives to agent")
                         && agentReference != null)
                     {
-                        Undo.RecordObject(agentReference, "Copy heuristics to agent");
+                        Undo.RecordObject(agentReference, "Copy motives to agent");
 
                         agentReference.experienceScale = pLog.experience;
 
@@ -432,7 +423,12 @@ public class OGVisEditor : Editor
                 Handles.color = interaction.Value.displayColor;
                 Handles.DrawSolidDisc(interaction.Value.pos, Vector3.up, 
                     interaction.Value.displaySize);
-                Handles.Label(interaction.Value.pos, 
+            }
+
+            foreach (KeyValuePair<string, OGLogVisualizer.AggregateInteraction> interaction
+                in vis.aggregateInteractions)
+            {
+                Handles.Label(interaction.Value.pos,
                     interaction.Value.displayName, GUI.skin.textArea);
             }
         }

@@ -215,9 +215,12 @@ public class PathOSManager : NPSingleton<PathOSManager>
     {
         if (!File.Exists(filename) || filename.Substring(filename.Length - 3) != "csv")
         {
-            NPDebug.LogError("Could not load heuristic weights! " +
-                "PathOS heuristic weights can only be imported from a " +
-                "valid local .csv file.");
+            //Only show an error if some filename was selected.
+            //(Don't throw an error if the user cancels out of the dialog.)
+            if(filename != "")
+                NPDebug.LogError("Could not load heuristic weights! " +
+                    "PathOS heuristic weights can only be imported from a " +
+                    "valid local .csv file.");
 
             return;
         }

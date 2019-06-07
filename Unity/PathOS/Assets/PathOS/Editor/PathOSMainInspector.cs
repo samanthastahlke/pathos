@@ -28,16 +28,17 @@ public class PathOSMainInspector : Editor
     private GUIContent completionLabel;
 
     /* Level Markup */
-    private bool showMarkup = false;
+    private static bool showMarkup = false;
     private GameObject selection = null;
 
     /* Level Entity List */
-    private bool showList = false;
+    private static bool showList = false;
     private bool warnedEntityNull = false;
     private ReorderableList entityListReorderable;
     private SerializedProperty heuristicWeights;
 
     /* Heuristic Weight Matrix */
+    private static bool showWeights = false;
     private PathOS.Heuristic weightMatrixRowID;
     private int entityPopupId = 0;
     private string[] entityLabelList;
@@ -242,7 +243,11 @@ public class PathOSMainInspector : Editor
         }
 
         //Heuristic weight matrix.
-        if (EditorGUILayout.PropertyField(heuristicWeights))
+        showWeights = EditorGUILayout.Foldout(
+            showWeights, "Motive Weights", foldoutStyle);
+
+        //Heuristic weight matrix.
+        if (showWeights)
         {
             //Sync displayed values with values stored in manager.
             RefreshWeightDictionary();
@@ -250,7 +255,7 @@ public class PathOSMainInspector : Editor
             string transposeButtonText = "View by Entity Type";
 
             if (transposeWeightMatrix)
-                transposeButtonText = "View by Heuristic";
+                transposeButtonText = "View by Motive";
 
             if (GUILayout.Button(transposeButtonText))
                 transposeWeightMatrix = !transposeWeightMatrix;
@@ -262,7 +267,7 @@ public class PathOSMainInspector : Editor
             }
             else
             {
-                heuristicPopupId = EditorGUILayout.Popup("Heuristic: ", heuristicPopupId, heuristicLabelList);
+                heuristicPopupId = EditorGUILayout.Popup("Motive: ", heuristicPopupId, heuristicLabelList);
                 weightMatrixRowID = UI.heuristicLookup[heuristicLabelList[heuristicPopupId]];
             }
 
@@ -289,7 +294,7 @@ public class PathOSMainInspector : Editor
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RecordObject(manager, "Change Heuristic Weight");
+                    Undo.RecordObject(manager, "Change Motive Weight");
 
                     weightLookup[(curHeuristic, curEntityType)] = newWeight;
 
@@ -316,9 +321,8 @@ public class PathOSMainInspector : Editor
             {
                 string importPath = EditorUtility.OpenFilePanel("Import Weights...", Application.dataPath, "csv");
 
-                Undo.RecordObject(manager, "Import Heuristic Weights");
+                Undo.RecordObject(manager, "Import Motive Weights");
                 manager.ImportWeights(importPath);
-               
             }
         }
 

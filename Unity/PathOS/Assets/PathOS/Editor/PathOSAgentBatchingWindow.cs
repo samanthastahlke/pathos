@@ -15,6 +15,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
     private const int pathDisplayLength = 32;
     private GUIStyle errorStyle = new GUIStyle();
+    private GUIStyle headerStyle = new GUIStyle();
 
     private static char[] commaSep = { ',' };
 
@@ -228,6 +229,9 @@ public class PathOSAgentBatchingWindow : EditorWindow
             ref shortPrefabFile, pathDisplayLength);
 
         errorStyle.normal.textColor = Color.red;
+
+        headerStyle.fontStyle = FontStyle.Bold;
+
         CheckPrefabFile();
         CheckHeuristicsFile();
 
@@ -259,6 +263,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
     private void OnGUI()
     {
+        EditorGUILayout.LabelField("General", headerStyle);
+
         EditorGUI.BeginChangeCheck();
 
         GrabAgentReference();
@@ -319,6 +325,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
         }
 
         timeScale = EditorGUILayout.Slider("Timescale: ", timeScale, 1.0f, 8.0f);
+
+        EditorGUILayout.LabelField("Agent Motives", headerStyle);
 
         heuristicMode = (HeuristicMode)GUILayout.SelectionGrid(
             (int)heuristicMode, heuristicModeLabels, heuristicModeLabels.Length);
@@ -413,8 +421,13 @@ public class PathOSAgentBatchingWindow : EditorWindow
         }
 
         //Apply new heuristic values to the agent.
-        if (GUILayout.Button("Apply to agent"))
-            ApplyHeuristics();
+        if(heuristicMode != HeuristicMode.LOAD)
+        {
+            if (GUILayout.Button("Apply to agent"))
+                ApplyHeuristics();
+        }
+
+        GUILayout.Label("Simulation Controls", headerStyle);
 
         if(GUILayout.Button("Start"))
         {
@@ -424,7 +437,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     && !LoadHeuristics())
                 {
                     NPDebug.LogError("Can't start simulation in this mode without " +
-                        "a valid heuristics file containing at least one agent profile!");
+                        "a valid motives file containing at least one agent profile!");
                 }
                 else
                 {
