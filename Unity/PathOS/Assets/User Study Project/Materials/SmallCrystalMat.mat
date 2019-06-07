@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TranslucentCrystalv01
+  m_Name: SmallCrystalMat
   m_Shader: {fileID: 4800000, guid: 39fe729f5dcad0d41bc1d8df009668cb, type: 3}
   m_ShaderKeywords: _EMISSION _METALLICGLOSSMAP _NORMALMAP
   m_LightmapFlags: 1
@@ -96,7 +96,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EmissionPower: 2.42
+    - _EmissionPower: 2.41
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -113,7 +113,7 @@ Material:
     - _TransAmbient: 1
     - _TransDirect: 1
     - _TransNormalDistortion: 0.1
-    - _TransScattering: 10
+    - _TransScattering: 1
     - _TransShadow: 0.9
     - _Translucency: 0
     - _TranslucencyMaskPower: 1
@@ -125,4 +125,4 @@ Material:
     - _ColorTint: {r: 1, g: 0.24264705, b: 0.6970591, a: 1}
     - _ColorTint1: {r: 0, g: 0.10798726, b: 0.2573529, a: 1}
     - _ColorTint2: {r: 0.18382347, g: 0.52629757, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0.42068952, b: 1, a: 1}
+    - _EmissionColor: {r: 0.4031909, g: 0.19855823, b: 0.4339623, a: 1}
