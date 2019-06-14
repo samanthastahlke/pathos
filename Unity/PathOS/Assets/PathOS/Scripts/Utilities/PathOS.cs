@@ -125,6 +125,67 @@ namespace PathOS
         }
     }
 
+    [System.Serializable]
+    public class AgentProfile
+    {
+        public string name;
+        
+        [SerializeField]
+        public List<HeuristicRange> heuristicRanges;
+        public FloatRange expRange;
+
+        public AgentProfile()
+        {
+            name = "Unnamed Profile";
+            heuristicRanges = new List<HeuristicRange>();
+
+            expRange = new FloatRange { min = 0.0f, max = 1.0f };
+
+            foreach(Heuristic heuristic in System.Enum.GetValues(typeof(Heuristic)))
+            {
+                heuristicRanges.Add(new HeuristicRange(heuristic));
+            }
+        }
+
+        public AgentProfile(AgentProfile other)
+        {
+            heuristicRanges = new List<HeuristicRange>();
+            Copy(other);
+        }
+
+        public void Copy(AgentProfile other)
+        {
+            name = other.name;
+            heuristicRanges.Clear();
+
+            foreach (HeuristicRange hr in other.heuristicRanges)
+            {
+                heuristicRanges.Add(new HeuristicRange(hr.heuristic,
+                    hr.range.min, hr.range.max));
+            }
+
+            expRange = new FloatRange
+            {
+                min = other.expRange.min,
+                max = other.expRange.max
+            };
+        }
+
+        public void Clear()
+        {
+            name = "Unnamed Profile";
+
+            expRange.min = 0.0f;
+            expRange.max = 1.0f;
+
+            foreach (HeuristicRange hr in heuristicRanges)
+            {
+                hr.range.min = 0.0f;
+                hr.range.max = 1.0f;
+            }
+        }
+    }
+
     //Representation of entity objects defined in the PathOS manager.
     [System.Serializable]
     public class LevelEntity

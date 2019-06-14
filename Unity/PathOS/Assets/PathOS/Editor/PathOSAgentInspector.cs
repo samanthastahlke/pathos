@@ -18,6 +18,7 @@ public class PathOSAgentInspector : Editor
     private SerializedObject serial;
 
     private GUIStyle foldoutStyle = GUIStyle.none;
+    private GUIStyle boldStyle = GUIStyle.none;
 
     private SerializedProperty experienceScale;
     private SerializedProperty heuristicList;
@@ -37,6 +38,9 @@ public class PathOSAgentInspector : Editor
     private SerializedProperty exploreTargetMargin;
 
     private Dictionary<Heuristic, string> heuristicLabels;
+
+    private List<string> profileNames = new List<string>();
+    private int profileIndex = 0;
 
     private void OnEnable()
     {
@@ -67,6 +71,9 @@ public class PathOSAgentInspector : Editor
             label = label.Substring(0, 1).ToUpper() + label.Substring(1).ToLower();
             heuristicLabels.Add(curScale.heuristic, label);
         }
+
+        if(null == PathOSProfileWindow.profiles)
+            PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
     }
 
     public override void OnInspectorGUI()
@@ -96,6 +103,57 @@ public class PathOSAgentInspector : Editor
                      heuristicLabels[agent.heuristicScales[i].heuristic],
                      agent.heuristicScales[i].scale, 0.0f, 1.0f);
             }
+
+            boldStyle = EditorStyles.boldLabel;
+            EditorGUILayout.LabelField("Load Values from Profile", boldStyle);
+
+            profileNames.Clear();
+
+            if (null == PathOSProfileWindow.profiles)
+            {
+                Debug.Log("reload profiles");
+                PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
+            }
+
+            for(int i = 0; i < PathOSProfileWindow.profiles.Count; ++i)
+            {
+                profileNames.Add(PathOSProfileWindow.profiles[i].name);
+            }
+
+            if (profileNames.Count == 0)
+                profileNames.Add("--");
+
+            EditorGUILayout.BeginHorizontal();
+
+            profileIndex = EditorGUILayout.Popup(profileIndex, profileNames.ToArray());
+
+            if(GUILayout.Button("Apply Profile") 
+                && profileIndex < PathOSProfileWindow.profiles.Count)
+            {
+                AgentProfile profile = PathOSProfileWindow.profiles[profileIndex];
+
+                Dictionary<Heuristic, HeuristicRange> ranges = new Dictionary<Heuristic, HeuristicRange>();
+
+                for(int i = 0; i < profile.heuristicRanges.Count; ++i)
+                {
+                    ranges.Add(profile.heuristicRanges[i].heuristic,
+                        profile.heuristicRanges[i]);
+                }
+
+                Undo.RecordObject(agent, "Apply Agent Profile");
+                for(int i = 0; i < agent.heuristicScales.Count; ++i)
+                {
+                    if(ranges.ContainsKey(agent.heuristicScales[i].heuristic))
+                    {
+                        HeuristicRange hr = ranges[agent.heuristicScales[i].heuristic];
+                        agent.heuristicScales[i].scale = Random.Range(hr.range.min, hr.range.max);
+                    }
+                }
+
+                agent.experienceScale = Random.Range(profile.expRange.min, profile.expRange.max);
+            }
+
+            EditorGUILayout.EndHorizontal();
         }
 
         showNavCharacteristics = EditorGUILayout.Foldout(

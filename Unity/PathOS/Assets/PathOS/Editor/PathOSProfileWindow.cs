@@ -1,0 +1,255 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using PathOS;
+using UnityEditor;
+using UnityEngine;
+
+/*
+PathOSProfileWindow.cs
+PathOSProfileWindow (c) Nine Penguins (Samantha Stahlke) 2019
+*/
+
+public class PathOSProfileWindow : EditorWindow
+{
+    public const string editorPrefsID = "PathOSAgentProfiles";
+    public static char[] newlineSep = { '\n' };
+
+    public static List<AgentProfile> profiles;
+
+    private List<string> profileNames = new List<string>();
+
+    private int profileIndex = 0;
+    private AgentProfile curProfile = new AgentProfile();
+
+    [MenuItem("Window/PathOS Profiles")]
+    public static void ShowWindow()
+    {
+        EditorWindow window = EditorWindow.GetWindow(typeof(PathOSProfileWindow), true,
+            "PathOS Agent Profiles");
+
+        window.minSize = new Vector2(420.0f, 345.0f);
+    }
+
+    private void OnEnable()
+    {
+        profiles = new List<AgentProfile>();
+        profiles = ReadPrefsData();
+
+        if (profileIndex < profiles.Count)
+            curProfile.Copy(profiles[profileIndex]);
+    }
+
+    private void OnDisable()
+    {
+        WritePrefsData();
+    }
+
+    private void OnDestroy()
+    {
+        WritePrefsData();
+    }
+
+    private void WritePrefsData()
+    {
+        string prefsData = GetProfileString();
+        EditorPrefs.SetString(editorPrefsID, prefsData);
+    }
+
+    private string GetProfileString()
+    {
+        string profileJson = "";
+
+        for (int i = 0; i < profiles.Count; ++i)
+        {
+            profileJson += JsonUtility.ToJson(profiles[i], false);
+            profileJson += "\n";
+        }
+
+        return profileJson;
+    }
+
+    public static List<AgentProfile> ReadPrefsData()
+    {
+        string prefsData = EditorPrefs.GetString(editorPrefsID);
+        return ReadProfileString(prefsData);
+    }
+
+    private static List<AgentProfile> ReadProfileString(string json)
+    {
+        List<AgentProfile> result = new List<AgentProfile>();
+
+        string[] profileJson = json.Split(newlineSep,
+            System.StringSplitOptions.RemoveEmptyEntries);
+
+        for (int i = 0; i < profileJson.Length; ++i)
+        {
+            AgentProfile newProfile = JsonUtility.FromJson(
+                profileJson[i], typeof(AgentProfile)) as AgentProfile;
+
+            result.Add(newProfile);
+        }
+
+        return result;
+    }
+
+    private void LoadProfilesFromFile(string path)
+    {
+        if (path == "")
+            return;
+
+        if(!File.Exists(path) || path.Length < 8 
+            || path.Substring(path.Length - 8) != "profiles")
+        {
+            NPDebug.LogError("Could not load agent profiles! " +
+                "PathOS agent profiles can only be imported from a " +
+                "valid local .profiles file.");
+
+            return;
+        }
+
+        StreamReader sr = new StreamReader(path);
+        string profileJson = "";
+        string line = "";
+
+        while((line = sr.ReadLine()) != null)
+        {
+            profileJson += line + "\n";
+        }
+
+        sr.Close();
+
+        profiles = ReadProfileString(profileJson);
+        NPDebug.LogMessage("Loaded PathOS agent profiles.", typeof(PathOSProfileWindow));
+    }
+
+    private void WriteProfilesToFile(string path)
+    {
+        if (path == "")
+            return;
+
+        StreamWriter sw = new StreamWriter(path);
+        sw.Write(GetProfileString());
+        sw.Close();
+    }
+
+    private void OnGUI()
+    {
+        if(GUILayout.Button("Import Profiles..."))
+        {
+            string importPath = EditorUtility.OpenFilePanel("Import Agent Profiles...",
+                Application.dataPath, "profiles");
+
+            LoadProfilesFromFile(importPath);
+            profileIndex = 0;
+
+            if (profileIndex > profiles.Count)
+                curProfile.Copy(profiles[profileIndex]);
+        }
+
+        if(GUILayout.Button("Export Profiles..."))
+        {
+            string exportPath = EditorUtility.SaveFilePanel("Export Agent Profiles...",
+                Application.dataPath, "my-agent-profiles", "profiles");
+
+            WriteProfilesToFile(exportPath);
+        }
+
+        profileNames.Clear();
+
+        for(int i = 0; i < profiles.Count; ++i)
+        {
+            profileNames.Add(profiles[i].name);
+        }
+
+        if(profileNames.Count == 0)
+            profileNames.Add("--");
+
+        EditorGUILayout.BeginHorizontal();
+
+        bool copyProfile = false;
+
+        EditorGUI.BeginChangeCheck();
+        profileIndex = EditorGUILayout.Popup("View Profile: ", 
+            profileIndex, profileNames.ToArray());
+
+        copyProfile = EditorGUI.EndChangeCheck();
+
+        if(copyProfile && profileIndex < profiles.Count)
+        {
+            curProfile.Copy(profiles[profileIndex]);
+        }
+
+        if(GUILayout.Button("Add New"))
+        { 
+            profiles.Add(new AgentProfile());
+            profileIndex = profiles.Count - 1;
+            curProfile.Clear();
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        if(profileIndex < profiles.Count)
+        {
+            curProfile.name = EditorGUILayout.TextField("Profile Name:", curProfile.name);
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.MinMaxSlider("Experience Scale",
+                ref curProfile.expRange.min, ref curProfile.expRange.max,
+                0.0f, 1.0f);
+
+            curProfile.expRange.min = EditorGUILayout.FloatField(
+                UI.RoundFloatfield(curProfile.expRange.min),
+                GUILayout.Width(UI.shortFloatfieldWidth));
+
+            EditorGUILayout.LabelField("<->",
+                GUILayout.Width(UI.shortLabelWidth));
+
+            curProfile.expRange.max = EditorGUILayout.FloatField(
+                UI.RoundFloatfield(curProfile.expRange.max),
+                GUILayout.Width(UI.shortFloatfieldWidth));
+
+            EditorGUILayout.EndHorizontal();
+
+            for (int i = 0; i < curProfile.heuristicRanges.Count; ++i)
+            {
+                EditorGUILayout.BeginHorizontal();
+
+                HeuristicRange hr = curProfile.heuristicRanges[i];
+
+                EditorGUILayout.MinMaxSlider(
+                    UI.heuristicLabels[hr.heuristic],
+                    ref hr.range.min,
+                    ref hr.range.max,
+                    0.0f, 1.0f);
+
+                hr.range.min = EditorGUILayout.FloatField(
+                    UI.RoundFloatfield(hr.range.min),
+                    GUILayout.Width(UI.shortFloatfieldWidth));
+
+                EditorGUILayout.LabelField("<->",
+                    GUILayout.Width(UI.shortLabelWidth));
+
+                hr.range.max = EditorGUILayout.FloatField(
+                    UI.RoundFloatfield(hr.range.max),
+                    GUILayout.Width(UI.shortFloatfieldWidth));
+
+                EditorGUILayout.EndHorizontal();
+            }
+
+            if (GUILayout.Button("Apply Changes"))
+                profiles[profileIndex].Copy(curProfile);
+
+            if (GUILayout.Button("Delete Profile"))
+            {
+                profiles.RemoveAt(profileIndex);
+
+                if (profileIndex < profiles.Count)
+                    curProfile.Copy(profiles[profileIndex]);
+            }
+        }
+        
+
+    }
+}

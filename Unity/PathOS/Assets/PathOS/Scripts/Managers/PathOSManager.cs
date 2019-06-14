@@ -278,6 +278,9 @@ public class PathOSManager : NPSingleton<PathOSManager>
 
     public void ExportWeights(string filename)
     {
+        if (filename == "")
+            return;
+
         ResizeWeightMatrix();
 
         StreamWriter sw = new StreamWriter(filename);
