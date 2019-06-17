@@ -10,9 +10,13 @@ OGLogManager (c) Ominous Games 2018
 
 public class OGLogManager : OGSingleton<OGLogManager> 
 {
+    public const string directoryOverrideId = "OGLogDirectoryOverride";
+    public const string overrideFlagId = "OGLogOverrideFlag";
+    public const string fileIndexId = "OGLogFileIndex";
+
     //Whether logging should be enabled.
     public bool enableLogging = true;
-
+    
     //Specify directory/filename.
     public string logDirectory = "--";
     public string logFilePrefix = "agent";
@@ -48,31 +52,44 @@ public class OGLogManager : OGSingleton<OGLogManager>
             return;
         }
 
-        //Create a unique folder inside the logging directory
-        //with the current timestamp.
-        logDirectory += "/" + System.DateTime.Now.ToString(
-            "yyyy'-'MM'-'dd' 'HH'-'mm'-'ss") + "/";
+        bool forceDirectoryOverride = PlayerPrefs.GetInt(overrideFlagId) != 0;
 
-        if (!Directory.Exists(logDirectory))
-            Directory.CreateDirectory(logDirectory);
+        if(forceDirectoryOverride)
+        {
+            logDirectory += "/" + PlayerPrefs.GetString(directoryOverrideId) + "/";
+
+            if (!Directory.Exists(logDirectory))
+                Directory.CreateDirectory(logDirectory);
+        }
         else
         {
-            Debug.LogWarning("A log folder with this timestamp " +
-                "already exists in the specified directory! Logs will " +
-                "not be written.");
+            //Create a unique folder inside the logging directory
+            //with the current timestamp.
+            logDirectory += "/" + PathOS.UI.GetFormattedTimestamp() + "/";
 
-            return;
+            if (!Directory.Exists(logDirectory))
+                Directory.CreateDirectory(logDirectory);
+            else
+            {
+                Debug.LogWarning("A log folder with this timestamp " +
+                    "already exists in the specified directory! Logs will " +
+                    "not be written.");
+
+                return;
+            }
         }
-
-        //Calculate the sampling time for our logger.
-        sampleTime = 1.0f / sampleRate;
-
+        
         foreach(PathOSAgent agent in FindObjectsOfType<PathOSAgent>())
         {
             logObjects.Add(agent.gameObject);
         }
 
-        int fileIndex = 0;
+        //Calculate the sampling time for our logger.
+        sampleTime = 1.0f / sampleRate;
+
+        //File index for numbering logs.
+        int fileIndex = (forceDirectoryOverride) ? 
+            PlayerPrefs.GetInt(fileIndexId, 0) : 0;
 
         //Create loggers for each of the needed objects.
         for (int i = logObjects.Count - 1; i >= 0; --i)
@@ -95,6 +112,9 @@ public class OGLogManager : OGSingleton<OGLogManager>
             ++fileIndex;
         }
 
+        PlayerPrefs.SetInt(fileIndexId, fileIndex);
+        PlayerPrefs.Save();
+
         gameTimer = 0.0f;
 	}
 
@@ -110,6 +130,8 @@ public class OGLogManager : OGSingleton<OGLogManager>
 
     private void OnApplicationQuit()
     {
+        PlayerPrefs.SetInt(overrideFlagId, 0);
+
         if(loggers.Count > 0)
             print("Wrote agent logs to " + logDirectory);
 

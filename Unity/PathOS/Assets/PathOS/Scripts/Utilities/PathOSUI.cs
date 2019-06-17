@@ -38,6 +38,11 @@ namespace PathOS
             return Mathf.Round(val * 1000.0f) / 1000.0f;
         }
 
+        public static string GetFormattedTimestamp()
+        {
+            return System.DateTime.Now.ToString("yyyy'-'MM'-'dd' 'HH'-'mm'-'ss");
+        }
+
         public static SortedList<Heuristic, string> heuristicLabels =
             new SortedList<Heuristic, string>()
             {

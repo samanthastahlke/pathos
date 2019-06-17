@@ -250,6 +250,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
         //Reset the timescale.
         Time.timeScale = 1.0f;
 
+        PlayerPrefs.SetInt(OGLogManager.overrideFlagId, 0);
+
         DeleteInstantiatedAgents(instantiatedAgents.Count);
         SetSceneAgentsActive(true);
 
@@ -446,6 +448,10 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     agentsLeft = numAgents;
                     loadAgentIndex = 0;
 
+                    PlayerPrefs.SetString(OGLogManager.directoryOverrideId,
+                        "Batch-" + PathOS.UI.GetFormattedTimestamp());
+                    PlayerPrefs.Save();
+
                     if (simultaneous)
                     {
                         FindSceneAgents();
@@ -472,6 +478,9 @@ public class PathOSAgentBatchingWindow : EditorWindow
         {
             if (triggerFrame)
             {
+                PlayerPrefs.SetInt(OGLogManager.overrideFlagId, 1);
+                PlayerPrefs.Save();
+
                 EditorApplication.isPlaying = true;
                 Time.timeScale = timeScale;
                 triggerFrame = false;
@@ -533,6 +542,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
                 SetSceneAgentsActive(true);
                 DeleteInstantiatedAgents(instantiatedAgents.Count);
             }
+
+            PlayerPrefs.SetInt(OGLogManager.overrideFlagId, 0);
         }
 
         wasPlaying = EditorApplication.isPlaying;
