@@ -9,7 +9,7 @@ PathOSAgentRenderer (c) Nine Penguins (Samantha Stahlke) 2018
 */
 
 //Used to draw the in-game overlay for debugging/visualization purposes.
-public class PathOSAgentRenderer : MonoBehaviour 
+public class PathOSAgentRenderer : MonoBehaviour
 {
     public PathOSAgent agent;
 
@@ -75,7 +75,9 @@ public class PathOSAgentRenderer : MonoBehaviour
     public bool showMemoryMap = true;
 
     [Tooltip("The maximum size of the memory map on screen (in pixels)")]
+    [Range(32.0f, 512.0f)]
     public float mapScreenSize = 128;
+    private float oldMapSize;
 
     private Texture navmeshMemoryMap;
     private Rect navmeshMapScreenCoords;
@@ -84,7 +86,10 @@ public class PathOSAgentRenderer : MonoBehaviour
     public bool showPlayerView = true;
 
     [Tooltip("The maximum size of the player view on screen (in pixels)")]
+    [Range(64.0f, 512.0f)]
     public float viewScreenSize = 128;
+    private float oldViewSize;
+    private const int MAX_PLAYER_RENDER_SIZE = 512;
 
     private RenderTexture playerViewTexture;
     private Rect playerViewTextureCoords;
@@ -108,47 +113,28 @@ public class PathOSAgentRenderer : MonoBehaviour
         //Grab a persistent reference to the texture.
         navmeshMemoryMap = agent.memory.memoryMap.GetVisualGrid();
 
-        //Little bit of simple math to constrain the map's size and ensure
-        //it is drawn in the correct location.
-        float navmeshMapAsp = agent.memory.memoryMap.GetAspect();
-        float navmeshMapX = 0.0f, navmeshMapY = 0.0f;
-
-        if(navmeshMapAsp > 1.0f)
-        {
-            navmeshMapX = mapScreenSize;
-            navmeshMapY = navmeshMapX / navmeshMapAsp;
-        }
-        else
-        {
-            navmeshMapY = mapScreenSize;
-            navmeshMapX = navmeshMapY * navmeshMapAsp;
-        }
-
-        navmeshMapScreenCoords = new Rect(0.0f, Screen.height - navmeshMapY, navmeshMapX, navmeshMapY);
-
         //Map legend.
-        Vector2 pos = new Vector2(navmeshMapScreenCoords.x + navmeshMapX + padding, 
-            navmeshMapScreenCoords.y);
-
         mapLegendIcons = new List<Rect>();
         mapLegendLabels = new List<Rect>();
         mapLegendTextures = new Texture2D[mapLegendColors.Length];
 
         for (int i = 0; i < mapLegendColors.Length; ++i)
         {
-            mapLegendIcons.Add(new Rect(pos.x, pos.y, legendSize, legendSize));
-            mapLegendLabels.Add(new Rect(pos.x + legendSize + padding, pos.y, 100.0f, legendSize));
+            mapLegendIcons.Add(new Rect(0.0f, 0.0f, legendSize, legendSize));
+            mapLegendLabels.Add(new Rect());
 
             Texture2D colorTex = new Texture2D(1, 1);
             colorTex.SetPixel(0, 0, mapLegendColors[i]);
             colorTex.Apply();
 
             mapLegendTextures[i] = colorTex;
-
-            pos.y += legendSize + padding;
         }
 
+        UpdateNavmeshMapCoords();
+
         //Gizmo legend.
+        Vector2 pos = Vector2.zero;
+
         pos.x = padding;
         pos.y = padding;
 
@@ -171,6 +157,67 @@ public class PathOSAgentRenderer : MonoBehaviour
 
         if(eyesAspect > 1.0f)
         {
+            playerViewX = MAX_PLAYER_RENDER_SIZE;
+            playerViewY = playerViewX / eyesAspect;
+        }
+        else
+        {
+            playerViewY = MAX_PLAYER_RENDER_SIZE;
+            playerViewX = playerViewY * eyesAspect;
+        }
+
+        playerViewTexture = new RenderTexture((int)playerViewX, 
+            (int)playerViewY, 16);
+
+        eyesCamera.targetTexture = playerViewTexture;
+        eyesCamera.enabled = true;
+
+        UpdateRenderViewCoords();
+    }
+
+    private void UpdateNavmeshMapCoords()
+    {
+        //Little bit of simple math to constrain the map's size and ensure
+        //it is drawn in the correct location.
+        float navmeshMapAsp = agent.memory.memoryMap.GetAspect();
+        float navmeshMapX = 0.0f, navmeshMapY = 0.0f;
+
+        if (navmeshMapAsp > 1.0f)
+        {
+            navmeshMapX = mapScreenSize;
+            navmeshMapY = navmeshMapX / navmeshMapAsp;
+        }
+        else
+        {
+            navmeshMapY = mapScreenSize;
+            navmeshMapX = navmeshMapY * navmeshMapAsp;
+        }
+
+        navmeshMapScreenCoords = new Rect(0.0f, Screen.height - navmeshMapY,
+            navmeshMapX, navmeshMapY);
+
+        //Map legend.
+        Vector2 pos = new Vector2(navmeshMapScreenCoords.x + navmeshMapX + padding,
+            navmeshMapScreenCoords.y);
+
+        for (int i = 0; i < mapLegendColors.Length; ++i)
+        {
+            mapLegendIcons[i] = new Rect(pos.x, pos.y, legendSize, legendSize);
+            mapLegendLabels[i] = new Rect(pos.x + legendSize + padding, pos.y, 100.0f, legendSize);
+
+            pos.y += legendSize + padding;
+        }
+    }
+
+    private void UpdateRenderViewCoords()
+    {
+        Camera eyesCamera = agent.eyes.cam;
+        float eyesAspect = eyesCamera.aspect;
+
+        float playerViewX = 0.0f, playerViewY = 0.0f;
+
+        if (eyesAspect > 1.0f)
+        {
             playerViewX = viewScreenSize;
             playerViewY = playerViewX / eyesAspect;
         }
@@ -180,15 +227,6 @@ public class PathOSAgentRenderer : MonoBehaviour
             playerViewX = playerViewY * eyesAspect;
         }
 
-        playerViewTexture = new RenderTexture((int)playerViewX, 
-            (int)playerViewY, 16);
-
-        if(showPlayerView)
-        {
-            eyesCamera.targetTexture = playerViewTexture;
-            eyesCamera.enabled = true;
-        }
-        
         playerViewTextureCoords = new Rect(Screen.width - playerViewX,
             Screen.height - playerViewY, playerViewX, playerViewY);
     }
@@ -216,6 +254,12 @@ public class PathOSAgentRenderer : MonoBehaviour
         if (!sceneInit)
             return;
 
+        if (oldMapSize != mapScreenSize)
+            UpdateNavmeshMapCoords();
+
+        if (oldViewSize != viewScreenSize)
+            UpdateRenderViewCoords();
+
         if (showMemoryMap)
             GUI.DrawTexture(navmeshMapScreenCoords,
                 navmeshMemoryMap, ScaleMode.ScaleToFit, false);
@@ -238,6 +282,9 @@ public class PathOSAgentRenderer : MonoBehaviour
                 GUI.Label(gizmoLegendLabels[i], gizmoLegendText[i]);
             }
         }
+
+        oldMapSize = mapScreenSize;
+        oldViewSize = viewScreenSize;
     }
 
     private void OnDrawGizmosSelected()

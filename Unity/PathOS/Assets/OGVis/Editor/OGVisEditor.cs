@@ -75,7 +75,6 @@ public class OGVisEditor : Editor
     private string lblInteractionFoldout = "Entity Interactions";
 
     private SerializedProperty propShowEntities;
-    private SerializedProperty propEntityGradient;
     private SerializedProperty propEntityAggregate;
     private SerializedProperty propEntityTimeSlice;
 
@@ -105,7 +104,6 @@ public class OGVisEditor : Editor
         propShowIndividualInteractions = serial.FindProperty("showIndividualInteractions");
 
         propShowEntities = serial.FindProperty("showEntities");
-        propEntityGradient = serial.FindProperty("interactionGradient");
         propEntityAggregate = serial.FindProperty("interactionAggregateActiveOnly");
         propEntityTimeSlice = serial.FindProperty("interactionUseTimeSlice");
 
@@ -357,7 +355,16 @@ public class OGVisEditor : Editor
         {
             EditorGUILayout.PropertyField(propShowEntities);
 
-            EditorGUILayout.PropertyField(propEntityGradient);
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.LabelField("Interaction Gradient", GUILayout.Width(PathOS.UI.longLabelWidth));
+
+            EditorGUILayout.LabelField("Low", GUILayout.Width(PathOS.UI.shortLabelWidth));
+            vis.interactionGradient = EditorGUILayout.GradientField(vis.interactionGradient);
+            EditorGUILayout.LabelField("High", GUILayout.Width(PathOS.UI.mediumLabelWidth));
+
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.PropertyField(propEntityAggregate, toggleAggregateLabel);
             EditorGUILayout.PropertyField(propEntityTimeSlice, toggleTimeSliceLabel);
 

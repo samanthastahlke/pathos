@@ -13,6 +13,8 @@ namespace PathOS
     {
         /* Style Constraints */
         public static float shortLabelWidth = 24.0f;
+        public static float mediumLabelWidth = 36.0f;
+        public static float longLabelWidth = 200.0f;
         public static float shortFloatfieldWidth = 40.0f;
 
         public static Color mapUnknown = Color.black;
