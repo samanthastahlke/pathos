@@ -168,7 +168,7 @@ public class PathOSAgent : MonoBehaviour
             memPathScale);
 
         lookTime = baseLookTime;
-	}
+    }
 
     private void Start()
     {
@@ -379,13 +379,22 @@ public class PathOSAgent : MonoBehaviour
 
             bias += PathOS.Constants.Behaviour.FINAL_GOAL_BONUS_FACTOR;
 
-            //Number of "unvisited" entities reduced by one to account for 
+            //Penalize for number of "unvisited" entities reduced by one to account for 
             //the goal itself - which shouldn't add to its penalty.
-            bias -= Mathf.Min(this.memory.UnvisitedRemaining() - 1, 0)
-                * PathOS.Constants.Behaviour.FINAL_GOAL_EXPLORER_PENALTY_FACTOR;
+            //(Scaled by average of curiosity and completion.)
+            float avgCompletionCuriosity = 0.5f *
+                (heuristicScaleLookup[Heuristic.CURIOSITY] +
+                 heuristicScaleLookup[Heuristic.COMPLETION]);
 
+            bias -= Mathf.Min(this.memory.UnvisitedRemaining() - 1, 0)
+                * PathOS.Constants.Behaviour.FINAL_GOAL_EXPLORATION_PENALTY_FACTOR
+                * avgCompletionCuriosity;
+
+            //Penalize for number of unvisited optional goals left.
+            //(Scaled by achievement).
             bias -= this.memory.AchievementGoalsLeft()
-                * PathOS.Constants.Behaviour.FINAL_GOAL_ACHIEVER_PENALTY_FACTOR;
+                * PathOS.Constants.Behaviour.FINAL_GOAL_ACHIEVEMENT_PENALTY_FACTOR
+                * heuristicScaleLookup[Heuristic.ACHIEVEMENT];
         }
 
         //Initial placeholder bias for preferring the goal we have already set.

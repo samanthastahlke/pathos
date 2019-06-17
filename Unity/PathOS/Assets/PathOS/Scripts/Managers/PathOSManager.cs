@@ -49,7 +49,7 @@ public class PathOSManager : NPSingleton<PathOSManager>
         {EntityType.ET_GOAL_OPTIONAL, "Optional Goal" },
         {EntityType.ET_GOAL_MANDATORY, "Mandatory Goal" },
         {EntityType.ET_GOAL_COMPLETION, "Final Goal" },
-        {EntityType.ET_RESOURCE_ACHIEVEMENT, "Collectable Item" },
+        {EntityType.ET_RESOURCE_ACHIEVEMENT, "Collectible" },
         {EntityType.ET_RESOURCE_PRESERVATION, "Self-Preservation Item (e.g., health)" },
         {EntityType.ET_HAZARD_ENEMY, "Enemy Hazard" },
         {EntityType.ET_HAZARD_ENVIRONMENT, "Environmental Hazard" },

@@ -97,9 +97,9 @@ namespace PathOS
             //Govern the "ending" behaviour of the agent.
             public const float FINAL_GOAL_BONUS_FACTOR = 5.0f;
             //Penalty used to reduce score of the end goal if optional goals remain.
-            public const float FINAL_GOAL_ACHIEVER_PENALTY_FACTOR = 1.0f;
+            public const float FINAL_GOAL_ACHIEVEMENT_PENALTY_FACTOR = 1.0f;
             //Penalty used to reduce score of the end goal for unexplored entities.
-            public const float FINAL_GOAL_EXPLORER_PENALTY_FACTOR = 1.0f;
+            public const float FINAL_GOAL_EXPLORATION_PENALTY_FACTOR = 1.0f;
 
             public const float SCORE_MAX = 10000.0f;
             public const float SCORE_UNCERTAINTY_THRESHOLD = 0.1f;

@@ -9472,7 +9472,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limitSimulationTime: 1
-  maxSimulationTime: 4
+  maxSimulationTime: 90
   endOnCompletionGoal: 1
   showLevelMarkup: 1
   levelEntities:
@@ -11534,6 +11534,16 @@ PrefabInstance:
         type: 3}
       propertyPath: heuristicScales.Array.data[5].scale
       value: 0.0997082
+      objectReference: {fileID: 0}
+    - target: {fileID: 114232718271966738, guid: 607318e5beb058643a9226e07f881723,
+        type: 3}
+      propertyPath: mapScreenSize
+      value: 256
+      objectReference: {fileID: 0}
+    - target: {fileID: 114232718271966738, guid: 607318e5beb058643a9226e07f881723,
+        type: 3}
+      propertyPath: viewScreenSize
+      value: 256
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 607318e5beb058643a9226e07f881723, type: 3}

@@ -89,7 +89,7 @@ namespace PathOS
                 { "Optional Goal",      EntityType.ET_GOAL_OPTIONAL },
                 { "Mandatory Goal",     EntityType.ET_GOAL_MANDATORY },
                 { "Final Goal",         EntityType.ET_GOAL_COMPLETION },
-                { "Collectable",        EntityType.ET_RESOURCE_ACHIEVEMENT },
+                { "Collectible",        EntityType.ET_RESOURCE_ACHIEVEMENT },
                 { "Self-Preservation",  EntityType.ET_RESOURCE_PRESERVATION },
                 { "Enemy",              EntityType.ET_HAZARD_ENEMY },
                 { "Environment Hazard", EntityType.ET_HAZARD_ENVIRONMENT },
