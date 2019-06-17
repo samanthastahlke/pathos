@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using PathOS;
 
 /*
 PathOSAgentBatchingWindow.cs 
@@ -116,6 +117,14 @@ public class PathOSAgentBatchingWindow : EditorWindow
     private Dictionary<PathOS.Heuristic, PathOS.FloatRange> rangeLookup =
         new Dictionary<PathOS.Heuristic, PathOS.FloatRange>();
 
+    private const string customProfile = "Custom...";
+
+    [SerializeField]
+    private string selectedProfile = customProfile;
+
+    private List<string> profileNames = new List<string>();
+    private int profileIndex = 0;
+
     [SerializeField]
     private PathOS.FloatRange rangeExp;
 
@@ -200,6 +209,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
             }
         }
 
+        //For heuristic ranges...
         if (rangeHeuristics.Count != heuristics.Length)
         {
             rangeHeuristics.Clear();
@@ -209,6 +219,13 @@ public class PathOSAgentBatchingWindow : EditorWindow
             }
         }
 
+        //Agent profiles.
+        if (null == PathOSProfileWindow.profiles)
+            PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
+
+        SyncProfileNames();
+
+        //Labels for heuristic fields.
         foreach (PathOS.Heuristic heuristic in heuristics)
         {
             string label = heuristic.ToString();
@@ -354,6 +371,20 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
             case HeuristicMode.RANGE:
 
+                if (null == PathOSProfileWindow.profiles)
+                    PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
+
+                SyncProfileNames();
+
+                EditorGUI.BeginChangeCheck();
+                profileIndex = EditorGUILayout.Popup("Profile: ", profileIndex, profileNames.ToArray());
+                selectedProfile = profileNames[profileIndex];
+
+                if (EditorGUI.EndChangeCheck()
+                    && profileIndex < PathOSProfileWindow.profiles.Count)
+                    LoadProfile(PathOSProfileWindow.profiles[profileIndex]);
+
+                EditorGUI.BeginChangeCheck();
                 EditorGUILayout.BeginHorizontal();
 
                 EditorGUILayout.MinMaxSlider("Experience Scale",
@@ -394,6 +425,12 @@ public class PathOSAgentBatchingWindow : EditorWindow
                         GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
 
                     EditorGUILayout.EndHorizontal();
+                }
+
+                if(EditorGUI.EndChangeCheck())
+                {
+                    selectedProfile = customProfile;
+                    profileIndex = profileNames.Count - 1;
                 }
 
                 break;
@@ -547,6 +584,43 @@ public class PathOSAgentBatchingWindow : EditorWindow
         }
 
         wasPlaying = EditorApplication.isPlaying;
+    }
+
+    private void LoadProfile(AgentProfile profile)
+    {
+        Dictionary<Heuristic, FloatRange> profileLookup =
+            new Dictionary<Heuristic, FloatRange>();
+
+        foreach (HeuristicRange hr in profile.heuristicRanges)
+        {
+            profileLookup.Add(hr.heuristic, hr.range);
+        }
+
+        for (int i = 0; i < rangeHeuristics.Count; ++i)
+        {
+            if (profileLookup.ContainsKey(rangeHeuristics[i].heuristic))
+            {
+                FloatRange range = profileLookup[rangeHeuristics[i].heuristic];
+                rangeHeuristics[i].range = range;
+            }
+        }
+
+        rangeExp = profile.expRange;
+    }
+
+    private void SyncProfileNames()
+    {
+        profileNames.Clear();
+
+        for (int i = 0; i < PathOSProfileWindow.profiles.Count; ++i)
+        {
+            profileNames.Add(PathOSProfileWindow.profiles[i].name);
+        }
+
+        profileNames.Add(customProfile);
+
+        int nameIndex = profileNames.FindIndex(name => name == selectedProfile);
+        profileIndex = (nameIndex >= 0) ? nameIndex : profileNames.Count - 1;
     }
 
     private bool LoadHeuristics()
