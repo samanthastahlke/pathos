@@ -45,15 +45,12 @@ public class PathOSAgentRenderer : MonoBehaviour
 
     private Texture2D blankLegendTex;
 
-    [Header("Icon Gizmos")]
-    public float iconSize = 24.0f;
-    private string iconExtension = ".png";
-
     //Gizmo/legend textures.
     private string eyeTex = "eyecon";
     private string targetTex = "target";
     private string visitTex = "visited";
     private string memoryTex = "brain";
+    private string iconExtension = ".png";
 
     private Texture[] gizmoLegendTextures;
 

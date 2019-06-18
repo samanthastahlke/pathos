@@ -44,7 +44,6 @@ public class OGVisEditor : Editor
     private static bool heatmapFoldout = false;
     private string lblHeatmapFoldout = "Heatmap";
 
-    private SerializedProperty propHeatmapGradient;
     private SerializedProperty propHeatmapAlpha;
     private SerializedProperty propHeatmapTileSize;
 
@@ -94,7 +93,6 @@ public class OGVisEditor : Editor
 
         propDisplayHeight = serial.FindProperty("displayHeight");
 
-        propHeatmapGradient = serial.FindProperty("heatmapGradient");
         propHeatmapAlpha = serial.FindProperty("heatmapAlpha");
         propHeatmapTileSize = serial.FindProperty("tileSize");
         propHeatmapAggregate = serial.FindProperty("heatmapAggregateActiveOnly");
@@ -311,7 +309,16 @@ public class OGVisEditor : Editor
             if (EditorGUI.EndChangeCheck())
                 vis.UpdateHeatmapVisibility();
 
-            EditorGUILayout.PropertyField(propHeatmapGradient);
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.LabelField("Heatmap Colours", GUILayout.Width(PathOS.UI.longLabelWidth));
+
+            EditorGUILayout.LabelField("Low", GUILayout.Width(PathOS.UI.shortLabelWidth));
+            vis.heatmapGradient = EditorGUILayout.GradientField(vis.heatmapGradient);
+            EditorGUILayout.LabelField("High", GUILayout.Width(PathOS.UI.mediumLabelWidth));
+
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.PropertyField(propHeatmapAlpha);
             EditorGUILayout.PropertyField(propHeatmapTileSize);
             EditorGUILayout.PropertyField(propHeatmapAggregate, toggleAggregateLabel);
@@ -402,7 +409,9 @@ public class OGVisEditor : Editor
                         Handles.DrawAAPolyLine(polylinetex, OGLogVisualizer.PATH_WIDTH, points);
                     }
 
-                    if (vis.showIndividualInteractions)
+                    //Individual interactions are only shown if aggregate interactions
+                    //are hidden (to prevent overlap).
+                    if (vis.showIndividualInteractions && !vis.showEntities)
                     {
                         for (int i = 0; i < pLog.interactionEvents.Count; ++i)
                         {

@@ -32,7 +32,8 @@ public class PathOSWorldCamera : MonoBehaviour
             lastCursor = Input.mousePosition; 
         }
 
-        if (Input.GetMouseButton(0))
+        //Left click (0) or middle click (2) can be used for panning.
+        if (Input.GetMouseButton(0) || Input.GetMouseButton(2))
             mouseDelta = Input.mousePosition - lastCursor;
         else
             mouseDelta = Vector3.zero;

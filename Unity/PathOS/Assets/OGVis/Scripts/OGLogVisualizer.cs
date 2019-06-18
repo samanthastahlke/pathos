@@ -36,6 +36,7 @@ public class OGLogVisualizer : MonoBehaviour
     public bool showIndividualPaths;
     
     //Interaction event settings.
+    [DisplayName("Show Aggregate Interactions")]
     public bool showEntities;
     public Gradient interactionGradient;
     public bool interactionAggregateActiveOnly = false;
