@@ -216,7 +216,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1161359580709621224}
   - component: {fileID: 1267894906983085284}
-  - component: {fileID: 1262832464806249030}
   - component: {fileID: 1158326485731816522}
   m_Layer: 0
   m_Name: Mushroom 3
@@ -232,7 +231,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1159636106300014848}
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
+  m_LocalRotation: {x: 0, y: 1, z: -0, w: -0.0000001872535}
   m_LocalPosition: {x: 13.71, y: 0.5, z: -3.272}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children:
@@ -261,18 +260,6 @@ Animation:
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
   m_CullingType: 1
---- !u!114 &1262832464806249030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1159636106300014848}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87f998754931e6249a29867bfd98ab6c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &1158326485731816522
 BoxCollider:
   m_ObjectHideFlags: 0
