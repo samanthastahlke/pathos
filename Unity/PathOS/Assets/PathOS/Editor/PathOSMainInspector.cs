@@ -93,10 +93,18 @@ public class PathOSMainInspector : Editor
                 style.fixedWidth = 32.0f;
             }
 
+            style = EditorStyles.miniButton;
+            style.fixedHeight = 32.0f;
+            style.fixedWidth = 32.0f;
+
             GUILayout.BeginHorizontal();
 
             active = GUILayout.Toggle(active, content, style);
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
             GUILayout.Label(label);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
 
             GUILayout.EndHorizontal();
 
