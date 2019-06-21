@@ -9,9 +9,10 @@ PathOSAgentRenderer (c) Nine Penguins (Samantha Stahlke) 2018
 */
 
 //Used to draw the in-game overlay for debugging/visualization purposes.
+[RequireComponent(typeof(PathOSAgent))]
 public class PathOSAgentRenderer : MonoBehaviour
 {
-    public PathOSAgent agent;
+    private PathOSAgent agent;
 
     //Legend.
     public bool showLegend = false;
@@ -97,6 +98,8 @@ public class PathOSAgentRenderer : MonoBehaviour
 
     private void Start()
     {
+        agent = GetComponent<PathOSAgent>();
+
         transformCam = Camera.main;
         sceneInit = true;
 
@@ -230,6 +233,12 @@ public class PathOSAgentRenderer : MonoBehaviour
 
     private void Update()
     {
+
+#if UNITY_EDITOR
+        if (Selection.activeGameObject != gameObject)
+            return;
+#endif
+
         if(Input.GetKeyDown(KeyCode.Space))
         {
             showLegend = !showLegend;
@@ -248,6 +257,12 @@ public class PathOSAgentRenderer : MonoBehaviour
 
     private void OnGUI()
     {
+
+#if UNITY_EDITOR
+        if (Selection.activeGameObject != gameObject)
+            return;
+#endif
+
         if (!sceneInit)
             return;
 
@@ -286,6 +301,12 @@ public class PathOSAgentRenderer : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
+
+#if UNITY_EDITOR
+        if (Selection.activeGameObject != gameObject)
+            return;
+#endif
+
         if (!sceneInit)
             return;
 

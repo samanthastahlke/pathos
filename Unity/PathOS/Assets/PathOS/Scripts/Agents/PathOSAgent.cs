@@ -28,7 +28,7 @@ public class PathOSAgent : MonoBehaviour
 
     //Used for testing.
     public bool freezeAgent;
-    public bool verboseDebugging = false;
+    private bool verboseDebugging = false;
 
     /* PLAYER CHARACTERISTICS */
 

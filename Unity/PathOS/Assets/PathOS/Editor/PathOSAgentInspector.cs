@@ -26,7 +26,6 @@ public class PathOSAgentInspector : Editor
     private bool showPlayerCharacteristics = true;
 
     private SerializedProperty freezeAgent;
-    private SerializedProperty verboseDebugging;
 
     private bool showNavCharacteristics = false;
 
@@ -51,7 +50,6 @@ public class PathOSAgentInspector : Editor
         heuristicList = serial.FindProperty("heuristicScales");
 
         freezeAgent = serial.FindProperty("freezeAgent");
-        verboseDebugging = serial.FindProperty("verboseDebugging");
 
         exploreDegrees = serial.FindProperty("exploreDegrees");
         invisibleExploreDegrees = serial.FindProperty("invisibleExploreDegrees");
@@ -88,7 +86,6 @@ public class PathOSAgentInspector : Editor
         EditorGUILayout.LabelField("General", EditorStyles.boldLabel);
 
         EditorGUILayout.PropertyField(freezeAgent);
-        EditorGUILayout.PropertyField(verboseDebugging);
 
         showPlayerCharacteristics = EditorGUILayout.Foldout(
             showPlayerCharacteristics, "Player Characteristics", foldoutStyle);
