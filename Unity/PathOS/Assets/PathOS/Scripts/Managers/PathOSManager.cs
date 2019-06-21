@@ -70,9 +70,9 @@ public class PathOSManager : NPSingleton<PathOSManager>
                 levelEntities.RemoveAt(i);
                 continue;
             }
-            
+
             //Grab renderers for object visibility checks by the agent.
-            levelEntities[i].rend = levelEntities[i].objectRef.GetComponentInChildren<Renderer>();
+            levelEntities[i].FetchRenderers();
         }
 
         simulationEnded = false;

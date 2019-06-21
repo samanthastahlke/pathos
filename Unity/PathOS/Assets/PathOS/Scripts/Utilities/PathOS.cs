@@ -194,7 +194,10 @@ namespace PathOS
 
         public GameObject objectRef;
         public EntityType entityType;
-        public Renderer rend { get; set; }
+
+        private List<Renderer> rend;
+        public Bounds bounds { get; private set; }
+        private bool initBounds = false;
 
         //Simulates compass/map availability.
         public bool alwaysKnown;
@@ -205,6 +208,41 @@ namespace PathOS
             name = objectRef.name;
 
             this.entityType = entityType;
+        }
+
+        public void FetchRenderers()
+        {
+            rend = new List<Renderer>();
+            rend.AddRange(objectRef.GetComponentsInChildren<Renderer>());
+
+            bounds = new Bounds();
+            UpdateBounds();
+        }
+
+        public void UpdateBounds()
+        {
+            if (initBounds && objectRef.isStatic)
+                return;
+
+            Bounds tempBounds = new Bounds();
+
+            if (rend.Count > 0)
+            {
+                tempBounds = rend[0].bounds;
+
+                for (int i = 1; i < rend.Count; ++i)
+                {
+                    tempBounds.Encapsulate(rend[i].bounds);
+                }
+            }
+            else
+            {
+                bounds.SetMinMax(objectRef.transform.position,
+                    objectRef.transform.position);
+            }
+
+            bounds = tempBounds;
+            initBounds = true;
         }
     }
 

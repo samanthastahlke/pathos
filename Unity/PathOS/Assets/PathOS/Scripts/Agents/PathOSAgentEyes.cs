@@ -65,8 +65,7 @@ public class PathOSAgentEyes : MonoBehaviour
             Vector3 entityVecXZ = entityPos - cam.transform.position;
             entityVecXZ.y = 0.0f;
 
-            if (entity.rend != null)
-                perceptionInfo.Add(new PerceivedEntity(entity));
+            perceptionInfo.Add(new PerceivedEntity(entity));
         }
 
         boundsCheck = new Vector3[8];
@@ -102,9 +101,11 @@ public class PathOSAgentEyes : MonoBehaviour
 
             //Visibility check - this can change between checks as the agent
             //moves around.
+            entity.entityRef.UpdateBounds();
+
             entity.visible = Vector3.Dot(camForwardXZ, entityVecXZ) > 0
-                && GeometryUtility.TestPlanesAABB(frustum, entity.entityRef.rend.bounds)
-                && RaycastVisibilityCheck(entity.entityRef.rend.bounds, entityPos);
+                && GeometryUtility.TestPlanesAABB(frustum, entity.entityRef.bounds)
+                && RaycastVisibilityCheck(entity.entityRef.bounds, entityPos);
 
             if (wasVisible != entity.visible)
             {
