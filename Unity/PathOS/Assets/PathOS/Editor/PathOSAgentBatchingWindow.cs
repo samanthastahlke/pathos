@@ -221,7 +221,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         //Agent profiles.
         if (null == PathOSProfileWindow.profiles)
-            PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
+            PathOSProfileWindow.ReadPrefsData();
 
         SyncProfileNames();
 
@@ -372,7 +372,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
             case HeuristicMode.RANGE:
 
                 if (null == PathOSProfileWindow.profiles)
-                    PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
+                    PathOSProfileWindow.ReadPrefsData();
 
                 SyncProfileNames();
 

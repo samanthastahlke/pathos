@@ -71,7 +71,7 @@ public class PathOSAgentInspector : Editor
         }
 
         if(null == PathOSProfileWindow.profiles)
-            PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
+            PathOSProfileWindow.ReadPrefsData();
     }
 
     public override void OnInspectorGUI()
@@ -107,8 +107,8 @@ public class PathOSAgentInspector : Editor
             profileNames.Clear();
 
             if (null == PathOSProfileWindow.profiles)
-                PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
-
+                PathOSProfileWindow.ReadPrefsData();
+  
             for(int i = 0; i < PathOSProfileWindow.profiles.Count; ++i)
             {
                 profileNames.Add(PathOSProfileWindow.profiles[i].name);

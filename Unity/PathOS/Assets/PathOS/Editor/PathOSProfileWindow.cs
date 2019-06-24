@@ -34,7 +34,7 @@ public class PathOSProfileWindow : EditorWindow
     private void OnEnable()
     {
         profiles = new List<AgentProfile>();
-        profiles = ReadPrefsData();
+        ReadPrefsData();
 
         if (profileIndex < profiles.Count)
             curProfile.Copy(profiles[profileIndex]);
@@ -50,13 +50,13 @@ public class PathOSProfileWindow : EditorWindow
         WritePrefsData();
     }
 
-    private void WritePrefsData()
+    private static void WritePrefsData()
     {
         string prefsData = GetProfileString();
         EditorPrefs.SetString(editorPrefsID, prefsData);
     }
 
-    private string GetProfileString()
+    private static string GetProfileString()
     {
         string profileJson = "";
 
@@ -69,10 +69,25 @@ public class PathOSProfileWindow : EditorWindow
         return profileJson;
     }
 
-    public static List<AgentProfile> ReadPrefsData()
+    public static void ReadPrefsData()
     {
-        string prefsData = EditorPrefs.GetString(editorPrefsID);
-        return ReadProfileString(prefsData);
+        if(EditorPrefs.HasKey(editorPrefsID))
+        {
+            string prefsData = EditorPrefs.GetString(editorPrefsID);
+            profiles = ReadProfileString(prefsData);
+        }
+        else
+        {
+            Debug.Log("No PathOS profile data found in Editor preferences. Loading defaults...");
+            profiles = new List<AgentProfile>();
+
+            string defaultPrefsFile = Application.dataPath
+                + "/PathOS/Settings/default-profiles.profiles";
+
+            LoadProfilesFromFile(defaultPrefsFile);
+
+            WritePrefsData();
+        }
     }
 
     private static List<AgentProfile> ReadProfileString(string json)
@@ -93,7 +108,7 @@ public class PathOSProfileWindow : EditorWindow
         return result;
     }
 
-    private void LoadProfilesFromFile(string path)
+    private static void LoadProfilesFromFile(string path)
     {
         if (path == "")
             return;
