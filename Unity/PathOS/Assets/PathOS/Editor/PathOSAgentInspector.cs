@@ -107,10 +107,7 @@ public class PathOSAgentInspector : Editor
             profileNames.Clear();
 
             if (null == PathOSProfileWindow.profiles)
-            {
-                Debug.Log("reload profiles");
                 PathOSProfileWindow.profiles = PathOSProfileWindow.ReadPrefsData();
-            }
 
             for(int i = 0; i < PathOSProfileWindow.profiles.Count; ++i)
             {
