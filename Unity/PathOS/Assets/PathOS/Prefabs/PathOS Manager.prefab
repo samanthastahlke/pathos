@@ -59,33 +59,33 @@ MonoBehaviour:
     - entype: 100
       weight: 0
     - entype: 110
-      weight: 0
+      weight: 0.1
     - entype: 120
-      weight: 0
+      weight: 0.1
     - entype: 150
       weight: 0
     - entype: 160
       weight: 0
     - entype: 200
-      weight: 0
+      weight: 0.1
     - entype: 250
-      weight: 0
+      weight: 0.1
     - entype: 300
-      weight: 1
+      weight: 0.9
     - entype: 350
-      weight: 1
+      weight: 0.9
   - heuristic: 10
     weights:
     - entype: 0
       weight: 0
     - entype: 100
-      weight: 1
+      weight: 0.5
     - entype: 110
-      weight: 1
+      weight: 0.2
     - entype: 120
-      weight: 1
+      weight: 0.2
     - entype: 150
-      weight: 1
+      weight: 0.5
     - entype: 160
       weight: 0
     - entype: 200
@@ -101,23 +101,23 @@ MonoBehaviour:
     - entype: 0
       weight: 0
     - entype: 100
-      weight: 1
+      weight: 0.5
     - entype: 110
-      weight: 1
+      weight: 0.2
     - entype: 120
-      weight: 0
+      weight: 0.2
     - entype: 150
-      weight: 1
+      weight: 0.5
     - entype: 160
-      weight: 1
+      weight: 0
     - entype: 200
-      weight: 0
+      weight: 0.2
     - entype: 250
-      weight: 0
+      weight: 0.1
     - entype: 300
-      weight: 0
+      weight: 0.1
     - entype: 350
-      weight: 0
+      weight: 0.1
   - heuristic: 20
     weights:
     - entype: 0
@@ -131,11 +131,11 @@ MonoBehaviour:
     - entype: 150
       weight: 0
     - entype: 160
-      weight: 0
+      weight: 0.1
     - entype: 200
       weight: 1
     - entype: 250
-      weight: 1
+      weight: 0.3
     - entype: 300
       weight: 0
     - entype: 350
@@ -153,9 +153,9 @@ MonoBehaviour:
     - entype: 150
       weight: 0
     - entype: 160
-      weight: 0
+      weight: 0.1
     - entype: 200
-      weight: 1
+      weight: 0.7
     - entype: 250
       weight: 1
     - entype: 300
@@ -175,11 +175,11 @@ MonoBehaviour:
     - entype: 150
       weight: 0
     - entype: 160
-      weight: 1
+      weight: 0.8
     - entype: 200
       weight: -1
     - entype: 250
-      weight: -1
+      weight: -0.5
     - entype: 300
       weight: 0
     - entype: 350
@@ -191,9 +191,9 @@ MonoBehaviour:
     - entype: 100
       weight: 0
     - entype: 110
-      weight: 1
+      weight: 0.5
     - entype: 120
-      weight: 1
+      weight: 0.5
     - entype: 150
       weight: 0
     - entype: 160

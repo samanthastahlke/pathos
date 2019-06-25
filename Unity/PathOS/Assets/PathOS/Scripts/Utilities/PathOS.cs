@@ -193,6 +193,8 @@ namespace PathOS
         public string name;
 
         public GameObject objectRef;
+
+        [EntityDisplay]
         public EntityType entityType;
 
         private List<Renderer> rend;

@@ -84,6 +84,20 @@ namespace PathOS
                 { EntityType.ET_POI_NPC,                "NPC" }
             };
 
+        public static string[] entityPopupList =
+        {
+            entityLabels[EntityType.ET_NONE],
+            entityLabels[EntityType.ET_GOAL_OPTIONAL],
+            entityLabels[EntityType.ET_GOAL_MANDATORY],
+            entityLabels[EntityType.ET_GOAL_COMPLETION],
+            entityLabels[EntityType.ET_RESOURCE_ACHIEVEMENT],
+            entityLabels[EntityType.ET_RESOURCE_PRESERVATION],
+            entityLabels[EntityType.ET_HAZARD_ENEMY],
+            entityLabels[EntityType.ET_HAZARD_ENVIRONMENT],
+            entityLabels[EntityType.ET_POI],
+            entityLabels[EntityType.ET_POI_NPC]
+        };
+
         public static Dictionary<string, EntityType> entityLookup =
             new Dictionary<string, EntityType>()
             {

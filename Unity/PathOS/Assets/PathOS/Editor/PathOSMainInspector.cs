@@ -330,7 +330,12 @@ public class PathOSMainInspector : Editor
                 string importPath = EditorUtility.OpenFilePanel("Import Weights...", Application.dataPath, "csv");
 
                 Undo.RecordObject(manager, "Import Motive Weights");
-                manager.ImportWeights(importPath);
+
+                if(manager.ImportWeights(importPath))
+                {
+                    EditorUtility.SetDirty(manager);
+                    EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+                }
             }
         }
 
