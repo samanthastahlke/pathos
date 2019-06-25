@@ -1298,14 +1298,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4905807406101670}
-  - component: {fileID: 626367637}
   - component: {fileID: 195686920623355856}
   - component: {fileID: 114084877281343334}
   - component: {fileID: 114482611139781848}
   - component: {fileID: 114839472988384982}
   - component: {fileID: 114232718271966738}
   m_Layer: 2
-  m_Name: ProxyAgent
+  m_Name: PathOS Agent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1320,7 +1319,7 @@ Transform:
   m_GameObject: {fileID: 1088327799159616}
   m_LocalRotation: {x: 0, y: -0.3710924, z: 0, w: 0.92859596}
   m_LocalPosition: {x: 14.506544, y: -0.35800004, z: -21.092281}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 4264792810611208}
   - {fileID: 324569357}
@@ -1328,25 +1327,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -43.566, z: 0}
---- !u!95 &626367637
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1088327799159616}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 45d480461bbdc704587e117329ce8e69, type: 3}
-  m_Controller: {fileID: 9100000, guid: f297797635a2b7445ad2ea55cec7353b, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!195 &195686920623355856
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1381,33 +1361,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06ce937a59a90e74fba6431216287456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  memory: {fileID: 114482611139781848}
-  eyes: {fileID: 114839472988384982}
   freezeAgent: 0
-  verboseDebugging: 0
-  experienceScale: 0.8958492
+  experienceScale: 0
   heuristicScales:
   - heuristic: 0
-    scale: 0.46291953
+    scale: 0
   - heuristic: 10
-    scale: 0.06646037
+    scale: 1
   - heuristic: 15
-    scale: 0.66666424
+    scale: 0
   - heuristic: 20
-    scale: 0.10239816
+    scale: 0
   - heuristic: 25
-    scale: 0.13247943
+    scale: 0
   - heuristic: 30
-    scale: 0.27551514
+    scale: 0
   - heuristic: 35
-    scale: 0.24166322
-  routeComputeTime: 0.5
-  perceptionComputeTime: 0.1
+    scale: 0
+  visitThreshold: 1
   exploreDegrees: 5
   invisibleExploreDegrees: 30
   lookDegrees: 60
-  visitThreshold: 1
-  exploreSimilarityThreshold: 2
+  exploreThreshold: 2
+  exploreTargetMargin: 25
 --- !u!114 &114482611139781848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1420,15 +1396,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79551727de4d2a64eb4ea3de338c3952, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 114084877281343334}
-  autogenerateMapExtents: 0
-  navmeshBounds:
-    min: {x: -30, y: 0, z: -30}
-    max: {x: 30, y: 0, z: 30}
-  worldExtentRadius: 200
-  worldBorderMargin: 25
   gridSampleSize: 2
-  gridSampleElevation: 8
+  navmeshBounds:
+    min: {x: -55, y: 0, z: -55}
+    max: {x: 55, y: 0, z: 55}
 --- !u!114 &114839472988384982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1441,10 +1412,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3890f8a556a7e8e4b8d9549dce289ad9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 114084877281343334}
-  navmeshCastDistance: 50
-  navmeshCastHeight: 5
   cam: {fileID: 20951506076577970}
+  navmeshCastDistance: 50
+  navmeshCastHeight: 0.75
 --- !u!114 &114232718271966738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1457,18 +1427,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c29783a4c9f62e4bbd64441fbb4b1e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 114084877281343334}
   showLegend: 0
-  iconSize: 24
-  iconExtension: .png
-  eyecon: {fileID: 2800000, guid: cc97256feea8747499af671fcfa34f97, type: 3}
-  targetIcon: {fileID: 2800000, guid: 363db2b515d434048878357880428af1, type: 3}
-  visitedIcon: {fileID: 2800000, guid: 810ea2e51d38c494ea2838cc3a5c24ed, type: 3}
-  memoryIcon: {fileID: 2800000, guid: 30a7dfa6cfb65ce40a8398d054b67f49, type: 3}
-  showNavmeshMemoryMap: 1
-  navmeshMapScreenMaxSize: 256
+  showMemoryMap: 1
+  mapScreenSize: 256
   showPlayerView: 1
-  playerViewScreenMaxSize: 256
+  viewScreenSize: 256
 --- !u!1 &1218624666145408
 GameObject:
   m_ObjectHideFlags: 0
@@ -1494,7 +1457,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1218624666145408}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0.019, y: 0.75, z: 0.155}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4905807406101670}

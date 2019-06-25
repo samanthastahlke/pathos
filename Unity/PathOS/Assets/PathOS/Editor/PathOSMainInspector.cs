@@ -369,6 +369,8 @@ public class PathOSMainInspector : Editor
                     if (selection != null)
                     {
                         Undo.RecordObject(manager, "Edit Level Markup");
+                        EditorUtility.SetDirty(manager);
+                        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
 
                         int selectedID = selection.GetInstanceID();
 
