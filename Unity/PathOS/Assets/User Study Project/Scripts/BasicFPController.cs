@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
+BasicFPController.cs 
+BasicFPController (c) Nine Penguins (Samantha Stahlke) 2019
+
+Simple camera and character controller for PathOS user demo.
 */
 
 public class BasicFPController : MonoBehaviour
@@ -43,6 +47,7 @@ public class BasicFPController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
             ToggleCursor();
 
+        //Only control the camera if the user has locked the cursor.
         if (cursorLocked)
         {
             Vector3 mouse = new Vector3(Input.GetAxis("Mouse X"),

@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+OGVis.cs
+OGVis (c) Ominous Games 2019
+*/
+
 namespace OGVis
 {
     //Utility class for defining custom scales.

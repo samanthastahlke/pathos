@@ -33,7 +33,10 @@ public class PathOSAgentBatchingWindow : EditorWindow
     [SerializeField]
     private int numAgents;
 
-    //Simulating multiple agents simultaneously.
+    [SerializeField]
+    private float timeScale = 1.0f;
+
+    /* For Simulataneous Simulation */
     [SerializeField]
     private bool simultaneousProperty = false;
     private bool simultaneous = false;
@@ -48,6 +51,9 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
     private bool validPrefabFile = false;
 
+    //Unity can lose our reference to the in-scene agent in between
+    //edit mode and playmode. Here, we use the instance ID, which persists
+    //between modes, to ensure we keep our reference during successive runs.
     [System.Serializable]
     private class RuntimeAgentReference
     {
@@ -76,9 +82,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
     //Max number of agents to be simulated simultaneously.
     private const int MAX_AGENTS_SIMULTANEOUS = 8;
 
-    [SerializeField]
-    private float timeScale = 1.0f;
-
+    /* Motive Configuration */
     public enum HeuristicMode
     {
         FIXED = 0,
@@ -93,7 +97,6 @@ public class PathOSAgentBatchingWindow : EditorWindow
         "Load from File"
     };
 
-    /* Behaviour Customization */
     [SerializeField]
     private HeuristicMode heuristicMode;
 
@@ -128,7 +131,6 @@ public class PathOSAgentBatchingWindow : EditorWindow
     [SerializeField]
     private PathOS.FloatRange rangeExp;
 
-    //TODO: Implementation for loading a series of agents from a file.
     [SerializeField]
     private string loadHeuristicsFile = "--";
 
@@ -385,46 +387,16 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     LoadProfile(PathOSProfileWindow.profiles[profileIndex]);
 
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.BeginHorizontal();
 
-                EditorGUILayout.MinMaxSlider("Experience Scale",
-                    ref rangeExp.min, ref rangeExp.max, 0.0f, 1.0f);
-
-                rangeExp.min = EditorGUILayout.FloatField(
-                    PathOS.UI.RoundFloatfield(rangeExp.min), 
-                    GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
-
-                EditorGUILayout.LabelField("<->", 
-                    GUILayout.Width(PathOS.UI.shortLabelWidth));
-
-                rangeExp.max = EditorGUILayout.FloatField(
-                    PathOS.UI.RoundFloatfield(rangeExp.max), 
-                    GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
-
-                EditorGUILayout.EndHorizontal();
+                PathOS.EditorUI.FullMinMaxSlider("Experience Scale",
+                    ref rangeExp.min, ref rangeExp.max);
 
                 for (int i = 0; i < rangeHeuristics.Count; ++i)
                 {
-                    EditorGUILayout.BeginHorizontal();
-
-                    EditorGUILayout.MinMaxSlider(
+                    PathOS.EditorUI.FullMinMaxSlider(
                         heuristicLabels[rangeHeuristics[i].heuristic],
                         ref rangeHeuristics[i].range.min,
-                        ref rangeHeuristics[i].range.max,
-                        0.0f, 1.0f);
-
-                    rangeHeuristics[i].range.min = EditorGUILayout.FloatField(
-                        PathOS.UI.RoundFloatfield(rangeHeuristics[i].range.min), 
-                        GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
-
-                    EditorGUILayout.LabelField("<->", 
-                        GUILayout.Width(PathOS.UI.shortLabelWidth));
-
-                    rangeHeuristics[i].range.max = EditorGUILayout.FloatField(
-                        PathOS.UI.RoundFloatfield(rangeHeuristics[i].range.max), 
-                        GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
-
-                    EditorGUILayout.EndHorizontal();
+                        ref rangeHeuristics[i].range.max);
                 }
 
                 if(EditorGUI.EndChangeCheck())

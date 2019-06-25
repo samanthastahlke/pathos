@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+CollectibleAnimator.cs 
+CollectibleAnimator (c) Nine Penguins (Samantha Stahlke) 2019
+
+Simple animator for PathOS user demo.
+*/
+
 public class CollectibleAnimator : MonoBehaviour
 {
     public float ySpinSpeed = 0.0f;

@@ -208,49 +208,15 @@ public class PathOSProfileWindow : EditorWindow
         {
             curProfile.name = EditorGUILayout.TextField("Profile Name:", curProfile.name);
 
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.MinMaxSlider("Experience Scale",
-                ref curProfile.expRange.min, ref curProfile.expRange.max,
-                0.0f, 1.0f);
-
-            curProfile.expRange.min = EditorGUILayout.FloatField(
-                UI.RoundFloatfield(curProfile.expRange.min),
-                GUILayout.Width(UI.shortFloatfieldWidth));
-
-            EditorGUILayout.LabelField("<->",
-                GUILayout.Width(UI.shortLabelWidth));
-
-            curProfile.expRange.max = EditorGUILayout.FloatField(
-                UI.RoundFloatfield(curProfile.expRange.max),
-                GUILayout.Width(UI.shortFloatfieldWidth));
-
-            EditorGUILayout.EndHorizontal();
+            PathOS.EditorUI.FullMinMaxSlider("Experience Scale",
+                ref curProfile.expRange.min, ref curProfile.expRange.max);
 
             for (int i = 0; i < curProfile.heuristicRanges.Count; ++i)
             {
-                EditorGUILayout.BeginHorizontal();
-
                 HeuristicRange hr = curProfile.heuristicRanges[i];
 
-                EditorGUILayout.MinMaxSlider(
-                    UI.heuristicLabels[hr.heuristic],
-                    ref hr.range.min,
-                    ref hr.range.max,
-                    0.0f, 1.0f);
-
-                hr.range.min = EditorGUILayout.FloatField(
-                    UI.RoundFloatfield(hr.range.min),
-                    GUILayout.Width(UI.shortFloatfieldWidth));
-
-                EditorGUILayout.LabelField("<->",
-                    GUILayout.Width(UI.shortLabelWidth));
-
-                hr.range.max = EditorGUILayout.FloatField(
-                    UI.RoundFloatfield(hr.range.max),
-                    GUILayout.Width(UI.shortFloatfieldWidth));
-
-                EditorGUILayout.EndHorizontal();
+                PathOS.EditorUI.FullMinMaxSlider(UI.heuristicLabels[hr.heuristic],
+                    ref hr.range.min, ref hr.range.max);
             }
 
             if (GUILayout.Button("Apply Changes"))

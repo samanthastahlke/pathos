@@ -6,7 +6,7 @@ using PathOS;
 
 /*
 PathOSAgentEyes.cs 
-PathOSAgentEyes (c) Nine Penguins (Samantha Stahlke) 2018
+PathOSAgentEyes (c) Nine Penguins (Samantha Stahlke) 2018-19
 */
 
 [RequireComponent(typeof(PathOSAgent))]

@@ -167,26 +167,11 @@ public class OGVisEditor : Editor
 
         if(filterFoldout)
         {
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.MinMaxSlider("Time Range",
+            PathOS.EditorUI.FullMinMaxSlider("Time Range",
                 ref vis.displayTimeRange.min,
                 ref vis.displayTimeRange.max,
                 vis.fullTimeRange.min,
                 vis.fullTimeRange.max);
-
-            vis.displayTimeRange.min = EditorGUILayout.FloatField(
-                PathOS.UI.RoundFloatfield(vis.displayTimeRange.min),
-                GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
-
-            EditorGUILayout.LabelField("<->",
-                    GUILayout.Width(PathOS.UI.shortLabelWidth));
-
-            vis.displayTimeRange.max = EditorGUILayout.FloatField(
-                PathOS.UI.RoundFloatfield(vis.displayTimeRange.max),
-                GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
-
-            EditorGUILayout.EndHorizontal();
 
             if (GUILayout.Button("Apply Time Range"))
                 vis.ApplyDisplayRange();
@@ -220,7 +205,8 @@ public class OGVisEditor : Editor
                     pLog.pathColor, false, false, false, GUILayout.Width(16.0f));
 
                 oldFilter = pLog.visInclude;
-                pLog.visInclude = GUILayout.Toggle(pLog.visInclude, pLog.playerID);
+                pLog.visInclude = GUILayout.Toggle(pLog.visInclude, "", GUILayout.Width(16.0f));
+                pLog.playerID = EditorGUILayout.TextField(pLog.playerID);
 
                 if (oldFilter != pLog.visInclude)
                     refreshFilter = true;
