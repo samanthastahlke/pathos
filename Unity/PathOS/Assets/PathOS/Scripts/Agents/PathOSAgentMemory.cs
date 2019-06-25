@@ -102,7 +102,7 @@ public class PathOSAgentMemory : MonoBehaviour
             //Flag an entity as visited if we pass by in close range.
             //Inelegant brute-force to prevent "accidental" completion.
             if (Vector3.SqrMagnitude(entity.entity.ActualPosition() - agentPos) 
-                < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR
+                < agent.visitThresholdSqr
                 && entity.entity.entityType != EntityType.ET_GOAL_COMPLETION)
                 entity.Visit(this.gameObject, PathOSAgent.logger);
 
@@ -138,7 +138,7 @@ public class PathOSAgentMemory : MonoBehaviour
         for(int i = 0; i < finalGoalTracker.Count; ++i)
         {
             if (Vector3.SqrMagnitude(finalGoalTracker[i].entity.ActualPosition() - agentPos) 
-                < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
+                < agent.visitThresholdSqr)
                 finalGoalTracker[i].Visit();             
         }
 
@@ -146,7 +146,7 @@ public class PathOSAgentMemory : MonoBehaviour
         if(finalGoal != null 
             && agent.IsTargeted(finalGoal.entity)
             && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
-            < PathOS.Constants.Navigation.VISIT_THRESHOLD_SQR)
+            < agent.visitThresholdSqr)
         {
             finalGoal.Visit(this.gameObject, PathOSAgent.logger);
             finalGoalCompleted = true;

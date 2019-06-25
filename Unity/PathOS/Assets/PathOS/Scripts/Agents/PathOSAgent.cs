@@ -15,7 +15,6 @@ PathOSAgent (c) Samantha Stahlke and Atiya Nova 2018
 public class PathOSAgent : MonoBehaviour 
 {
     /* OBJECT REFERENCES AND DEBUGGING */
-
     private NavMeshAgent navAgent;
 
     //The agent's memory/internal world model.
@@ -44,6 +43,7 @@ public class PathOSAgent : MonoBehaviour
     [Tooltip("How close (in units) does the agent have to get " +
         "to a goal to mark it as visited?")]
     public float visitThreshold = 1.0f;
+    public float visitThresholdSqr { get; private set; }
 
     [Tooltip("How many degrees should separate lines of " +
         "sight checked for \"explorability\" by the agent?")]
@@ -143,6 +143,8 @@ public class PathOSAgent : MonoBehaviour
             + heuristicScaleLookup[Heuristic.CAUTION] * avgCautionScore;
 
         hazardPenalty = -hazardScore;
+
+        visitThresholdSqr = visitThreshold * visitThreshold;
 
         //Duration of working memory for game entities is scaled by experience level.
         forgetTime = Mathf.Lerp(PathOS.Constants.Memory.FORGET_TIME_MIN,
@@ -421,9 +423,6 @@ public class PathOSAgent : MonoBehaviour
         Vector3 toEntity = memory.RecallPos() - GetPosition();
         float score = ScoreDirection(GetPosition(), toEntity, bias, toEntity.magnitude);
 
-        if (score >= 0.0f)
-            score += PathOS.Constants.Behaviour.ENTITY_GOAL_BIAS;
-
         //Stochasticity introduced to goal update.
         if(PathOS.ScoringUtility.UpdateScore(score, maxScore))
         {
@@ -461,10 +460,9 @@ public class PathOSAgent : MonoBehaviour
                 origin + distance * dir, exploreTargetMargin);
         }
 
-        float bias = (distance / eyes.navmeshCastDistance) 
-            * (heuristicScaleLookup[Heuristic.CURIOSITY]);
+        float bias = 0.0f;
 
-        //Initial placeholder bias for preferring the goal we have already set.
+        //Bias for preferring the goal we have already set.
         //(If we haven't reached it already.)
         if ((newDest - currentDest.pos).magnitude < exploreThreshold
             && (GetPosition() - currentDest.pos).magnitude > exploreThreshold)
@@ -507,7 +505,8 @@ public class PathOSAgent : MonoBehaviour
         memory.memoryMap.RaycastMemoryMap(origin, dir, maxDistance, out hit);
 
         score += (heuristicScaleLookup[Heuristic.CURIOSITY]) 
-            * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples;
+            * hit.numUnexplored / PathOSNavUtility.NavmeshMemoryMapper.maxCastSamples
+            * hit.distance / eyes.navmeshCastDistance;
 
         //Enumerate over all entities the agent knows about, and use them
         //to affect our assessment of the potential target.

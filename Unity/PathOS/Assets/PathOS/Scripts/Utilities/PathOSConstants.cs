@@ -42,9 +42,6 @@ namespace PathOS
             //What should the base minimum time for recomputing a destination be?
             public const float ROUTE_COMPUTE_BASE = 0.5f;
 
-            //How close need the agent pass by an entity to consider it visited?
-            public const float VISIT_THRESHOLD_SQR = 1.0f;
-
             //How close do two goals need to be to be considered the same?
             public const float GOAL_EPSILON_SQR = 0.1f;
 
@@ -84,10 +81,6 @@ namespace PathOS
 
             //Bias for preferring the existing goal.
             public const float EXISTING_GOAL_BIAS = 0.5f;
-
-            //Bias for preferring entities as destinations.
-            //(Only applied when the entity has a positive score.)
-            public const float ENTITY_GOAL_BIAS = 0.5f;
 
             //Adjustment factor for calculating the role of distance in 
             //entity scoring.

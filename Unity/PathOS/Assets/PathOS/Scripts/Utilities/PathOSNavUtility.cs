@@ -167,7 +167,7 @@ public class PathOSNavUtility
 
         NavmeshBoundsXZ bounds;
         float sampleGridSize;
-        public const int maxCastSamples = 64;
+        public const int maxCastSamples = 128;
         private bool visualGridDirty = false;
 
         Vector3 gridOrigin;
@@ -321,7 +321,6 @@ public class PathOSNavUtility
                     ++obstacleCount;
                 //Stop if we reach the edge of the grid or we've crossed more than 
                 //one obstacle tile (avoid mistaking corners for walls).
-                //(This "hit detection" for obstacles should be improved as well.)
                 else if (sample == NavmeshMapCode.NM_DNE || obstacleCount > 1)
                     break;
 
