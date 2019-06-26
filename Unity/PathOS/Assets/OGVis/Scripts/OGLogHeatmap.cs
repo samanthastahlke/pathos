@@ -3,19 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using OGVis;
 
+/*
+OGLogHeatmap.cs
+OGLogHeatmap (c) Ominous Games 2019
+*/
+
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 [ExecuteInEditMode]
 public class OGLogHeatmap : MonoBehaviour
 {
+    //Display settings.
     private Gradient gradient;
     private float alpha = 0.5f;
 
+    private float displayHeight;
+
+    //Heatmap mesh data.
     private Vector3[] vertices;
     private Vector2[] uv;
     private int[] triangles;
-
-    private float displayHeight;
 
     public Mesh mesh { get; private set; }
     private MeshFilter filter;
@@ -24,6 +31,7 @@ public class OGLogHeatmap : MonoBehaviour
     public Material mat { get; private set; }
     public Texture2D tex { get; private set; }
 
+    //Heatmap generation settings.
     private Vector3 origin;
     private Vector3 gridSize;
     private float tileWidth;
@@ -39,13 +47,14 @@ public class OGLogHeatmap : MonoBehaviour
         this.gradient = gradient;
         this.alpha = alpha;
         
+        //Asset generation/allocation.
         if(null == mesh)
             mesh = new Mesh();
 
         filter.mesh = mesh;
-
-        DestroyImmediate(mat);
-        mat = new Material(Shader.Find("Unlit/Transparent"));
+        
+        if(null == mat)
+            mat = new Material(Shader.Find("Unlit/Transparent"));
 
         if (null == tex)
             tex = new Texture2D(0, 0);
@@ -56,7 +65,7 @@ public class OGLogHeatmap : MonoBehaviour
         mat.mainTexture = tex;
         rend.material = mat;
 
-        //Order: Bottom left, top left, top right, bottom right.
+        //Vertex order: Bottom left, top left, top right, bottom right.
         uv = new Vector2[4];
         uv[0] = new Vector2(0.0f, 0.0f);
         uv[1] = new Vector2(0.0f, 1.0f);
@@ -69,28 +78,34 @@ public class OGLogHeatmap : MonoBehaviour
         UpdateExtents(extents, tileSize);
     }
 
-    public void SetAlpha(float alpha)
-    {
-        this.alpha = alpha;
-    }
-
-    public void SetGradient(Gradient gradient)
-    {
-        this.gradient = gradient;
-    }
-
     public void Clear()
     {
         ClearTex();
         SetVisible(false);
     }
 
-    public void SetVisible(bool visible)
+    private void ClearTex()
     {
-        if (null == rend)
-            rend = GetComponent<MeshRenderer>();
+        if (null == tex || tex.width == 0 || tex.height == 0)
+            return;
 
-        rend.enabled = visible;
+        Color32 white = new Color32(255, 255, 255, (byte)(alpha * 255));
+        Color32[] resetArray = tex.GetPixels32();
+
+        for (int i = 0; i < resetArray.Length; ++i)
+        {
+            resetArray[i] = white;
+        }
+
+        tex.SetPixels32(resetArray);
+        tex.Apply();
+    }
+
+    private void OnApplicationQuit()
+    {
+        DestroyImmediate(tex);
+        DestroyImmediate(mat);
+        DestroyImmediate(mesh);
     }
 
     public void UpdateExtents(Extents extents, float tileSize)
@@ -137,30 +152,6 @@ public class OGLogHeatmap : MonoBehaviour
         origin.y = displayHeight;
 
         transform.position = origin;
-    }
-
-    private void ClearTex()
-    {
-        if (null == tex || tex.width == 0 || tex.height == 0)
-            return;
-
-        Color32 white = new Color32(255, 255, 255, (byte)(alpha * 255));
-        Color32[] resetArray = tex.GetPixels32();
-
-        for(int i = 0; i < resetArray.Length; ++i)
-        {
-            resetArray[i] = white;
-        }
-
-        tex.SetPixels32(resetArray);
-        tex.Apply();
-    }
-
-    private void OnApplicationQuit()
-    {
-        DestroyImmediate(tex);
-        DestroyImmediate(mat);
-        DestroyImmediate(mesh);
     }
 
     public void UpdateData(List<PlayerLog> logs, bool enabledOnly, bool windowOnly)
@@ -243,5 +234,23 @@ public class OGLogHeatmap : MonoBehaviour
 
         tex.SetPixels32(heatmapArray);
         tex.Apply();
+    }
+
+    public void SetAlpha(float alpha)
+    {
+        this.alpha = alpha;
+    }
+
+    public void SetGradient(Gradient gradient)
+    {
+        this.gradient = gradient;
+    }
+
+    public void SetVisible(bool visible)
+    {
+        if (null == rend)
+            rend = GetComponent<MeshRenderer>();
+
+        rend.enabled = visible;
     }
 }

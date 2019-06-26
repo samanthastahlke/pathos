@@ -6,7 +6,7 @@ using UnityEngine;
 
 /*
 OGLogger.cs
-OGLogger (c) Ominous Games 2018
+OGLogger (c) Ominous Games 2018-19
 */
 
 public class OGLogger : MonoBehaviour 
