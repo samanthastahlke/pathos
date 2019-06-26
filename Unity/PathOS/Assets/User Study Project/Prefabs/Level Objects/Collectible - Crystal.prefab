@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4102798530119815139}
   - component: {fileID: 4102798530119815140}
   - component: {fileID: 4102798530119815137}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Collectible - Crystal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 4102798530119815141}
   m_LocalRotation: {x: -0.03266098, y: -0.06719898, z: 0.10945722, w: 0.99117947}
   m_LocalPosition: {x: -14.29, y: 0.78999996, z: -3.79}
-  m_LocalScale: {x: 0.49999994, y: 0.5, z: 0.49999994}
+  m_LocalScale: {x: 0.49999982, y: 0.5, z: 0.49999982}
   m_Children:
   - {fileID: 4102798530503210344}
   m_Father: {fileID: 0}
@@ -88,7 +88,7 @@ SphereCollider:
   m_GameObject: {fileID: 4102798530119815141}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.6916751
   m_Center: {x: 0.005674182, y: 0.07128775, z: 0.10767055}

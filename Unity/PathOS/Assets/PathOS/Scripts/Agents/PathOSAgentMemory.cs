@@ -148,17 +148,19 @@ public class PathOSAgentMemory : MonoBehaviour
                 finalGoalTracker[i].Visit();             
         }
 
-        float finalThresholdSqr = (finalGoal.entity.entityRef.overrideVisitRadius) ?
+        if(finalGoal != null)
+        {
+            float finalThresholdSqr = (finalGoal.entity.entityRef.overrideVisitRadius) ?
             finalGoal.entity.entityRef.visitRadiusSqr : agent.visitThresholdSqr;
 
-        //Only mark completion if the agent actively targets the final goal.
-        if(finalGoal != null 
-            && agent.IsTargeted(finalGoal.entity)
-            && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
-            < finalThresholdSqr)
-        {
-            finalGoal.Visit(this.gameObject, PathOSAgent.logger);
-            finalGoalCompleted = true;
+            //Only mark completion if the agent actively targets the final goal.
+            if (agent.IsTargeted(finalGoal.entity)
+                && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
+                < finalThresholdSqr)
+            {
+                finalGoal.Visit(this.gameObject, PathOSAgent.logger);
+                finalGoalCompleted = true;
+            }
         }
 
         for(int i = paths.Count - 1; i >= 0; --i)

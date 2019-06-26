@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9528261715652325}
   - component: {fileID: 19204538866713169}
   - component: {fileID: 27670353675193127}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BetterCrystal01 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57,7 +57,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 416d15cd169c5a0468b8346abad16527, type: 2}
+  - {fileID: 2100000, guid: 52c04bd9897f68f46a9ae43a010c14be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -86,8 +86,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 17554370712025985}
-  m_Layer: 8
-  m_Name: TestCrystal
+  - component: {fileID: 175109114}
+  m_Layer: 0
+  m_Name: Large Crystal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -114,6 +115,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &175109114
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14289688354049797}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3.130095, y: 4.437201, z: 3.581934}
+  m_Center: {x: -0.09682298, y: 1.7185998, z: 0.3550148}
 --- !u!1 &14813862815919167
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,7 +139,7 @@ GameObject:
   - component: {fileID: 9538835897154377}
   - component: {fileID: 20618170671732183}
   - component: {fileID: 28064323450563449}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BetterCrystal01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,7 +185,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 416d15cd169c5a0468b8346abad16527, type: 2}
+  - {fileID: 2100000, guid: 52c04bd9897f68f46a9ae43a010c14be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -202,7 +216,7 @@ GameObject:
   - component: {fileID: 17666031462020237}
   - component: {fileID: 20203837442339455}
   - component: {fileID: 27730021937207597}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BetterCrystal01 (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -248,7 +262,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 416d15cd169c5a0468b8346abad16527, type: 2}
+  - {fileID: 2100000, guid: 52c04bd9897f68f46a9ae43a010c14be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -279,7 +293,7 @@ GameObject:
   - component: {fileID: 17649257644688673}
   - component: {fileID: 19146206041764953}
   - component: {fileID: 28225174012487733}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BetterCrystal01 (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -325,7 +339,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 416d15cd169c5a0468b8346abad16527, type: 2}
+  - {fileID: 2100000, guid: 52c04bd9897f68f46a9ae43a010c14be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -356,7 +370,7 @@ GameObject:
   - component: {fileID: 17651468386191233}
   - component: {fileID: 19847958415428417}
   - component: {fileID: 28130436281975911}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BetterCrystal01 (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -402,7 +416,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 416d15cd169c5a0468b8346abad16527, type: 2}
+  - {fileID: 2100000, guid: 52c04bd9897f68f46a9ae43a010c14be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -433,7 +447,7 @@ GameObject:
   - component: {fileID: 17776685262939145}
   - component: {fileID: 20245979273080849}
   - component: {fileID: 28621655994934951}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BetterCrystal01 (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -479,7 +493,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 416d15cd169c5a0468b8346abad16527, type: 2}
+  - {fileID: 2100000, guid: 52c04bd9897f68f46a9ae43a010c14be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -510,7 +524,7 @@ GameObject:
   - component: {fileID: 9508862790156343}
   - component: {fileID: 20257943704757699}
   - component: {fileID: 27792843039899281}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BetterCrystal01 (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -556,7 +570,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 416d15cd169c5a0468b8346abad16527, type: 2}
+  - {fileID: 2100000, guid: 52c04bd9897f68f46a9ae43a010c14be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
