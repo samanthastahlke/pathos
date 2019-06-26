@@ -9311,90 +9311,134 @@ MonoBehaviour:
     objectRef: {fileID: 646738594}
     entityType: 200
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Enemy 2
     objectRef: {fileID: 1546099334}
     entityType: 200
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Enemy 5
     objectRef: {fileID: 74872219}
     entityType: 200
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Enemy 6
     objectRef: {fileID: 15503858}
     entityType: 200
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Mushroom POI
     objectRef: {fileID: 1868184791}
     entityType: 300
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Player House
     objectRef: {fileID: 53943982}
     entityType: 300
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Treasure
     objectRef: {fileID: 1349998424}
     entityType: 150
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Treasure
     objectRef: {fileID: 173190110}
     entityType: 150
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Sheep
     objectRef: {fileID: 870276753}
     entityType: 160
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Cow
     objectRef: {fileID: 187761348}
     entityType: 160
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Cat
     objectRef: {fileID: 1678530154}
     entityType: 350
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Mushroom
     objectRef: {fileID: 355282928}
     entityType: 250
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Mushroom
     objectRef: {fileID: 640875532}
     entityType: 250
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Mushroom
     objectRef: {fileID: 399391077}
     entityType: 250
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Goal Crystal
     objectRef: {fileID: 1015002897}
     entityType: 100
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Goal Crystal
     objectRef: {fileID: 234555605}
     entityType: 100
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Goal Tomb
     objectRef: {fileID: 53043637}
     entityType: 110
     alwaysKnown: 1
+    overrideVisitRadius: 0
+    objectVisitRadius: 1
   - name: Goal Cave
     objectRef: {fileID: 1775179089}
     entityType: 110
     alwaysKnown: 1
+    overrideVisitRadius: 0
+    objectVisitRadius: 1
   - name: Final Goal
     objectRef: {fileID: 1260841063}
     entityType: 120
     alwaysKnown: 1
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: SheepWhite1
     objectRef: {fileID: 2057694350}
     entityType: 160
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Enemy 4
     objectRef: {fileID: 1263680427}
     entityType: 200
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   - name: Enemy 3
     objectRef: {fileID: 341286005}
     entityType: 200
     alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 0
   heuristicWeights:
   - heuristic: 0
     weights:
@@ -11485,11 +11529,11 @@ MonoBehaviour:
   experienceScale: 1
   heuristicScales:
   - heuristic: 0
-    scale: 0.41
+    scale: 0
   - heuristic: 10
     scale: 1
   - heuristic: 15
-    scale: 1
+    scale: 0
   - heuristic: 20
     scale: 0
   - heuristic: 25
@@ -11497,7 +11541,7 @@ MonoBehaviour:
   - heuristic: 30
     scale: 0
   - heuristic: 35
-    scale: 0.757
+    scale: 1
   visitThreshold: 1
   exploreDegrees: 5
   invisibleExploreDegrees: 30

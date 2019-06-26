@@ -71,8 +71,8 @@ public class PathOSManager : NPSingleton<PathOSManager>
                 continue;
             }
 
-            //Grab renderers for object visibility checks by the agent.
-            levelEntities[i].FetchRenderers();
+            //Set up entity (grab renderers, calculate squared visitation radius).
+            levelEntities[i].Init();
         }
 
         simulationEnded = false;

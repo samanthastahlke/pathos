@@ -99,10 +99,13 @@ public class PathOSAgentMemory : MonoBehaviour
 
             entity.impressionTime += Time.deltaTime;
 
+            float visitThresholdSqr = (entity.entity.entityRef.overrideVisitRadius) ?
+                entity.entity.entityRef.visitRadiusSqr : agent.visitThresholdSqr;
+
             //Flag an entity as visited if we pass by in close range.
             //Inelegant brute-force to prevent "accidental" completion.
             if (Vector3.SqrMagnitude(entity.entity.ActualPosition() - agentPos) 
-                < agent.visitThresholdSqr
+                < visitThresholdSqr
                 && entity.entity.entityType != EntityType.ET_GOAL_COMPLETION)
                 entity.Visit(this.gameObject, PathOSAgent.logger);
 
@@ -137,16 +140,22 @@ public class PathOSAgentMemory : MonoBehaviour
 
         for(int i = 0; i < finalGoalTracker.Count; ++i)
         {
+            float visitThresholdSqr = (finalGoalTracker[i].entity.entityRef.overrideVisitRadius) ?
+                finalGoalTracker[i].entity.entityRef.visitRadiusSqr : agent.visitThresholdSqr;
+
             if (Vector3.SqrMagnitude(finalGoalTracker[i].entity.ActualPosition() - agentPos) 
-                < agent.visitThresholdSqr)
+                < visitThresholdSqr)
                 finalGoalTracker[i].Visit();             
         }
+
+        float finalThresholdSqr = (finalGoal.entity.entityRef.overrideVisitRadius) ?
+            finalGoal.entity.entityRef.visitRadiusSqr : agent.visitThresholdSqr;
 
         //Only mark completion if the agent actively targets the final goal.
         if(finalGoal != null 
             && agent.IsTargeted(finalGoal.entity)
             && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
-            < agent.visitThresholdSqr)
+            < finalThresholdSqr)
         {
             finalGoal.Visit(this.gameObject, PathOSAgent.logger);
             finalGoalCompleted = true;

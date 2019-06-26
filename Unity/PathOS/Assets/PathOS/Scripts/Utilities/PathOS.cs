@@ -197,12 +197,22 @@ namespace PathOS
         [EntityDisplay]
         public EntityType entityType;
 
+        //Simulates compass/map availability.
+        public bool alwaysKnown;
+
+        //Individual per-object visitation radius.
+        [Tooltip("Should this object have a custom threshold " +
+            "for whether it has been visited?")]
+        public bool overrideVisitRadius;
+        [Tooltip("How close does the agent need to get to this object" +
+            "to mark it as visited? (If override is enabled)")]
+        public float objectVisitRadius = 1.0f;
+        public float visitRadiusSqr { get; private set; }
+
+        //For visibility checking.
         private List<Renderer> rend;
         public Bounds bounds { get; private set; }
         private bool initBounds = false;
-
-        //Simulates compass/map availability.
-        public bool alwaysKnown;
 
         public LevelEntity(GameObject objectRef, EntityType entityType)
         {
@@ -212,7 +222,13 @@ namespace PathOS
             this.entityType = entityType;
         }
 
-        public void FetchRenderers()
+        public void Init()
+        {
+            visitRadiusSqr = objectVisitRadius * objectVisitRadius;
+            FetchRenderers();
+        }
+
+        private void FetchRenderers()
         {
             rend = new List<Renderer>();
             rend.AddRange(objectRef.GetComponentsInChildren<Renderer>());
