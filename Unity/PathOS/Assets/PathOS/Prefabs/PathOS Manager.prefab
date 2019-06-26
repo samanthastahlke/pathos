@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limitSimulationTime: 1
-  maxSimulationTime: 20
+  maxSimulationTime: 180
   endOnCompletionGoal: 1
   showLevelMarkup: 1
   levelEntities: []

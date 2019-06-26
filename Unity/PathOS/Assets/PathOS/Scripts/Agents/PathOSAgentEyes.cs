@@ -185,8 +185,13 @@ public class PathOSAgentEyes : MonoBehaviour
             origin + dir.normalized * navmeshCastDistance + Vector3.up * navmeshCastHeight,
             out hit, NavMesh.AllAreas);
 
-        agent.memory.memoryMap.Fill(hit.position, 
-            PathOSNavUtility.NavmeshMemoryMapper.NavmeshMapCode.NM_OBSTACLE);
+
+        PathOSNavUtility.NavmeshMemoryMapper.NavmeshMapCode fillCode =
+            (result) ?
+            PathOSNavUtility.NavmeshMemoryMapper.NavmeshMapCode.NM_OBSTACLE :
+            PathOSNavUtility.NavmeshMemoryMapper.NavmeshMapCode.NM_SEEN;
+
+        agent.memory.memoryMap.Fill(hit.position, fillCode);
 
         PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit memHit = 
             new PathOSNavUtility.NavmeshMemoryMapper.NavmeshMemoryMapperCastHit();

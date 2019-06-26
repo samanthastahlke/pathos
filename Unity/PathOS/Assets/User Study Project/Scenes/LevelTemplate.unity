@@ -133,6 +133,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -266,7 +276,7 @@ PrefabInstance:
     - target: {fileID: 5005646905853620061, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}
       propertyPath: levelEntities.Array.size
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5005646905853620061, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}
@@ -388,6 +398,11 @@ PrefabInstance:
       propertyPath: levelEntities.Array.data[0].alwaysKnown
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5005646905853620061, guid: 31f1861d4df0ac1488cf45674399f745,
+        type: 3}
+      propertyPath: maxSimulationTime
+      value: 180
+      objectReference: {fileID: 0}
     - target: {fileID: 5005646905853620063, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}
       propertyPath: heatmapVisualizer
@@ -411,6 +426,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -499,6 +524,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -573,6 +608,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -649,6 +694,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -723,6 +778,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -799,6 +864,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -873,6 +948,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -949,6 +1034,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1023,6 +1118,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (13)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -1099,6 +1204,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1173,6 +1288,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -1249,6 +1374,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1323,6 +1458,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -1399,6 +1544,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1473,6 +1628,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -1549,6 +1714,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1623,6 +1798,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -1699,6 +1884,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1773,6 +1968,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -1849,6 +2054,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1923,6 +2138,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -1999,6 +2224,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2073,6 +2308,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -2149,6 +2394,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2223,6 +2478,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -2299,6 +2564,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2373,6 +2648,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -2449,6 +2734,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2524,6 +2819,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2598,6 +2903,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -2679,7 +2994,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 8
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!65 &612861355
 BoxCollider:
@@ -2765,6 +3080,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2839,6 +3164,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (10)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -2915,6 +3250,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2989,6 +3334,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -3065,6 +3420,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3139,6 +3504,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (10)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -3215,6 +3590,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3290,6 +3675,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3364,6 +3759,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -3442,7 +3847,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &832170386
 Transform:
@@ -3474,6 +3879,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -3641,6 +4056,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3715,6 +4140,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -3791,6 +4226,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3865,6 +4310,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -3941,6 +4396,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4016,6 +4481,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4090,6 +4565,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -4169,7 +4654,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!65 &1061918005
 BoxCollider:
@@ -4235,6 +4720,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -4311,6 +4806,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4385,6 +4890,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -4464,7 +4979,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!65 &1209438472
 BoxCollider:
@@ -4530,6 +5045,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -4606,6 +5131,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4680,6 +5215,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -4756,6 +5301,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4830,6 +5385,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -4906,6 +5471,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (12)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4980,6 +5555,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -5056,6 +5641,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5130,6 +5725,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -5206,6 +5811,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5280,6 +5895,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -5356,6 +5981,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5430,6 +6065,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -5506,6 +6151,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5580,6 +6235,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -5656,6 +6321,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5730,6 +6405,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -5806,6 +6491,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5880,6 +6575,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -5956,6 +6661,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6030,6 +6745,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (10)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -6106,6 +6831,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6180,6 +6915,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -6259,7 +7004,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!65 &1630275971
 BoxCollider:
@@ -6325,6 +7070,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -6401,6 +7156,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6475,6 +7240,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -6551,6 +7326,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6625,6 +7410,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -6701,6 +7496,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6775,6 +7580,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -6851,6 +7666,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6925,6 +7750,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -7001,6 +7836,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7075,6 +7920,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -7151,6 +8006,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7225,6 +8090,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -7304,7 +8179,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!65 &1840671942
 BoxCollider:
@@ -7370,6 +8245,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -7446,6 +8331,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7520,6 +8415,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -7596,6 +8501,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7670,6 +8585,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -7746,6 +8671,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7820,6 +8755,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -7896,6 +8841,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7970,6 +8925,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -8046,6 +9011,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -8120,6 +9095,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
@@ -8196,6 +9181,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -8270,6 +9265,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -8346,6 +9351,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Long Fence Segment
       objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -8421,6 +9436,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Short Fence Segment (12)
       objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -8495,6 +9520,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Long Fence Segment
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952369050379175183, guid: 30e6e32948acb4c4f95658b393beb74e,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6946826766052632501, guid: 30e6e32948acb4c4f95658b393beb74e,
         type: 3}
@@ -8813,6 +9848,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Short Fence Segment
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 922442539233488707, guid: 5d64e2228e30aa2419191410a24ab39f,
+        type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 920188774218414373, guid: 5d64e2228e30aa2419191410a24ab39f,
         type: 3}
