@@ -352,8 +352,10 @@ public class PathOSAgentBatchingWindow : EditorWindow
         heuristicMode = (HeuristicMode)GUILayout.SelectionGrid(
             (int)heuristicMode, heuristicModeLabels, heuristicModeLabels.Length);
 
+        //Motive configration panel.
         switch(heuristicMode)
         {
+            //Set fixed values for experience/motives for every agent.
             case HeuristicMode.FIXED:
 
                 if (GUILayout.Button("Load from Agent"))
@@ -370,7 +372,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
                 }
 
                 break;
-
+            
+            //Define an acceptable range of values for each motive.
             case HeuristicMode.RANGE:
 
                 if (null == PathOSProfileWindow.profiles)
@@ -406,7 +409,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
                 }
 
                 break;
-
+            
+            //Load a series of values for each agent from a file.
             case HeuristicMode.LOAD:
 
                 EditorGUILayout.LabelField("File to load: ", shortHeuristicsFile);
@@ -440,6 +444,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         GUILayout.Label("Simulation Controls", headerStyle);
 
+        //Trigger the start of the simulation.
         if(GUILayout.Button("Start"))
         {
             if (PathOSManager.instance != null)
@@ -457,10 +462,14 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     agentsLeft = numAgents;
                     loadAgentIndex = 0;
 
+                    //Initialize settings for logging to a single directory.
+                    PlayerPrefs.SetInt(OGLogManager.fileIndexId, 0);
                     PlayerPrefs.SetString(OGLogManager.directoryOverrideId,
                         "Batch-" + PathOS.UI.GetFormattedTimestamp());
                     PlayerPrefs.Save();
 
+                    //If simultaneous simulation is enabled, set any existing agents
+                    //to disabled during the batched run.
                     if (simultaneous)
                     {
                         FindSceneAgents();
@@ -485,8 +494,12 @@ public class PathOSAgentBatchingWindow : EditorWindow
     {
         if (simulationActive)
         {
+            //The frame the application should start.
+            //(We need to wait a frame for Editor changes to take effect on agents).
             if (triggerFrame)
             {
+                //Set a flag to ensure logs are recorded to a single directory
+                //between successive batches.
                 PlayerPrefs.SetInt(OGLogManager.overrideFlagId, 1);
                 PlayerPrefs.Save();
 
@@ -496,6 +509,9 @@ public class PathOSAgentBatchingWindow : EditorWindow
             }
             else if (!EditorApplication.isPlaying)
             {
+                //Completely stop the simulation if there are no agents left
+                //or it was ended prematurely (i.e., the user pressed stop from the 
+                //editor).
                 if (agentsLeft == 0 || (wasPlaying 
                     && !EditorPrefs.GetBool(
                         PathOSManager.simulationEndedEditorPrefsID)))
@@ -535,6 +551,9 @@ public class PathOSAgentBatchingWindow : EditorWindow
                 }
             }
         }
+        //Again, we need to wait a frame to ensure the changes
+        //we make editor-side (e.g., deactiviating scene agents)
+        //will persist.
         else if(cleanupWait)
         {
             cleanupWait = false;
@@ -558,6 +577,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
         wasPlaying = EditorApplication.isPlaying;
     }
 
+    //Load custom agent profile for defining motive ranges.
     private void LoadProfile(AgentProfile profile)
     {
         Dictionary<Heuristic, FloatRange> profileLookup =
@@ -580,6 +600,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
         rangeExp = profile.expRange;
     }
 
+    //Reconcile UI selection of custom profile with collection of profiles
+    //from the profile window.
     private void SyncProfileNames()
     {
         profileNames.Clear();
@@ -700,6 +722,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
             agentReference = EditorUtility.InstanceIDToObject(agentID) as PathOSAgent;
     }
 
+    //Apply motive values to the agent in-scene.
     private void ApplyHeuristics()
     {
         GrabAgentReference();
@@ -712,6 +735,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
         SetHeuristics(agentReference);
     }
 
+    //Apply heuristics to the given agent.
     private void SetHeuristics(PathOSAgent agent)
     {
         switch (heuristicMode)

@@ -16,6 +16,7 @@ This class manages the Unity Inspector pane for vis customization.
 [CustomEditor(typeof(OGLogVisualizer))]
 public class OGVisEditor : Editor
 {
+    //Core object references.
     private OGLogVisualizer vis;
     private SerializedObject serial;
 
@@ -417,6 +418,7 @@ public class OGVisEditor : Editor
             }
         } 
         
+        //Draw aggregate entity interactions.
         if(vis.showEntities)
         {
             foreach(KeyValuePair<string, OGLogVisualizer.AggregateInteraction> interaction 

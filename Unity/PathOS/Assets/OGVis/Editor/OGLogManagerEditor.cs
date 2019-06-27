@@ -12,9 +12,11 @@ OGLogManagerEditor (c) Nine Penguins (Samantha Stahlke) 2019
 [CustomEditor(typeof(OGLogManager))]
 public class OGLogManagerEditor : Editor
 {
+    //Core object references.
     private OGLogManager manager;
     private SerializedObject serial;
 
+    //Stylization.
     private const int pathDisplayLength = 32;
     private GUIStyle errorStyle = new GUIStyle();
 
