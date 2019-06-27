@@ -30,7 +30,7 @@ namespace PathOS
 
             //The radius with which to vary the remembered position of
             //entities not in view.
-            public const float POS_VARIANCE = 3.0f;
+            public const float POS_VARIANCE = 2.0f;
 
             //The time taken to "retrieve" an object from memory.
             //Used to help scale goal recompute time.

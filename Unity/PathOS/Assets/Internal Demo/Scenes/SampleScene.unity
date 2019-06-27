@@ -1281,7 +1281,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 185895896}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -9761,9 +9761,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   logDirectory: C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/OGVis/OGLogs/2019-05-29
     10-46-47
-  directoriesLoaded:
-  - C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/OGVis/OGLogs/2019-05-29
-    10-46-47/
+  directoriesLoaded: []
   heatmapVisualizer: {fileID: 185895898}
   showHeatmap: 1
   heatmapGradient:
@@ -9838,10 +9836,10 @@ MonoBehaviour:
     max: 56
   displayTimeRange:
     min: 0
-    max: 56
+    max: 0
   fullTimeRange:
     min: 0
-    max: 56
+    max: 0
   tileSize: 2
 --- !u!114 &1664526735
 MonoBehaviour:
@@ -9855,7 +9853,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03c4f1f40e4b545468e93ed92db6d5bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableLogging: 1
+  enableLogging: 0
   logDirectory: C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/OGVis/OGLogs
   logFilePrefix: agent
   sampleRate: 4
@@ -11530,19 +11528,19 @@ MonoBehaviour:
   experienceScale: 1
   heuristicScales:
   - heuristic: 0
-    scale: 0
+    scale: 0.005
   - heuristic: 10
-    scale: 1
+    scale: 0
   - heuristic: 15
     scale: 0
   - heuristic: 20
-    scale: 0
+    scale: 0.939
   - heuristic: 25
-    scale: 0
+    scale: 0.792
   - heuristic: 30
     scale: 0
   - heuristic: 35
-    scale: 1
+    scale: 0.613
   visitThreshold: 1
   exploreDegrees: 5
   invisibleExploreDegrees: 30

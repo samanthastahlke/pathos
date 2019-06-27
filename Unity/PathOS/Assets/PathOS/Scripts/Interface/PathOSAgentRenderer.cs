@@ -329,6 +329,7 @@ public class PathOSAgentRenderer : MonoBehaviour
         Vector3 targetPos = agent.GetTargetPosition();
 
         List<PathOS.EntityMemory> memory = agent.memory.entities;
+        PathOS.PerceivedEntity agentTargetEntity = agent.GetDestinationEntity();
 
         //Memorized objects.
         for (int i = 0; i < memory.Count; ++i)
@@ -336,8 +337,7 @@ public class PathOSAgentRenderer : MonoBehaviour
             Vector3 pos = memory[i].entity.perceivedPos;
 
             //Skip if this entity is the target.
-            if (Vector3.SqrMagnitude(pos - targetPos) 
-                < PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
+            if (memory[i].entity == agentTargetEntity)
                 continue;
 
             //Draw the visited, memorized, or visible icon as appropriate.

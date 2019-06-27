@@ -321,6 +321,15 @@ public class PathOSAgent : MonoBehaviour
 
         bool previousOnMem = onMemPath;
 
+        //Adjust goal position if we have reached our destination but the set 
+        //position was initially inaccurate.
+        //(In the future, this logic would need to be adjusted to account for moving objects).
+        if(Vector3.SqrMagnitude(currentDest.pos - GetPosition()) < visitThresholdSqr
+            && currentDest.entity != null)
+        {
+            currentDest.pos = currentDest.entity.perceivedPos;
+        }
+
         //Only recompute goal routing if our new goal is different
         //from the previous goal.
         if(Vector3.SqrMagnitude(currentDest.pos - dest.pos) 
@@ -357,6 +366,11 @@ public class PathOSAgent : MonoBehaviour
         if(verboseDebugging)
             NPDebug.LogMessage("Position: " + navAgent.transform.position + 
                 ", Destination: " + currentDest);
+    }
+
+    public PerceivedEntity GetDestinationEntity()
+    {
+        return currentDest.entity;
     }
 
     //maxScore is updated if the entity achieves a higher score.
@@ -399,9 +413,8 @@ public class PathOSAgent : MonoBehaviour
                 * heuristicScaleLookup[Heuristic.ACHIEVEMENT];
         }
 
-        //Initial placeholder bias for preferring the goal we have already set.
-        if (Vector3.SqrMagnitude(memory.entity.perceivedPos - currentDest.pos) 
-            < PathOS.Constants.Navigation.GOAL_EPSILON_SQR
+        //Bias for preferring the goal we have already set.
+        if (memory.entity == currentDest.entity
             && Vector3.SqrMagnitude(GetPosition() - currentDest.pos)
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
             bias += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
@@ -433,7 +446,16 @@ public class PathOSAgent : MonoBehaviour
 
             dest.entity = memory.entity;
             dest.pos = memory.entity.perceivedPos;
-        }
+            
+            //If the entity is visible/always known to the player, ensure 
+            //its position is set to the actual position of the entity.
+            if (memory.entity.visible || memory.entity.entityRef.alwaysKnown)
+                dest.pos = memory.entity.perceivedPos;
+            //If this entity is a "new" target, fetch its position from memory.
+            //(Imperfect recall, done when the decision is made).
+            else if(dest.entity != currentDest.entity)
+                dest.pos = memory.RecallPos();
+        }    
     }
 
     //maxScore is updated if the direction achieves a higher score.
