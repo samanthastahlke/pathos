@@ -13,13 +13,13 @@ OGLogHeatmap (c) Ominous Games 2019
 [ExecuteInEditMode]
 public class OGLogHeatmap : MonoBehaviour
 {
-    //Display settings.
+    /* Display Settings */
     private Gradient gradient;
     private float alpha = 0.5f;
 
     private float displayHeight;
 
-    //Heatmap mesh data.
+    /* Heatmap Mesh Data */
     private Vector3[] vertices;
     private Vector2[] uv;
     private int[] triangles;
@@ -31,7 +31,7 @@ public class OGLogHeatmap : MonoBehaviour
     public Material mat { get; private set; }
     public Texture2D tex { get; private set; }
 
-    //Heatmap generation settings.
+    /* Heatmap Generation */
     private Vector3 origin;
     private Vector3 gridSize;
     private float tileWidth;
@@ -84,6 +84,7 @@ public class OGLogHeatmap : MonoBehaviour
         SetVisible(false);
     }
 
+    //Resets heatmap texture to white.
     private void ClearTex()
     {
         if (null == tex || tex.width == 0 || tex.height == 0)
@@ -103,6 +104,7 @@ public class OGLogHeatmap : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        //Free resources.
         DestroyImmediate(tex);
         DestroyImmediate(mat);
         DestroyImmediate(mesh);
@@ -130,6 +132,7 @@ public class OGLogHeatmap : MonoBehaviour
 
         tileCounts = new int[(int)gridSize.x, (int)gridSize.z];
 
+        //Set up mesh data.
         vertices[0] = new Vector3(-0.5f * gridSize.x * tileWidth, 0.0f, -0.5f * gridSize.z * tileWidth);
         vertices[1] = new Vector3(-0.5f * gridSize.x * tileWidth, 0.0f,  0.5f * gridSize.z * tileWidth);
         vertices[2] = new Vector3( 0.5f * gridSize.x * tileWidth, 0.0f,  0.5f * gridSize.z * tileWidth);
@@ -146,18 +149,11 @@ public class OGLogHeatmap : MonoBehaviour
         tex.Apply();
     }
 
-    public void SetDisplayHeight(float displayHeight)
+    public void UpdateData(List<PlayerLog> logs, bool enabledOnly, bool timeRangeOnly)
     {
-        this.displayHeight = displayHeight;
-        origin.y = displayHeight;
-
-        transform.position = origin;
-    }
-
-    public void UpdateData(List<PlayerLog> logs, bool enabledOnly, bool windowOnly)
-    {
-        float minX = -0.5f * gridSize.x * tileWidth;
-        float minZ = -0.5f * gridSize.z * tileWidth;
+        //Minimum coordinates derived from heatmap origin and size. 
+        float minX = origin.x - 0.5f * gridSize.x * tileWidth;
+        float minZ = origin.z - 0.5f * gridSize.z * tileWidth;
 
         float fac = 1.0f / tileWidth;
 
@@ -168,6 +164,7 @@ public class OGLogHeatmap : MonoBehaviour
 
         int xGrid, zGrid = 0;
 
+        //Update counts per-tile for agent position samples.
         for (int i = 0; i < logs.Count; ++i)
         {
             PlayerLog log = logs[i];
@@ -175,8 +172,8 @@ public class OGLogHeatmap : MonoBehaviour
             if (enabledOnly && !log.visInclude)
                 continue;
 
-            int minIndex = (windowOnly) ? log.displayStartIndex : 0;
-            int maxIndex = (windowOnly) ? log.displayEndIndex : log.pathPoints.Count - 1;
+            int minIndex = (timeRangeOnly) ? log.displayStartIndex : 0;
+            int maxIndex = (timeRangeOnly) ? log.displayEndIndex : log.pathPoints.Count - 1;
 
             for(int j = minIndex; j <= maxIndex; ++j)
             {
@@ -200,6 +197,7 @@ public class OGLogHeatmap : MonoBehaviour
             }
         }
 
+        //We want a minimum of 2 and a maximum of 10 bins.
         int levels = Mathf.Min(10, Mathf.Max(maxCount, 2));
         float colorStep = 1.0f / (levels - 1);
 
@@ -212,6 +210,7 @@ public class OGLogHeatmap : MonoBehaviour
             colors.Add(current);
         }
 
+        //Extra bin added as an overflow buffer.
         Color final = gradient.Evaluate(1.0f);
         final.a = alpha;
         colors.Add(final);
@@ -223,6 +222,7 @@ public class OGLogHeatmap : MonoBehaviour
 
         int rowSize = (int)gridSize.x;
 
+        //Determine grid colours based on sample counts.
         for (int x = 0; x < maxGridX; ++x)
         {
             for(int z = 0; z < maxGridZ; ++z)
@@ -252,5 +252,13 @@ public class OGLogHeatmap : MonoBehaviour
             rend = GetComponent<MeshRenderer>();
 
         rend.enabled = visible;
+    }
+
+    public void SetDisplayHeight(float displayHeight)
+    {
+        this.displayHeight = displayHeight;
+        origin.y = displayHeight;
+
+        transform.position = origin;
     }
 }
