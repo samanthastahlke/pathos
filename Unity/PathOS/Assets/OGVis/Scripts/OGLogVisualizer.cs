@@ -134,6 +134,8 @@ public class OGLogVisualizer : MonoBehaviour
         ClearData();
     }
 
+    //Fetch level entities from the AI manager for labelling entity 
+    //interactions in the vis.
     private void PopulateManagerEntities()
     {
         PathOSManager levelManager = PathOSManager.instance;
@@ -223,6 +225,7 @@ public class OGLogVisualizer : MonoBehaviour
         fullTimeRange.max = Mathf.Ceil(fullTimeRange.max);
         displayTimeRange = fullTimeRange;
 
+        //If no data was loaded, don't set up the heatmap or aggregate interactions.
         if (!dataInit)
             return;
 
@@ -241,34 +244,6 @@ public class OGLogVisualizer : MonoBehaviour
                 heatmapUseTimeSlice);
 
             heatmapVisualizer.SetVisible(showHeatmap);
-        }
-    }
-
-    public void UpdateHeatmapVisibility()
-    {
-        if (heatmapVisualizer != null)
-            heatmapVisualizer.SetVisible(showHeatmap);
-    }
-
-    public void ApplyHeatmapSettings()
-    {
-        if (dataInit && heatmapVisualizer != null)
-        {
-            heatmapVisualizer.SetGradient(heatmapGradient);
-            heatmapVisualizer.SetAlpha(heatmapAlpha);
-            heatmapVisualizer.UpdateExtents(dataExtents, tileSize);
-        }
-
-        UpdateHeatmap();
-    }
-
-    public void UpdateHeatmap()
-    {
-        if (dataInit && heatmapVisualizer != null)
-        {
-            heatmapVisualizer.UpdateData(pLogs,
-                heatmapAggregateActiveOnly,
-                heatmapUseTimeSlice);
         }
     }
 
@@ -387,6 +362,7 @@ public class OGLogVisualizer : MonoBehaviour
         return true;
     }
 
+    //Read log headers, containing information on sample rate and agent profiles.
     public void ParseHeader(PlayerLog pLog, string[] lineContents)
     {
         switch(lineContents[1])
@@ -439,7 +415,36 @@ public class OGLogVisualizer : MonoBehaviour
 
         dataInit = false;
     }
-    
+
+    //Heatmap operations.
+    public void UpdateHeatmapVisibility()
+    {
+        if (heatmapVisualizer != null)
+            heatmapVisualizer.SetVisible(showHeatmap);
+    }
+
+    public void ApplyHeatmapSettings()
+    {
+        if (dataInit && heatmapVisualizer != null)
+        {
+            heatmapVisualizer.SetGradient(heatmapGradient);
+            heatmapVisualizer.SetAlpha(heatmapAlpha);
+            heatmapVisualizer.UpdateExtents(dataExtents, tileSize);
+        }
+
+        UpdateHeatmap();
+    }
+
+    public void UpdateHeatmap()
+    {
+        if (dataInit && heatmapVisualizer != null)
+        {
+            heatmapVisualizer.UpdateData(pLogs,
+                heatmapAggregateActiveOnly,
+                heatmapUseTimeSlice);
+        }
+    }
+
     //Apply changes to display height of the vis.
     public void ApplyDisplayHeight()
     {

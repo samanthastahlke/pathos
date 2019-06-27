@@ -90,12 +90,15 @@ namespace OGVis
         public List<VectorT> positions;
         public List<QuaternionT> orientations;
 
+        //Timestamped visitation of level entities.
         public List<InteractionEvent> interactionEvents;
 
+        //Path points for display.
         public List<Vector3> pathPoints;
         public int displayStartIndex;
         public int displayEndIndex;
 
+        //Player profile data.
         public Dictionary<PathOS.Heuristic, float> heuristics;
         public float experience;
 
@@ -118,6 +121,7 @@ namespace OGVis
             heuristics = new Dictionary<PathOS.Heuristic, float>();
         }
 
+        //Data population.
         public void AddPosition(float timestamp, Vector3 pos)
         {
             positions.Add(new VectorT { timestamp = timestamp, pos = pos });
@@ -126,6 +130,11 @@ namespace OGVis
         public void AddOrientation(float timestamp, Quaternion rot)
         {
             orientations.Add(new QuaternionT { timestamp = timestamp, rot = rot });
+        }
+
+        public void AddInteractionEvent(float timestamp, Vector3 pos, string objectName)
+        {
+            interactionEvents.Add(new InteractionEvent(timestamp, pos, objectName));
         }
 
         public void UpdateDisplayPath(float displayHeight)
@@ -150,11 +159,13 @@ namespace OGVis
             }
         }
 
+        //Set up interval to allow filtering based on time-slicing.
         public void SliceDisplayPath(TimeRange range)
         {
             int startEstimate = 0;
             int endEstimate = positions.Count - 1;
 
+            //Estimate indices of start/end positions based on sample rate.
             if (sampleRate > 0.0f)
             {
                 startEstimate = Mathf.Max(0,
@@ -164,6 +175,7 @@ namespace OGVis
                     (int)Mathf.Floor(range.max * sampleRate));
             }
 
+            //Adjust indices to find exact window.
             bool foundIndex = false;
 
             while (!foundIndex)
@@ -210,13 +222,6 @@ namespace OGVis
 
             displayStartIndex = startEstimate;
             displayEndIndex = endEstimate;
-
-            
-        }
-
-        public void AddInteractionEvent(float timestamp, Vector3 pos, string objectName)
-        {
-            interactionEvents.Add(new InteractionEvent(timestamp, pos, objectName));
         }
     }
 }

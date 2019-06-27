@@ -10,6 +10,7 @@ OGLogManager (c) Ominous Games 2018
 
 public class OGLogManager : OGSingleton<OGLogManager> 
 {
+    //Editor flags for manipulation during batching.
     public const string directoryOverrideId = "OGLogDirectoryOverride";
     public const string overrideFlagId = "OGLogOverrideFlag";
     public const string fileIndexId = "OGLogFileIndex";
@@ -37,6 +38,7 @@ public class OGLogManager : OGSingleton<OGLogManager>
         HEADER
     };
 
+    //Queried by loggers for timestamps.
     public float gameTimer { get; set; }
 
     private void Awake()
