@@ -19,9 +19,10 @@ namespace PathOS
             public const float IMPRESSION_TIME_CONVERT_LTM = 5.0f;
             public const int IMPRESSIONS_MAX = 16;
             public const int IMPRESSIONS_CONVERT_LTM = 4;
+            public const int IMPRESSIONS_CONVERT_UNFORGETTABLE = 8;
 
-            public const float FORGET_TIME_MIN = 15.0f;
-            public const float FORGET_TIME_MAX = 30.0f;
+            public const float FORGET_TIME_MIN = 30.0f;
+            public const float FORGET_TIME_MAX = 60.0f;
 
             //Cowan (2000)
             //Limitations of short-term memory for basic recall tasks.

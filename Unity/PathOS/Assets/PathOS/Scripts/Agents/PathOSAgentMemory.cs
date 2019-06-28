@@ -228,6 +228,12 @@ public class PathOSAgentMemory : MonoBehaviour
                 || entity.impressionCount >= PathOS.Constants.Memory.IMPRESSIONS_CONVERT_LTM)
                 memory.ltm = true;  
         }
+
+        if(memory.forgettable)
+        {
+            if (entity.impressionCount >= PathOS.Constants.Memory.IMPRESSIONS_CONVERT_UNFORGETTABLE)
+                memory.MakeUnforgettable();
+        }
     }
 
     public void CommitUnforgettable(PerceivedEntity entity)
