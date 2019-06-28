@@ -262,7 +262,7 @@ public class PathOSAgentMemory : MonoBehaviour
 
         for(int i = 0; i < paths.Count; ++i)
         {
-            if (path == paths[i])
+            if (path.EqualsSimilar(paths[i], agent))
             { 
                 paths[i].UpdateScore(path.score);
                 return;

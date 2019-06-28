@@ -50,8 +50,9 @@ namespace PathOS
 
             //How close do two "path" memories need to be to be considered
             //equivalent?
-            public const float EXPLORE_PATH_POS_THRESHOLD = 5.0f;
-            public const float EXPLORE_PATH_DEG_THRESHOLD = 15.0f;
+            //(Applied as multipliers to agent exploration thresholds).
+            public const float EXPLORE_PATH_POS_THRESHOLD_FAC = 3.0f;
+            public const float EXPLORE_PATH_DEG_THRESHOLD_FAC = 3.0f;
 
             //How proportionally large should the hazard movement penalty
             //be when passing next to a hazard while constructing a path from

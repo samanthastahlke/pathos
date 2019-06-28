@@ -484,55 +484,14 @@ namespace PathOS
             this.score = score;
         }
 
-        private bool EqualsSimilar(ExploreMemory rhs)
+        public bool EqualsSimilar(ExploreMemory rhs, PathOSAgent agent)
         {
             return (originPoint - rhs.originPoint).magnitude 
-                <= PathOS.Constants.Navigation.EXPLORE_PATH_POS_THRESHOLD
+                <= PathOS.Constants.Navigation.EXPLORE_PATH_POS_THRESHOLD_FAC
+                   * agent.exploreThreshold
                 && Vector3.Angle(direction, rhs.direction) 
-                <= PathOS.Constants.Navigation.EXPLORE_PATH_DEG_THRESHOLD;
-        }
-
-        public static bool operator ==(ExploreMemory lhs, ExploreMemory rhs)
-        {
-            if (object.ReferenceEquals(lhs, null))
-                return object.ReferenceEquals(rhs, null);
-          
-            if (object.ReferenceEquals(rhs, null))
-                return object.ReferenceEquals(lhs, null);
-
-            return lhs.EqualsSimilar(rhs);
-        }
-
-        public static bool operator !=(ExploreMemory lhs, ExploreMemory rhs)
-        {
-            if (object.ReferenceEquals(lhs, null))
-                return !object.ReferenceEquals(rhs, null);
-
-            if (object.ReferenceEquals(rhs, null))
-                return !object.ReferenceEquals(lhs, null);
-
-            return !lhs.EqualsSimilar(rhs);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
-
-            ExploreMemory objAsEntity = obj as ExploreMemory;
-
-            if (objAsEntity == null)
-                return false;
-
-            return this == objAsEntity;
-        }
-
-        //Placeholder - for now our equality check should always be run.
-        //Will probably replace this with a hashing based on snapping the
-        //origin point/direction.
-        public override int GetHashCode()
-        {
-            return 0;
+                <= PathOS.Constants.Navigation.EXPLORE_PATH_DEG_THRESHOLD_FAC
+                   * agent.exploreDegrees;
         }
     }
 }

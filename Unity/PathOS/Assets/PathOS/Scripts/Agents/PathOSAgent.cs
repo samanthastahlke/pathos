@@ -414,6 +414,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //Bias for preferring the goal we have already set.
+        //(If we haven't already reached it).
         if (memory.entity == currentDest.entity
             && Vector3.SqrMagnitude(GetPosition() - currentDest.pos)
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
@@ -502,7 +503,8 @@ public class PathOSAgent : MonoBehaviour
             //Else, target the "start" point, and the agent will re-assess its 
             //options when it gets there.
             if (Vector3.SqrMagnitude(origin - GetPosition())
-                < PathOS.Constants.Navigation.EXPLORE_PATH_POS_THRESHOLD)
+                < PathOS.Constants.Navigation.EXPLORE_PATH_POS_THRESHOLD_FAC 
+                * exploreThreshold)
                 dest.pos = newDest;
             else
                 dest.pos = origin;
