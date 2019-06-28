@@ -82,6 +82,15 @@ public class PathOSAgent : MonoBehaviour
 
     //Where is the agent targeting?
     private TargetDest currentDest;
+
+    //What is the total positive impact of all unvisited entities?
+    //(Used to penalize level completion). 
+    private float cumulativeEntityScore = 0.0f;
+    private float pastCumulativeEntityScore = 0.0f;
+    //Prevent initial selection of final goal as the target (edge case).
+    private bool assessedGoalsInit = false;
+
+    //Is the agent "finished" the level?
     public bool completed { get; set; }
 
     //For backtracking traversal.
@@ -257,6 +266,9 @@ public class PathOSAgent : MonoBehaviour
 
         float maxScore = -10000.0f;
 
+        pastCumulativeEntityScore = cumulativeEntityScore;
+        cumulativeEntityScore = 0.0f;
+
         //Potential entity goals.
         for(int i = 0; i < memory.entities.Count; ++i)
         {
@@ -363,6 +375,8 @@ public class PathOSAgent : MonoBehaviour
             currentDest = dest;
         }
 
+        assessedGoalsInit = true;
+
         if(verboseDebugging)
             NPDebug.LogMessage("Position: " + navAgent.transform.position + 
                 ", Destination: " + currentDest);
@@ -381,8 +395,7 @@ public class PathOSAgent : MonoBehaviour
             return;
 
         bool isFinalGoal = memory.entity.entityType == EntityType.ET_GOAL_COMPLETION;
-
-        //Initial bias added to account for object's type.
+        
         float bias = 0.0f;
 
         //Special circumstances for the final goal - since it marks the end of play
@@ -390,27 +403,16 @@ public class PathOSAgent : MonoBehaviour
         if (isFinalGoal)
         {
             //If mandatory goals remain, the final goal can't be targeted.
-            if (this.memory.MandatoryGoalsLeft())
+            if (this.memory.MandatoryGoalsLeft() || !assessedGoalsInit)
                 return;
 
-            bias += PathOS.Constants.Behaviour.FINAL_GOAL_BONUS_FACTOR;
+            bias += Mathf.Lerp(PathOS.Constants.Behaviour.FINAL_GOAL_BONUS_MIN, 
+                PathOS.Constants.Behaviour.FINAL_GOAL_BONUS_MAX,
+                heuristicScaleLookup[Heuristic.EFFICIENCY]);
 
-            //Penalize for number of "unvisited" entities reduced by one to account for 
-            //the goal itself - which shouldn't add to its penalty.
-            //(Scaled by average of curiosity and completion.)
-            float avgCompletionCuriosity = 0.5f *
-                (heuristicScaleLookup[Heuristic.CURIOSITY] +
-                 heuristicScaleLookup[Heuristic.COMPLETION]);
-
-            bias -= Mathf.Min(this.memory.UnvisitedRemaining() - 1, 0)
-                * PathOS.Constants.Behaviour.FINAL_GOAL_EXPLORATION_PENALTY_FACTOR
-                * avgCompletionCuriosity;
-
-            //Penalize for number of unvisited optional goals left.
-            //(Scaled by achievement).
-            bias -= this.memory.AchievementGoalsLeft()
-                * PathOS.Constants.Behaviour.FINAL_GOAL_ACHIEVEMENT_PENALTY_FACTOR
-                * heuristicScaleLookup[Heuristic.ACHIEVEMENT];
+            //Penalize for the agent's assessment of benefit for all unvisited
+            //positive entities.
+            bias -= pastCumulativeEntityScore;
         }
 
         //Bias for preferring the goal we have already set.
@@ -421,6 +423,7 @@ public class PathOSAgent : MonoBehaviour
             bias += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
 
         //Weighted scoring function.
+        //Bias added to account for entity's type.
         foreach (HeuristicScale heuristicScale in heuristicScales)
         {
             (Heuristic, EntityType) key = (heuristicScale.heuristic, memory.entity.entityType);
@@ -436,6 +439,9 @@ public class PathOSAgent : MonoBehaviour
 
         Vector3 toEntity = memory.RecallPos() - GetPosition();
         float score = ScoreDirection(GetPosition(), toEntity, bias, toEntity.magnitude);
+
+        if (!isFinalGoal && score > 0)
+            cumulativeEntityScore += score;
 
         //Stochasticity introduced to goal update.
         if(PathOS.ScoringUtility.UpdateScore(score, maxScore))
@@ -591,7 +597,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //Memory path update.
-        if(onMemPath)
+        if (onMemPath)
         {
             Vector3 curXZ = GetPosition();
             curXZ.y = 0.0f;
@@ -611,9 +617,11 @@ public class PathOSAgent : MonoBehaviour
                     navAgent.SetDestination(memPathWaypoints[0]);
                     memWaypoint.x = memPathWaypoints[0].x;
                     memWaypoint.z = memPathWaypoints[0].z;
-                }      
-            }  
+                }
+            }
         }
+        else
+            navAgent.SetDestination(currentDest.pos);
 
         //Perception update.
         //This will allow the agent's eyes to "process" nearby entities

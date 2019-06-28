@@ -90,11 +90,8 @@ namespace PathOS
             public const float DIST_SCORE_FACTOR_SQR = DIST_SCORE_FACTOR * DIST_SCORE_FACTOR;
 
             //Govern the "ending" behaviour of the agent.
-            public const float FINAL_GOAL_BONUS_FACTOR = 5.0f;
-            //Penalty used to reduce score of the end goal if optional goals remain.
-            public const float FINAL_GOAL_ACHIEVEMENT_PENALTY_FACTOR = 1.0f;
-            //Penalty used to reduce score of the end goal for unexplored entities.
-            public const float FINAL_GOAL_EXPLORATION_PENALTY_FACTOR = 1.0f;
+            public const float FINAL_GOAL_BONUS_MIN = 1.0f;
+            public const float FINAL_GOAL_BONUS_MAX = 5.0f;
 
             public const float SCORE_MAX = 10000.0f;
             public const float SCORE_UNCERTAINTY_THRESHOLD = 0.1f;

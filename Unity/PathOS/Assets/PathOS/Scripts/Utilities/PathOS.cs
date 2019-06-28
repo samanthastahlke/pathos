@@ -255,7 +255,7 @@ namespace PathOS
             }
             else
             {
-                bounds.SetMinMax(objectRef.transform.position,
+                tempBounds.SetMinMax(objectRef.transform.position,
                     objectRef.transform.position);
             }
 

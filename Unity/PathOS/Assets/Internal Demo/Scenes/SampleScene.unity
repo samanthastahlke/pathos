@@ -212,6 +212,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Flowerpot01_d07
       objectReference: {fileID: 0}
+    - target: {fileID: 165532, guid: 3ded3765d3df53e43a67aa508bd74f2c, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 428888, guid: 3ded3765d3df53e43a67aa508bd74f2c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.33699995
@@ -267,6 +271,14 @@ PrefabInstance:
     - target: {fileID: 428888, guid: 3ded3765d3df53e43a67aa508bd74f2c, type: 3}
       propertyPath: m_LocalScale.z
       value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 170008, guid: 3ded3765d3df53e43a67aa508bd74f2c, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 155320, guid: 3ded3765d3df53e43a67aa508bd74f2c, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ded3765d3df53e43a67aa508bd74f2c, type: 3}
@@ -697,6 +709,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Building01_d02 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 166120, guid: 8841453141b7e0e41aeefed8999e05fd, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 450312, guid: 8841453141b7e0e41aeefed8999e05fd, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.5099995
@@ -929,6 +945,10 @@ PrefabInstance:
     - target: {fileID: 180120, guid: a76d6dc72bc81434e93a247dcc2fe116, type: 3}
       propertyPath: m_Name
       value: Door14
+      objectReference: {fileID: 0}
+    - target: {fileID: 180120, guid: a76d6dc72bc81434e93a247dcc2fe116, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 463940, guid: a76d6dc72bc81434e93a247dcc2fe116, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1273,7 +1293,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 185895896}
-  m_Mesh: {fileID: 1056708398}
+  m_Mesh: {fileID: 455882092}
 --- !u!23 &185895900
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1291,7 +1311,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1886174343}
+  - {fileID: 920142681}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1498,6 +1518,10 @@ PrefabInstance:
     - target: {fileID: 128178, guid: 8ddcb62f6c2df7e478384fd8781918eb, type: 3}
       propertyPath: m_Name
       value: Chimney01
+      objectReference: {fileID: 0}
+    - target: {fileID: 128178, guid: 8ddcb62f6c2df7e478384fd8781918eb, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 412266, guid: 8ddcb62f6c2df7e478384fd8781918eb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1759,6 +1783,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HouseDoor
       objectReference: {fileID: 0}
+    - target: {fileID: 180120, guid: a76d6dc72bc81434e93a247dcc2fe116, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 463940, guid: a76d6dc72bc81434e93a247dcc2fe116, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1835,6 +1863,10 @@ PrefabInstance:
     - target: {fileID: 159314, guid: c707e67a0d554814a9e598752d32bf48, type: 3}
       propertyPath: m_Name
       value: Window06_b04
+      objectReference: {fileID: 0}
+    - target: {fileID: 159314, guid: c707e67a0d554814a9e598752d32bf48, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 475256, guid: c707e67a0d554814a9e598752d32bf48, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2053,6 +2085,10 @@ PrefabInstance:
     - target: {fileID: 137170, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
       propertyPath: m_Name
       value: Window01_b01
+      objectReference: {fileID: 0}
+    - target: {fileID: 137170, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 426578, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2980,6 +3016,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Window06_b04 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 159314, guid: c707e67a0d554814a9e598752d32bf48, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 475256, guid: c707e67a0d554814a9e598752d32bf48, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.9699999
@@ -3321,6 +3361,169 @@ Transform:
   m_Father: {fileID: 673952698}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!43 &455882092
+Mesh:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 10
+  m_SubMeshes:
+  - serializedVersion: 2
+    firstByte: 0
+    indexCount: 6
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 4
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 20, y: 0, z: 20}
+  m_Shapes:
+    vertices: []
+    shapes: []
+    channels: []
+    fullWeights: []
+  m_BindPose: []
+  m_BoneNameHashes: 
+  m_RootBoneNameHash: 0
+  m_BonesAABB: []
+  m_VariableBoneCountWeights:
+    m_Data: 
+  m_MeshCompression: 0
+  m_IsReadable: 1
+  m_KeepVertices: 1
+  m_KeepIndices: 1
+  m_IndexFormat: 0
+  m_IndexBuffer: 000001000200000002000300
+  m_VertexData:
+    serializedVersion: 3
+    m_VertexCount: 4
+    m_Channels:
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 12
+      format: 0
+      dimension: 2
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    m_DataSize: 80
+    _typelessdata: 0000a0c1000000000000a0c100000000000000000000a0c1000000000000a041000000000000803f0000a041000000000000a0410000803f0000803f0000a041000000000000a0c10000803f00000000
+  m_CompressedMesh:
+    m_Vertices:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UV:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Normals:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Tangents:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Weights:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_NormalSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_TangentSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_FloatColors:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_BoneIndices:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Triangles:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UVInfo: 0
+  m_LocalAABB:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 20, y: 0, z: 20}
+  m_MeshUsageFlags: 0
+  m_BakedConvexCollisionMesh: 
+  m_BakedTriangleCollisionMesh: 
+  m_MeshMetrics[0]: 1
+  m_MeshMetrics[1]: 1
+  m_MeshOptimizationFlags: 1
+  m_StreamData:
+    offset: 0
+    size: 0
+    path: 
 --- !u!1001 &480005635
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3450,6 +3653,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: 1d87a6bf860e4194092e0a5206d119f0, type: 3}
       propertyPath: m_Name
       value: Rope01_a02
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 1d87a6bf860e4194092e0a5206d119f0, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 1d87a6bf860e4194092e0a5206d119f0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4410,6 +4617,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Window01_b01 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 137170, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 426578, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.01
@@ -5153,6 +5364,31 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 906089555}
   m_PrefabAsset: {fileID: 0}
+--- !u!21 &920142681
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Unlit/Transparent
+  m_Shader: {fileID: 10750, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1001 &923501510
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5318,6 +5554,10 @@ PrefabInstance:
     - target: {fileID: 108602, guid: bd99fd9ce0a4d7146a8ea6912f781027, type: 3}
       propertyPath: m_Name
       value: Hanger01_a01
+      objectReference: {fileID: 0}
+    - target: {fileID: 108602, guid: bd99fd9ce0a4d7146a8ea6912f781027, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 440106, guid: bd99fd9ce0a4d7146a8ea6912f781027, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5649,6 +5889,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Window01_b01
       objectReference: {fileID: 0}
+    - target: {fileID: 137170, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 426578, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.06
@@ -5903,6 +6147,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 166120, guid: 8841453141b7e0e41aeefed8999e05fd, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 450312, guid: 8841453141b7e0e41aeefed8999e05fd, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.62000024
@@ -5979,169 +6227,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1047440895}
   m_PrefabAsset: {fileID: 0}
---- !u!43 &1056708398
-Mesh:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 10
-  m_SubMeshes:
-  - serializedVersion: 2
-    firstByte: 0
-    indexCount: 6
-    topology: 0
-    baseVertex: 0
-    firstVertex: 0
-    vertexCount: 4
-    localAABB:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 20, y: 0, z: 20}
-  m_Shapes:
-    vertices: []
-    shapes: []
-    channels: []
-    fullWeights: []
-  m_BindPose: []
-  m_BoneNameHashes: 
-  m_RootBoneNameHash: 0
-  m_BonesAABB: []
-  m_VariableBoneCountWeights:
-    m_Data: 
-  m_MeshCompression: 0
-  m_IsReadable: 1
-  m_KeepVertices: 1
-  m_KeepIndices: 1
-  m_IndexFormat: 0
-  m_IndexBuffer: 000001000200000002000300
-  m_VertexData:
-    serializedVersion: 3
-    m_VertexCount: 4
-    m_Channels:
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 3
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 12
-      format: 0
-      dimension: 2
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    m_DataSize: 80
-    _typelessdata: 0000a0c1000000000000a0c100000000000000000000a0c1000000000000a041000000000000803f0000a041000000000000a0410000803f0000803f0000a041000000000000a0c10000803f00000000
-  m_CompressedMesh:
-    m_Vertices:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UV:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Normals:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Tangents:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Weights:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_NormalSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_TangentSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_FloatColors:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_BoneIndices:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Triangles:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UVInfo: 0
-  m_LocalAABB:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 20, y: 0, z: 20}
-  m_MeshUsageFlags: 0
-  m_BakedConvexCollisionMesh: 
-  m_BakedTriangleCollisionMesh: 
-  m_MeshMetrics[0]: 1
-  m_MeshMetrics[1]: 1
-  m_MeshOptimizationFlags: 1
-  m_StreamData:
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &1060252982
 GameObject:
   m_ObjectHideFlags: 0
@@ -6320,6 +6405,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 1106205639809762, guid: c53e680fdc8fae04d91b4ce9e548d2df, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4024617225401250, guid: c53e680fdc8fae04d91b4ce9e548d2df, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20.83
@@ -6420,6 +6509,10 @@ PrefabInstance:
     - target: {fileID: 122108, guid: 8ea9dc37f9ec7584cbbe5fe654ca0878, type: 3}
       propertyPath: m_Name
       value: Vine01_a02
+      objectReference: {fileID: 0}
+    - target: {fileID: 122108, guid: 8ea9dc37f9ec7584cbbe5fe654ca0878, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 424258, guid: 8ea9dc37f9ec7584cbbe5fe654ca0878, type: 3}
       propertyPath: m_LocalPosition.x
@@ -7501,6 +7594,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Flowerpot03_g06
       objectReference: {fileID: 0}
+    - target: {fileID: 173222, guid: df278cf9f3a973b4783ea065e9e25020, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 450914, guid: df278cf9f3a973b4783ea065e9e25020, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.29799998
@@ -7556,6 +7653,18 @@ PrefabInstance:
     - target: {fileID: 450914, guid: df278cf9f3a973b4783ea065e9e25020, type: 3}
       propertyPath: m_LocalScale.z
       value: 0.49999997
+      objectReference: {fileID: 0}
+    - target: {fileID: 149812, guid: df278cf9f3a973b4783ea065e9e25020, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 125054, guid: df278cf9f3a973b4783ea065e9e25020, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 159776, guid: df278cf9f3a973b4783ea065e9e25020, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: df278cf9f3a973b4783ea065e9e25020, type: 3}
@@ -7950,6 +8059,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Shop_sign08_c01 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 151662, guid: 2cb8fee6351f7fe41af5e1f284b8b19a, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 400432, guid: 2cb8fee6351f7fe41af5e1f284b8b19a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.88
@@ -8099,6 +8212,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: 2b0c2618ef57a6447a3ecf7ba6b2f331, type: 3}
       propertyPath: m_Name
       value: Wood02_a04
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 2b0c2618ef57a6447a3ecf7ba6b2f331, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 2b0c2618ef57a6447a3ecf7ba6b2f331, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8285,6 +8402,10 @@ PrefabInstance:
     - target: {fileID: 128438, guid: c94c647d1bcd15f4497307fc7cef4ae4, type: 3}
       propertyPath: m_Name
       value: Door16_d02
+      objectReference: {fileID: 0}
+    - target: {fileID: 128438, guid: c94c647d1bcd15f4497307fc7cef4ae4, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 430774, guid: c94c647d1bcd15f4497307fc7cef4ae4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8504,6 +8625,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Window01_b01 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 137170, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 426578, guid: ea40f15626c42da4b885dfc336e10d79, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.07
@@ -8609,6 +8734,10 @@ PrefabInstance:
     - target: {fileID: 115982, guid: 1847918c7f52b0f4cb5fe7fbb59b2c07, type: 3}
       propertyPath: m_Name
       value: Building22_e02
+      objectReference: {fileID: 0}
+    - target: {fileID: 115982, guid: 1847918c7f52b0f4cb5fe7fbb59b2c07, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 481560, guid: 1847918c7f52b0f4cb5fe7fbb59b2c07, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8976,6 +9105,10 @@ PrefabInstance:
     - target: {fileID: 171242, guid: d81e4d74d077ac641a0b0eda01258ea5, type: 3}
       propertyPath: m_Name
       value: Shop_sign01_b05
+      objectReference: {fileID: 0}
+    - target: {fileID: 171242, guid: d81e4d74d077ac641a0b0eda01258ea5, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 453728, guid: d81e4d74d077ac641a0b0eda01258ea5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9763,7 +9896,7 @@ MonoBehaviour:
     10-46-47
   directoriesLoaded: []
   heatmapVisualizer: {fileID: 185895898}
-  showHeatmap: 1
+  showHeatmap: 0
   heatmapGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -10475,6 +10608,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_6 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1106205639809762, guid: c53e680fdc8fae04d91b4ce9e548d2df, type: 3}
+      propertyPath: m_NavMeshLayer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4024617225401250, guid: c53e680fdc8fae04d91b4ce9e548d2df, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.98
@@ -10802,31 +10939,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1880581128}
   m_PrefabAsset: {fileID: 0}
---- !u!21 &1886174343
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Unlit/Transparent
-  m_Shader: {fileID: 10750, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &1903075768 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1337108901918474, guid: da41fd2967a439d409358c2214a5409e,
@@ -11528,19 +11640,19 @@ MonoBehaviour:
   experienceScale: 1
   heuristicScales:
   - heuristic: 0
-    scale: 0.005
+    scale: 1
   - heuristic: 10
     scale: 0
   - heuristic: 15
-    scale: 0
+    scale: 1
   - heuristic: 20
-    scale: 0.939
+    scale: 0.243
   - heuristic: 25
-    scale: 0.792
+    scale: 0.446
   - heuristic: 30
     scale: 0
   - heuristic: 35
-    scale: 0.613
+    scale: 0
   visitThreshold: 1
   exploreDegrees: 5
   invisibleExploreDegrees: 30
