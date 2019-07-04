@@ -422,6 +422,8 @@ public class PathOSAgent : MonoBehaviour
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
             bias += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
 
+        Vector3 toEntity = memory.RecallPos() - GetPosition();
+
         //Weighted scoring function.
         //Bias added to account for entity's type.
         foreach (HeuristicScale heuristicScale in heuristicScales)
@@ -434,17 +436,20 @@ public class PathOSAgent : MonoBehaviour
                 continue;
             }
 
-            bias += heuristicScale.scale * entityScoringLookup[key];
+            bias += heuristicScale.scale * entityScoringLookup[key]
+                * PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR / toEntity.sqrMagnitude;
         }
 
-        Vector3 toEntity = memory.RecallPos() - GetPosition();
         float score = ScoreDirection(GetPosition(), toEntity, bias, toEntity.magnitude);
 
-        if (!isFinalGoal && score > 0)
+        if (!isFinalGoal && score > 0.0f)
             cumulativeEntityScore += score;
 
+        if (bias > 0.0f && score > 0.0f)
+            score += PathOS.Constants.Behaviour.INTERACTIVITY_BIAS;
+
         //Stochasticity introduced to goal update.
-        if(PathOS.ScoringUtility.UpdateScore(score, maxScore))
+        if (PathOS.ScoringUtility.UpdateScore(score, maxScore))
         {
             //Only update maxScore if the new score is actually higher.
             //(Prevent over-accumulation of error.)

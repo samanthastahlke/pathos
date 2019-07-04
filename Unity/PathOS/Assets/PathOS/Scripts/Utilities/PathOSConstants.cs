@@ -84,8 +84,14 @@ namespace PathOS
             //Bias for preferring the existing goal.
             public const float EXISTING_GOAL_BIAS = 0.5f;
 
+            //Bias for preferring entity targets.
+            public const float INTERACTIVITY_BIAS = 0.5f;
+
             //Adjustment factor for calculating the role of distance in 
             //entity scoring.
+            //Factor is calculated as the squared factor over the squared distance.
+            //As a reference, the score factor is the distance in units
+            //that will result in an adjustment factor of 1.0.
             public const float DIST_SCORE_FACTOR = 2.0f;
             public const float DIST_SCORE_FACTOR_SQR = DIST_SCORE_FACTOR * DIST_SCORE_FACTOR;
 
