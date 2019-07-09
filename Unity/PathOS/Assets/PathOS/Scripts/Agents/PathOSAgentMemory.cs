@@ -90,6 +90,7 @@ public class PathOSAgentMemory : MonoBehaviour
         memoryMap.BakeVisualGrid();
 
         Vector3 agentPos = agent.GetPosition();
+        agentPos.y = 0.0f;
 
         stm.Clear();
 
@@ -104,7 +105,7 @@ public class PathOSAgentMemory : MonoBehaviour
 
             //Flag an entity as visited if we pass by in close range.
             //Inelegant brute-force to prevent "accidental" completion.
-            if (Vector3.SqrMagnitude(entity.entity.ActualPosition() - agentPos) 
+            if (Vector3.SqrMagnitude(entity.XZActualPos() - agentPos) 
                 < visitThresholdSqr
                 && entity.entity.entityType != EntityType.ET_GOAL_COMPLETION)
                 entity.Visit(this.gameObject, PathOSAgent.logger);
@@ -143,7 +144,7 @@ public class PathOSAgentMemory : MonoBehaviour
             float visitThresholdSqr = (finalGoalTracker[i].entity.entityRef.overrideVisitRadius) ?
                 finalGoalTracker[i].entity.entityRef.visitRadiusSqr : agent.visitThresholdSqr;
 
-            if (Vector3.SqrMagnitude(finalGoalTracker[i].entity.ActualPosition() - agentPos) 
+            if (Vector3.SqrMagnitude(finalGoalTracker[i].XZActualPos() - agentPos) 
                 < visitThresholdSqr)
                 finalGoalTracker[i].Visit();             
         }
@@ -155,7 +156,7 @@ public class PathOSAgentMemory : MonoBehaviour
 
             //Only mark completion if the agent actively targets the final goal.
             if (agent.IsTargeted(finalGoal.entity)
-                && Vector3.SqrMagnitude(finalGoal.entity.ActualPosition() - agentPos)
+                && Vector3.SqrMagnitude(finalGoal.XZActualPos() - agentPos)
                 < finalThresholdSqr)
             {
                 finalGoal.Visit(this.gameObject, PathOSAgent.logger);
@@ -167,7 +168,10 @@ public class PathOSAgentMemory : MonoBehaviour
         {
             paths[i].impressionTime += Time.deltaTime;
 
-            if (paths[i].impressionTime >= agent.forgetTime)
+            //Paths are ejected from memory if they are forgotten,
+            //or if back-end navmesh logic has determined they cannot be reached.
+            if (paths[i].impressionTime >= agent.forgetTime
+                || agent.IsUnreachable(paths[i].estimatedDest))
                 paths.RemoveAt(i);
         }       
     }
@@ -243,6 +247,18 @@ public class PathOSAgentMemory : MonoBehaviour
             if(PerceivedEntity.SameEntity(entity, entities[i]))
             {
                 entities[i].MakeUnforgettable();
+                return;
+            }
+        }
+    }
+
+    public void MakeUnreachable(PerceivedEntity entity)
+    {
+        for(int i = 0; i < entities.Count; ++i)
+        {
+            if(PerceivedEntity.SameEntity(entity, entities[i]))
+            {
+                entities[i].MakeUnreachable();
                 return;
             }
         }

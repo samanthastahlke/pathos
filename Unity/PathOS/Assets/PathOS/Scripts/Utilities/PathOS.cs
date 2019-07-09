@@ -375,6 +375,7 @@ namespace PathOS
     {
         public PerceivedEntity entity = null;
         public Vector3 pos = Vector3.zero;
+        public bool accurate = true;
 
         public TargetDest() { }
 
@@ -382,6 +383,7 @@ namespace PathOS
         {
             entity = data.entity;
             pos = data.pos;
+            accurate = data.accurate;
         }   
     }
 
@@ -391,6 +393,7 @@ namespace PathOS
     {
         public PerceivedEntity entity;
         public bool visited = false;
+        public bool unreachable = false;
 
         //Whether the memory should be considered long-term.
         public bool ltm = false;
@@ -440,9 +443,17 @@ namespace PathOS
             visited = true;
         }
 
+        public void MakeUnreachable()
+        {
+            if(!unreachable)
+                MakeUnforgettable();
+
+            unreachable = true;
+        }
+
         public Vector3 RecallPos()
         {
-            Vector3 pos = entity.perceivedPos;
+            Vector3 pos = entity.ActualPosition();
 
             //Add noise to position recall if the object is not in sight 
             //and not always known.
@@ -459,6 +470,14 @@ namespace PathOS
 
             return pos;
         }
+
+        public Vector3 XZActualPos()
+        {
+            Vector3 actualPos = entity.ActualPosition();
+            actualPos.y = 0.0f;
+
+            return actualPos;
+        }
     }
 
     //How the memory of a path/explore point is represented in the agent's world model.
@@ -469,13 +488,15 @@ namespace PathOS
 
         public Vector3 originPoint;
         public Vector3 direction;
+        public Vector3 estimatedDest;
 
         public float impressionTime = 0.0f;
 
-        public ExploreMemory(Vector3 originPoint, Vector3 direction, float score)
+        public ExploreMemory(Vector3 originPoint, Vector3 direction, Vector3 estimatedDest, float score)
         {
             this.originPoint = originPoint;
             this.direction = direction;
+            this.estimatedDest = estimatedDest;
             this.score = score;
         }
 

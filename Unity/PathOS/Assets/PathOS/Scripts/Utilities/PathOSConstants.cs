@@ -48,12 +48,31 @@ namespace PathOS
 
             //How close do we need to be to a waypoint to have crossed it?
             public const float WAYPOINT_EPSILON_SQR = 1.0f;
+            //How far apart do we set memory path waypoints?
+            public const float WAYPOINT_DIST_MIN = 8.0f;
+            public const float WAYPOINT_DIST_MIN_SQR = 
+                WAYPOINT_DIST_MIN * WAYPOINT_DIST_MIN;
 
             //How close do two "path" memories need to be to be considered
             //equivalent?
             //(Applied as multipliers to agent exploration thresholds).
             public const float EXPLORE_PATH_POS_THRESHOLD_FAC = 3.0f;
             public const float EXPLORE_PATH_DEG_THRESHOLD_FAC = 3.0f;
+
+            //For checking when exploration targets are unreachable.
+            //(R - the threshold for whether a point should be used as a reference
+            //to an unreachable area.)
+            public const float UNREACHABLE_POS_SIMILARITY_RAD = 2.0f;
+
+            //For optimized checking, use R^2.
+            public const float UNREACHABLE_POS_SIMILARITY_SQR =
+                UNREACHABLE_POS_SIMILARITY_RAD *
+                UNREACHABLE_POS_SIMILARITY_RAD;
+
+            //To guarantee a point is not covered by an unreachable reference - 
+            //(R * 2)^2 = R^2 * 4.
+            public const float UNREACHABLE_POS_CHECK_SQR = 
+                4 * UNREACHABLE_POS_SIMILARITY_SQR;
 
             //How proportionally large should the hazard movement penalty
             //be when passing next to a hazard while constructing a path from

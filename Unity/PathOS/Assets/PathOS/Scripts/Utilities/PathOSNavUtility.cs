@@ -50,6 +50,7 @@ public class PathOSNavUtility
         {
             public int xCoord = 0;
             public int zCoord = 0;
+            public Vector3 point = Vector3.zero;
             public float gScore = 1000.0f;
             public float hScore = 1000.0f;
             public float fScore = 1000.0f;
@@ -412,29 +413,33 @@ public class PathOSNavUtility
 
             if (Walkable(left.xCoord, left.zCoord))
             {
+                left.point = GetPoint(left.xCoord, left.zCoord);
                 left.UpdateScores(dest);
-                left.AddPenalty(memory.MovementHazardPenalty(GetPoint(left.xCoord, left.zCoord)));
+                left.AddPenalty(memory.MovementHazardPenalty(left.point));
                 adjacent.Add(left);
             }
                 
             if (Walkable(right.xCoord, right.zCoord))
             {
+                right.point = GetPoint(right.xCoord, right.zCoord);
                 right.UpdateScores(dest);
-                right.AddPenalty(memory.MovementHazardPenalty(GetPoint(right.xCoord, right.zCoord)));
+                right.AddPenalty(memory.MovementHazardPenalty(right.point));
                 adjacent.Add(right);
             }
                 
             if (Walkable(up.xCoord, up.zCoord))
             {
+                up.point = GetPoint(up.xCoord, up.zCoord);
                 up.UpdateScores(dest);
-                up.AddPenalty(memory.MovementHazardPenalty(GetPoint(up.xCoord, up.zCoord)));
+                up.AddPenalty(memory.MovementHazardPenalty(up.point));
                 adjacent.Add(up);
             }
                 
             if (Walkable(down.xCoord, down.zCoord))
             {
+                down.point = GetPoint(down.xCoord, down.zCoord);
                 down.UpdateScores(dest);
-                down.AddPenalty(memory.MovementHazardPenalty(GetPoint(down.xCoord, down.zCoord)));
+                down.AddPenalty(memory.MovementHazardPenalty(down.point));
                 adjacent.Add(down);
             }
         }
@@ -449,11 +454,13 @@ public class PathOSNavUtility
             AStarTile startTile = new AStarTile();
             startTile.xCoord = gridX;
             startTile.zCoord = gridZ;
+            startTile.point = GetPoint(startTile.xCoord, startTile.zCoord);
 
             GetGridCoords(dest, ref gridX, ref gridZ);
             AStarTile destTile = new AStarTile();
             destTile.xCoord = gridX;
             destTile.zCoord = gridZ;
+            destTile.point = GetPoint(destTile.xCoord, destTile.zCoord);
 
             startTile.gScore = Mathf.Abs(startTile.xCoord - destTile.xCoord)
                 + Mathf.Abs(startTile.zCoord - destTile.zCoord);
@@ -500,28 +507,32 @@ public class PathOSNavUtility
 
                 if (open.Count == 0)
                 {
-                    //NPDebug.LogMessage("Failed to reach destination.");
                     complete = true;
                     break;
                 }
 
-                curTile = open[0];
-                open.RemoveAt(0);
+                int maxIndex = 0;
+
+                for(int i = 1; i < open.Count; ++i)
+                {
+                    if (open[i].fScore <= open[0].fScore)
+                        maxIndex = i;
+                    else
+                        break;
+                }
+
+                //Stochasticity introduced for promoting less
+                //"robotic" behaviour.
+                int selectedIndex = Random.Range(0, maxIndex + 1);
+                curTile = open[selectedIndex];
+                open.RemoveAt(selectedIndex);
             }
 
             List<AStarTile> path = new List<AStarTile>();
 
             //Construct final path.
-            if(destinationReached)
-            {
-                while(curTile != startTile)
-                {
-                    path.Insert(0, curTile);
-                    curTile = curTile.parent;
-                }          
-            }
-            else
-            {
+            if(!destinationReached)
+            { 
                 //"Try" to navigate back - take the tile that got closest and build path.
                 AStarTile best = closed[0];
 
@@ -532,30 +543,34 @@ public class PathOSNavUtility
                 }
 
                 curTile = best;
+            }
 
-                while(curTile != startTile)
+            //curTile is either our destination or the best tile found.
+            AStarTile lastInsert;
+            int pathTileCount = 0;
+
+            while (curTile != startTile)
+            {
+                path.Insert(0, curTile);
+                lastInsert = curTile;
+
+                do
                 {
-                    path.Insert(0, curTile);
                     curTile = curTile.parent;
-                }
+                    ++pathTileCount;
+
+                } while (curTile != startTile
+                && Vector3.SqrMagnitude(curTile.point - lastInsert.point)
+                < PathOS.Constants.Navigation.WAYPOINT_DIST_MIN_SQR);
             }
 
-            //For debugging.
-            /*
-            for (int i = 0; i < path.Count; ++i)
+            for (int i = 0; i < path.Count - 1; ++i)
             {
-                visualGrid.SetPixel(path[i].xCoord, path[i].zCoord, Color.blue);
+                waypoints.Add(path[i].point);
             }
 
-            visualGrid.Apply();
-            */
-
-            for(int i = 1; i < path.Count - 1; ++i)
-            {
-                waypoints.Add(GetPoint(path[i].xCoord, path[i].zCoord));
-            }
-
-            return path.Count >= PathOS.Constants.Behaviour.MIN_A_STAR_MEMORY_LENGTH;
+            return waypoints.Count > 0 
+                && pathTileCount >= PathOS.Constants.Behaviour.MIN_A_STAR_MEMORY_LENGTH;
         }
 
         private bool Walkable(int x, int z)

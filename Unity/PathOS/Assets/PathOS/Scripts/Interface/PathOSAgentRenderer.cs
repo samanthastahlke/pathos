@@ -51,6 +51,7 @@ public class PathOSAgentRenderer : MonoBehaviour
     private string targetTex = "target";
     private string visitTex = "visited";
     private string memoryTex = "brain";
+    private string badTex = "unreachable";
     private string iconExtension = ".png";
 
     private Texture[] gizmoLegendTextures;
@@ -340,8 +341,10 @@ public class PathOSAgentRenderer : MonoBehaviour
             if (memory[i].entity == agentTargetEntity)
                 continue;
 
-            //Draw the visited, memorized, or visible icon as appropriate.
-            if (memory[i].visited)
+            //Draw the unreachable, visited, memorized, or visible icon as appropriate.
+            if (memory[i].unreachable)
+                Gizmos.DrawIcon(GetGizmoIconPos(pos), badTex + iconExtension);
+            else if (memory[i].visited)
                 Gizmos.DrawIcon(GetGizmoIconPos(pos), visitTex + iconExtension);
             else if (memory[i].entity.visible)
                 Gizmos.DrawIcon(GetGizmoIconPos(pos), eyeTex + iconExtension);
