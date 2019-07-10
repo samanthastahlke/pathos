@@ -90,10 +90,6 @@ namespace PathOS
             public const float ENEMY_RADIUS_SQR = ENEMY_RADIUS * ENEMY_RADIUS;
             public const int ENEMY_COUNT_THRESHOLD = 4;
 
-            //How many tiles must a "memory path" to a goal cover to be
-            //used instead of regular NavMeshAgent navigation?
-            public const int MIN_A_STAR_MEMORY_LENGTH = 3;
-
             //How often will the agent try to navigate somewhere based on 
             //memory rather than navmesh logic (optimal/exploring)?
             public const float BASE_MEMORY_NAV_CHANCE = 0.5f;

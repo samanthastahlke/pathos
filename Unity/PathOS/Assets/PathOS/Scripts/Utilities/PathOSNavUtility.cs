@@ -176,19 +176,53 @@ public class PathOSNavUtility
 
         Texture2D visualGrid;
 
-        public NavmeshMemoryMapper(float sampleGridSize, float extents, float sampleHeight)
+        public NavmeshMemoryMapper(float sampleGridSize)
         {
             this.sampleGridSize = sampleGridSize;
 
-            //Grab the NavMesh bounds.
-            SetBounds(GetNavmeshBounds(sampleHeight, extents));
+            //Test autodetection of NavMesh bounds.
+            NavMeshTriangulation navDetails = NavMesh.CalculateTriangulation();
+            NavmeshBoundsXZ autoBounds = new NavmeshBoundsXZ();
+
+            Vector3 v = Vector3.zero;
+
+            for (int i = 0; i < navDetails.vertices.Length; ++i)
+            {
+                v = navDetails.vertices[i];
+
+                if (v.x < autoBounds.min.x)
+                    autoBounds.min.x = v.x;
+                if (v.x > autoBounds.max.x)
+                    autoBounds.max.x = v.x;
+                if (v.z < autoBounds.min.z)
+                    autoBounds.min.z = v.z;
+                if (v.z > autoBounds.max.z)
+                    autoBounds.max.z = v.z;
+            }
+
+            //Round bounds areas up to the nearest grid tile and add 1 tilesize
+            //at each end.
+            autoBounds.min.x = RoundExtrema(autoBounds.min.x, true);
+            autoBounds.max.x = RoundExtrema(autoBounds.max.x, false);
+            autoBounds.min.z = RoundExtrema(autoBounds.min.z, true);
+            autoBounds.max.z = RoundExtrema(autoBounds.max.z, false);
+
+            autoBounds.RecomputeCentreAndSize();
+            SetBounds(autoBounds);
         }
 
-        public NavmeshMemoryMapper(float sampleGridSize, NavmeshBoundsXZ bounds)
+        private float RoundExtrema(float extrema, bool minimum)
         {
-            this.sampleGridSize = sampleGridSize;
-            bounds.RecomputeCentreAndSize();
-            SetBounds(bounds);
+            float sign = (extrema < 0) ? -1.0f : 1.0f;
+
+            float result = (Mathf.Floor(Mathf.Abs(extrema / sampleGridSize))) * sampleGridSize;
+            result *= sign;
+
+            //For a minimum, we always want to "step down" to add a margin to the map.
+            //For a maximum, we do the opposite.
+            result += (minimum) ? -2.0f * sampleGridSize : 2.0f * sampleGridSize;
+
+            return result;
         }
 
         private void SetBounds(NavmeshBoundsXZ bounds)
@@ -547,7 +581,6 @@ public class PathOSNavUtility
 
             //curTile is either our destination or the best tile found.
             AStarTile lastInsert;
-            int pathTileCount = 0;
 
             while (curTile != startTile)
             {
@@ -557,20 +590,21 @@ public class PathOSNavUtility
                 do
                 {
                     curTile = curTile.parent;
-                    ++pathTileCount;
 
                 } while (curTile != startTile
                 && Vector3.SqrMagnitude(curTile.point - lastInsert.point)
                 < PathOS.Constants.Navigation.WAYPOINT_DIST_MIN_SQR);
             }
 
+            //Skip targeting of the destination tile.
+            //(This will happen automatically when the agent reaches
+            //the last waypoint before the target.)
             for (int i = 0; i < path.Count - 1; ++i)
             {
                 waypoints.Add(path[i].point);
             }
 
-            return waypoints.Count > 0 
-                && pathTileCount >= PathOS.Constants.Behaviour.MIN_A_STAR_MEMORY_LENGTH;
+            return waypoints.Count > 0;
         }
 
         private bool Walkable(int x, int z)

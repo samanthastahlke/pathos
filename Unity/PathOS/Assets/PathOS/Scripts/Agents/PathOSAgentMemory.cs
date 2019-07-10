@@ -30,14 +30,6 @@ public class PathOSAgentMemory : MonoBehaviour
     [Header("Navmesh Memory Model")]
     [Tooltip("The edge length of a tile in the memory map (in units)")]
     public float gridSampleSize = 2.0f;
-    public PathOSNavUtility.NavmeshBoundsXZ navmeshBounds;
-
-    //For automatic memory map generation.
-    //Limiting to user-specified for this version.
-    private bool autogenerateMapExtents = false;
-    private float gridSampleElevation = 8.0f;
-    private float worldExtentRadius = 200.0f;
-
     public PathOSNavUtility.NavmeshMemoryMapper memoryMap { get; set; }
 
     //Check to see if there are any goals left
@@ -57,11 +49,7 @@ public class PathOSAgentMemory : MonoBehaviour
             manager = PathOSManager.instance;
 
         //Initialize the (blank) model of the agent's internal "map".
-        if (autogenerateMapExtents)
-            memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, worldExtentRadius, gridSampleElevation);
-        else
-            memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize, navmeshBounds);
-
+        memoryMap = new PathOSNavUtility.NavmeshMemoryMapper(gridSampleSize);
         memoryMap.memory = this;
 
         //Commit any "always-known" entities to memory.
