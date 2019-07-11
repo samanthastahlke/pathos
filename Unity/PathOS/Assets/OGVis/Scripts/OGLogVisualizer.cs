@@ -297,11 +297,11 @@ public class OGLogVisualizer : MonoBehaviour
                         //Store the "extents" of our data - used in heatmap generation.
                         if (p.x > dataExtents.max.x)
                             dataExtents.max.x = p.x;
-                        else if (p.x < dataExtents.min.x)
+                        if (p.x < dataExtents.min.x)
                             dataExtents.min.x = p.x;
                         if (p.z > dataExtents.max.z)
                             dataExtents.max.z = p.z;
-                        else if (p.z < dataExtents.min.z)
+                        if (p.z < dataExtents.min.z)
                             dataExtents.min.z = p.z;
 
                         pLog.AddPosition(timestamp, p);

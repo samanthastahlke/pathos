@@ -22,6 +22,12 @@ public class PathOSAgentEyes : MonoBehaviour
 
     [Header("Navmesh \"Sight\"")]
 
+    [DisplayName("Visibility Size Threshold")]
+    [Tooltip("How large must an object appear on screen (expressed" +
+        "as a percentage of viewport width) before it can be considered" +
+        "visible?")]
+    public float visSizeThreshold = 0.05f;
+
     [DisplayName("Raycast Distance")]
     [Tooltip("How far the agent \"looks\" over the navmesh " +
         "when scanning for obstacles/exploration targets.")]
@@ -105,6 +111,7 @@ public class PathOSAgentEyes : MonoBehaviour
 
             entity.visible = Vector3.Dot(camForwardXZ, entityVecXZ) > 0
                 && GeometryUtility.TestPlanesAABB(frustum, entity.entityRef.bounds)
+                && entity.entityRef.SizeVisibilityCheck(cam, visSizeThreshold)
                 && RaycastVisibilityCheck(entity.entityRef.bounds, entityPos);
 
             if (wasVisible != entity.visible)

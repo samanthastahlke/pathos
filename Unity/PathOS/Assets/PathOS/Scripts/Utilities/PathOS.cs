@@ -212,6 +212,7 @@ namespace PathOS
         //For visibility checking.
         private List<Renderer> rend;
         public Bounds bounds { get; private set; }
+        private Vector3[] boxVerts;
         private bool initBounds = false;
 
         public LevelEntity(GameObject objectRef, EntityType entityType)
@@ -260,7 +261,61 @@ namespace PathOS
             }
 
             bounds = tempBounds;
+
+            boxVerts = new Vector3[8];
+
+            boxVerts[0] = new Vector3(bounds.min.x, bounds.min.y, bounds.min.z);
+            boxVerts[1] = new Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
+            boxVerts[2] = new Vector3(bounds.min.x, bounds.max.y, bounds.min.z);
+            boxVerts[3] = new Vector3(bounds.min.x, bounds.max.y, bounds.max.z);
+
+            boxVerts[4] = new Vector3(bounds.max.x, bounds.min.y, bounds.min.z);
+            boxVerts[5] = new Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
+            boxVerts[6] = new Vector3(bounds.max.x, bounds.max.y, bounds.min.z);
+            boxVerts[7] = new Vector3(bounds.max.x, bounds.max.y, bounds.max.z);
+
             initBounds = true;
+        }
+
+        public bool SizeVisibilityCheck(Camera cam, float normThres)
+        {
+            //For objects with no calculated bounds, we don't have
+            //an accurate impression of the renderers.
+            //Return true to avoid false "blindness".
+            if (bounds.size.sqrMagnitude < 0.01f)
+                return true;
+
+            Vector3 vProj = Vector3.zero;
+
+            float minX, minY, maxX, maxY;
+
+            minX = minY = float.MaxValue;
+            maxX = maxY = float.MinValue;
+
+            //Coordinates are normalized in the camera's viewport.
+            //By Unity's specs, lower left is (0.0f, 0.0f) and upper
+            //right is (1.0f, 1.0f).
+            for(int i = 0; i < boxVerts.Length; ++i)
+            {
+                vProj = cam.WorldToViewportPoint(boxVerts[i]);
+
+                if (vProj.x < minX)
+                    minX = vProj.x;
+                if (vProj.x > minX)
+                    maxX = vProj.x;
+                if (vProj.y < minY)
+                    minY = vProj.y;
+                if (vProj.y > maxY)
+                    maxY = vProj.y;
+            }
+
+            float hFac = 1.0f / cam.aspect;
+
+            if ((maxY - minY) * hFac >= normThres
+                || (maxX - minX) >= normThres)
+                return true;
+
+            return false;
         }
     }
 

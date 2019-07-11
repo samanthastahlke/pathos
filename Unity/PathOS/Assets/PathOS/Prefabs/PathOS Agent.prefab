@@ -1362,22 +1362,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   freezeAgent: 0
-  experienceScale: 0
+  experienceScale: 1
   heuristicScales:
   - heuristic: 0
-    scale: 0
+    scale: 1
   - heuristic: 10
     scale: 1
   - heuristic: 15
-    scale: 0
+    scale: 1
   - heuristic: 20
-    scale: 0
+    scale: 1
   - heuristic: 25
-    scale: 0
+    scale: 1
   - heuristic: 30
-    scale: 0
+    scale: 1
   - heuristic: 35
-    scale: 0
+    scale: 1
   visitThreshold: 1
   exploreDegrees: 5
   invisibleExploreDegrees: 30
@@ -1397,9 +1397,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridSampleSize: 2
-  navmeshBounds:
-    min: {x: -52, y: 0, z: -52}
-    max: {x: 52, y: 0, z: 52}
 --- !u!114 &114839472988384982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1413,6 +1410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 20951506076577970}
+  visSizeThreshold: 0.04
   navmeshCastDistance: 50
   navmeshCastHeight: 0.75
 --- !u!114 &114232718271966738

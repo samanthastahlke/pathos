@@ -24785,10 +24785,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PathOS Agent
       objectReference: {fileID: 0}
-    - target: {fileID: 1088327799159616, guid: 607318e5beb058643a9226e07f881723, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4905807406101670, guid: 607318e5beb058643a9226e07f881723, type: 3}
       propertyPath: m_LocalPosition.x
       value: -23.87751
@@ -24832,66 +24828,6 @@ PrefabInstance:
     - target: {fileID: 4905807406101670, guid: 607318e5beb058643a9226e07f881723, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[0].scale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[2].scale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[4].scale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[6].scale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: experienceScale
-      value: 0.371
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[1].scale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[5].scale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: heuristicScales.Array.data[3].scale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114482611139781848, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: navmeshBounds.min.x
-      value: -42
-      objectReference: {fileID: 0}
-    - target: {fileID: 114482611139781848, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: navmeshBounds.min.z
-      value: -42
-      objectReference: {fileID: 0}
-    - target: {fileID: 114482611139781848, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: navmeshBounds.max.x
-      value: 42
-      objectReference: {fileID: 0}
-    - target: {fileID: 114482611139781848, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: navmeshBounds.max.z
-      value: 42
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 607318e5beb058643a9226e07f881723, type: 3}
