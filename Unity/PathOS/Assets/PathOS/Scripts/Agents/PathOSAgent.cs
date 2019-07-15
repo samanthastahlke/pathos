@@ -451,9 +451,19 @@ public class PathOSAgent : MonoBehaviour
         //Stochasticity introduced to goal update.
         if (PathOS.ScoringUtility.UpdateScore(score, maxScore))
         {
+            //Only update maxScore if the new score is actually higher.
+            //(Prevent over-accumulation of error.)
+            if (score > maxScore)
+                maxScore = score;
+
             //We only need to update the destination position
             //if we're targeting an entity other than the current target.
-            if(memory.entity != dest.entity)
+            if (memory.entity == currentDest.entity)
+            {
+                dest.pos = currentDest.pos;
+                dest.accurate = currentDest.accurate;
+            }
+            else
             {
                 //Check for reachability.
                 Vector3 realPos = Vector3.zero;
@@ -490,12 +500,7 @@ public class PathOSAgent : MonoBehaviour
                     dest.accurate = !reachable;
                 }
             }
-
-            //Only update maxScore if the new score is actually higher.
-            //(Prevent over-accumulation of error.)
-            if (score > maxScore)
-                maxScore = score;
-
+            
             dest.entity = memory.entity;
         }
     }
@@ -651,7 +656,12 @@ public class PathOSAgent : MonoBehaviour
         {
             routeTimer = 0.0f;
 
-            if(changeTargetCount <= PathOS.Constants.Behaviour.GOAL_INDECISION_COUNT_THRESHOLD)
+            float rerouteChance = changeTargetCount 
+                * PathOS.Constants.Behaviour.GOAL_INDECISION_CHANCE;
+
+            float rerouteRoll = Random.Range(0.0f, 1.0f);
+
+            if (rerouteRoll >= rerouteChance)
                 ComputeNewDestination();
         }
 

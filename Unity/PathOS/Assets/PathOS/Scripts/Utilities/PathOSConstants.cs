@@ -103,7 +103,8 @@ namespace PathOS
 
             //How many times in a row can the agent change its
             //mind without reaching a destination before it will lock on?
-            public const float GOAL_INDECISION_COUNT_THRESHOLD = 4;
+            public const float GOAL_INDECISION_COUNT_THRESHOLD = 5;
+            public const float GOAL_INDECISION_CHANCE = 1.0f / GOAL_INDECISION_COUNT_THRESHOLD;
 
             //Bias for preferring the existing goal.
             public const float EXISTING_GOAL_BIAS = 0.5f;
@@ -124,7 +125,7 @@ namespace PathOS
             public const float FINAL_GOAL_BONUS_MAX = 5.0f;
 
             public const float SCORE_MAX = 10000.0f;
-            public const float SCORE_UNCERTAINTY_THRESHOLD = 0.1f;
+            public const float SCORE_UNCERTAINTY_THRESHOLD = 0.25f;
             public const float SCORE_UNCERTAINTY_HALF = 0.5f * SCORE_UNCERTAINTY_THRESHOLD;
         }
     }
