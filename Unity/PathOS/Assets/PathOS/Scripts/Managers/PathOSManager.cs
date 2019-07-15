@@ -63,10 +63,22 @@ public class PathOSManager : NPSingleton<PathOSManager>
 
     private void Awake()
 	{
+        bool warned = false;
+
         for (int i = levelEntities.Count - 1; i >= 0; --i)
         {
-            if(null == levelEntities[i].objectRef)
+            if(null == levelEntities[i].objectRef
+                || !levelEntities[i].objectRef.activeInHierarchy)
             {
+                if(!warned)
+                {
+                    NPDebug.LogWarning("One or more PathOS entities in the " +
+                        "scene is null or inactive in the scene. It will be " +
+                        "ignored during the simulation.");
+
+                    warned = true;
+                }
+
                 levelEntities.RemoveAt(i);
                 continue;
             }

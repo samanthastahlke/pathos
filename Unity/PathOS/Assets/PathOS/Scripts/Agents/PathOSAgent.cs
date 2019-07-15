@@ -84,6 +84,9 @@ public class PathOSAgent : MonoBehaviour
     private TargetDest currentDest;
     private bool pathResolved = true;
 
+    //Accumulates to prevent rapid changes in goal with no decision made.
+    private int changeTargetCount = 0;
+
     //What is the total positive impact of all unvisited entities?
     //(Used to penalize level completion). 
     private float cumulativeEntityScore = 0.0f;
@@ -341,10 +344,14 @@ public class PathOSAgent : MonoBehaviour
 
         //Only recompute goal routing if our new goal is different
         //from the previous goal.
-        if(Vector3.SqrMagnitude(currentDest.pos - dest.pos) 
+        if(currentDest.entity != dest.entity ||
+            Vector3.SqrMagnitude(currentDest.pos - dest.pos) 
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
         {
+            ++changeTargetCount;
+
             currentDest = dest;
+
             float memChanceRoll = Random.Range(0.0f, 1.0f);
             onMemPath = false;
 
@@ -363,10 +370,8 @@ public class PathOSAgent : MonoBehaviour
 
             //Once something has been selected as a destination,
             //commit it to long-term memory.
-            if (null != dest.entity)
-                memory.CommitLTM(dest.entity);
-
-            currentDest = dest;
+            if (null != currentDest.entity)
+                memory.CommitLTM(currentDest.entity);
         }
 
         assessedGoalsInit = true;
@@ -446,28 +451,53 @@ public class PathOSAgent : MonoBehaviour
         //Stochasticity introduced to goal update.
         if (PathOS.ScoringUtility.UpdateScore(score, maxScore))
         {
+            //We only need to update the destination position
+            //if we're targeting an entity other than the current target.
+            if(memory.entity != dest.entity)
+            {
+                //Check for reachability.
+                Vector3 realPos = Vector3.zero;
+
+                bool reachable = PathOSNavUtility.GetClosestPointWalkable(memory.entity.ActualPosition(),
+                    navAgent.height * PathOS.Constants.Navigation.NAV_SEARCH_RADIUS_FAC,
+                    ref realPos);
+
+                if (!reachable)
+                {
+                    memory.MakeUnreachable();
+                    return;
+                }
+
+                //If the entity is visible/always known to the player, ensure 
+                //its position is set to the actual position of the entity.
+                if (memory.entity.visible || memory.entity.entityRef.alwaysKnown)
+                {
+                    dest.pos = realPos;
+                    dest.accurate = true;
+                }
+                //Otherwise, fetch its position from memory.
+                //(Imperfect recall, done when the decision is made).
+                else
+                {
+                    Vector3 guessPos = Vector3.zero;
+
+                    reachable = PathOSNavUtility.GetClosestPointWalkable(
+                    memory.RecallPos(),
+                    navAgent.height * PathOS.Constants.Navigation.NAV_SEARCH_RADIUS_FAC,
+                    ref guessPos);
+
+                    dest.pos = (reachable) ? guessPos : realPos;
+                    dest.accurate = !reachable;
+                }
+            }
+
             //Only update maxScore if the new score is actually higher.
             //(Prevent over-accumulation of error.)
             if (score > maxScore)
                 maxScore = score;
 
             dest.entity = memory.entity;
-
-            //If the entity is visible/always known to the player, ensure 
-            //its position is set to the actual position of the entity.
-            if (memory.entity.visible || memory.entity.entityRef.alwaysKnown)
-            {
-                dest.pos = memory.entity.ActualPosition();
-                dest.accurate = true;
-            }
-            //If this entity is a "new" target, fetch its position from memory.
-            //(Imperfect recall, done when the decision is made).
-            else if(dest.entity != currentDest.entity)
-            {
-                dest.pos = memory.RecallPos();
-                dest.accurate = false;
-            }
-        }    
+        }
     }
 
     //maxScore is updated if the direction achieves a higher score.
@@ -495,11 +525,11 @@ public class PathOSAgent : MonoBehaviour
                 memory.memoryMap.RaycastMemoryMap(origin, dir, eyes.navmeshCastDistance, out hit);
                 distance = hit.distance;
 
-                newDest = PathOSNavUtility.GetClosestPointWalkable(
-                    origin + distance * dir, exploreTargetMargin);
+                bool reachable = PathOSNavUtility.GetClosestPointWalkable(
+                    origin + distance * dir, exploreTargetMargin, ref newDest);
 
                 //Disqualify a target if the agent has determined it to be unreachable.
-                if (IsUnreachable(newDest))
+                if (!reachable || IsUnreachable(newDest))
                     return;
             }
         }
@@ -597,6 +627,15 @@ public class PathOSAgent : MonoBehaviour
         if (freezeAgent || completed)
             return;
 
+        //If we've reached our destination, reset the number of times
+        //we've "changed our mind" without doing anything.
+        if (changeTargetCount > 0 
+            && (Vector3.SqrMagnitude(GetPosition() - currentDest.pos)
+                < PathOS.Constants.Navigation.GOAL_EPSILON_SQR
+                || (currentDest.entity != null 
+                    && memory.Visited(currentDest.entity))))
+            changeTargetCount = 0;
+
         //Update spatial memory.
         memory.memoryMap.Fill(navAgent.transform.position);
 
@@ -611,7 +650,9 @@ public class PathOSAgent : MonoBehaviour
         if (routeTimer >= RouteComputeTimeCalculated())
         {
             routeTimer = 0.0f;
-            ComputeNewDestination();
+
+            if(changeTargetCount <= PathOS.Constants.Behaviour.GOAL_INDECISION_COUNT_THRESHOLD)
+                ComputeNewDestination();
         }
 
         //Memory path update.
@@ -641,14 +682,10 @@ public class PathOSAgent : MonoBehaviour
         }
         else if(currentDest.entity != null && !currentDest.accurate
             && currentDest.entity.visible)
-        {
-            currentDest.pos = currentDest.entity.ActualPosition();
-            currentDest.accurate = true;
-            RouteDestination();
-        }
+            MakeEntityDestinationAccurate();
 
         //Targeting update. This prevents the agent from getting stuck.
-        if(!pathResolved && NavmeshPathEnded())
+        if(!pathResolved && NavmeshPathIncomplete())
         {
             //If we're following a memory path,
             //abort and route to the final target on the Navmesh.
@@ -663,11 +700,8 @@ public class PathOSAgent : MonoBehaviour
                 PerceivedEntity entity = currentDest.entity;
 
                 if (!currentDest.accurate)
-                {
-                    currentDest.pos = entity.ActualPosition();
-                    currentDest.accurate = true;
-                    RouteDestination();
-                }
+                    MakeEntityDestinationAccurate();
+
                 else
                 {
                     float adjVisitSqr = (entity.entityRef.overrideVisitRadius) ?
@@ -683,6 +717,10 @@ public class PathOSAgent : MonoBehaviour
                     if (Vector3.SqrMagnitude(agentPos - targetPos)
                         >= adjVisitSqr)
                         memory.MakeUnreachable(entity);
+
+                    //Reset the number of times we've changed our mind
+                    //without doing anything (since we tried to get here).
+                    changeTargetCount = 0;
                 }
             }
             //If we're dealing with an exploration target...
@@ -690,6 +728,7 @@ public class PathOSAgent : MonoBehaviour
             {
                 //This will prevent the agent from retargeting the current destination.
                 AddUnreachable(currentDest.pos);
+                changeTargetCount = 0;      
             }
 
             pathResolved = true;
@@ -728,6 +767,30 @@ public class PathOSAgent : MonoBehaviour
         pathResolved = false;
     }
 
+    private void ResetDestinationSelf()
+    {
+        currentDest.pos = GetPosition();
+        currentDest.entity = null;
+        currentDest.accurate = true;
+    }
+
+    private void MakeEntityDestinationAccurate()
+    {
+        bool reachable = PathOSNavUtility.GetClosestPointWalkable(
+                    currentDest.entity.ActualPosition(),
+                    navAgent.height * PathOS.Constants.Navigation.NAV_SEARCH_RADIUS_FAC,
+                    ref currentDest.pos);
+
+        if (!reachable)
+        {
+            memory.MakeUnreachable(currentDest.entity);
+            ResetDestinationSelf();
+        }
+
+        currentDest.accurate = true;
+        RouteDestination();
+    }
+
     private void AddUnreachable(Vector3 target)
     {
         for(int i = 0; i < unreachableReference.Count; ++i)
@@ -757,7 +820,7 @@ public class PathOSAgent : MonoBehaviour
         UpdateLookTime();
     }
 
-    private bool NavmeshPathEnded()
+    private bool NavmeshPathIncomplete()
     {
         return !navAgent.pathPending && !navAgent.hasPath;
     }

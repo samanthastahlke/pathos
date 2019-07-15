@@ -619,54 +619,15 @@ public class PathOSNavUtility
         }
     }
 
-    public static NavmeshBoundsXZ GetNavmeshBounds(float altitudeSampleHeight,
-        float extents)
+    public static bool GetClosestPointWalkable(Vector3 p, float margin, ref Vector3 result)
     {
-        NavmeshBoundsXZ result = new NavmeshBoundsXZ();
-
-        //Create our worldspace "corners" based on the search extents.
-        Vector3[] corners = new Vector3[4];
-        corners[0] = new Vector3(extents, altitudeSampleHeight, extents);
-        corners[1] = new Vector3(extents, altitudeSampleHeight, -extents);
-        corners[2] = new Vector3(-extents, altitudeSampleHeight, extents);
-        corners[3] = new Vector3(-extents, altitudeSampleHeight, -extents);
-
-        NavMeshHit castResult = new NavMeshHit();
-
-        //Get the closest points on the navmesh to each of the worldspace corners.
-        for (int i = 0; i < corners.Length; ++i)
-        {
-            NavMesh.SamplePosition(corners[i], out castResult, extents * 2.0f, NavMesh.AllAreas);
-            corners[i] = castResult.position;
-        }
-
-        //Grab the min/max XZ coordinates of the navmesh.
-        for(int i = 0; i < corners.Length; ++i)
-        {
-            if (corners[i].x > result.max.x)
-                result.max.x = corners[i].x;
-            if (corners[i].x < result.min.x)
-                result.min.x = corners[i].x;
-            if (corners[i].z > result.max.z)
-                result.max.z = corners[i].z;
-            if (corners[i].z < result.min.z)
-                result.min.z = corners[i].z;
-        }
-
-        result.RecomputeCentreAndSize();
-
-        return result;
-    }
-
-    public static Vector3 GetClosestPointWalkable(Vector3 p, float margin)
-    {
-        Vector3 result = Vector3.zero;
-
         NavMeshHit hitResult = new NavMeshHit();
 
-        NavMesh.SamplePosition(p, out hitResult, margin, NavMesh.AllAreas);
-        result = hitResult.position;
+        bool found = NavMesh.SamplePosition(p, out hitResult, margin, NavMesh.AllAreas);
 
-        return result;
+        if (found)
+            result = hitResult.position;
+
+        return found;
     }
 }

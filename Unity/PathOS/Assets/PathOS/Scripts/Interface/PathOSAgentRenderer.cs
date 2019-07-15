@@ -339,7 +339,10 @@ public class PathOSAgentRenderer : MonoBehaviour
 
             //Skip if this entity is the target.
             if (memory[i].entity == agentTargetEntity)
+            {
+                //print(agentTargetEntity.entityRef.objectRef.name);
                 continue;
+            }
 
             //Draw the unreachable, visited, memorized, or visible icon as appropriate.
             if (memory[i].unreachable)

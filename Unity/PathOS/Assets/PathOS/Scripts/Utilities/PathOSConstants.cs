@@ -44,7 +44,12 @@ namespace PathOS
             public const float ROUTE_COMPUTE_BASE = 0.5f;
 
             //How close do two goals need to be to be considered the same?
-            public const float GOAL_EPSILON_SQR = 0.1f;
+            public const float GOAL_EPSILON_SQR = 0.01f;
+
+            //Multiplier of the agent's height used for sample radius when
+            //snapping target positions from entities onto the navmesh.
+            //(Unity recommends 2 as a starting point).
+            public const float NAV_SEARCH_RADIUS_FAC = 3.0f;
 
             //How close do we need to be to a waypoint to have crossed it?
             public const float WAYPOINT_EPSILON_SQR = 1.0f;
@@ -95,6 +100,10 @@ namespace PathOS
             public const float BASE_MEMORY_NAV_CHANCE = 0.5f;
             public const float MEMORY_NAV_CHANCE_MIN = 0.0f;
             public const float MEMORY_NAV_CHANCE_MAX = 1.0f;
+
+            //How many times in a row can the agent change its
+            //mind without reaching a destination before it will lock on?
+            public const float GOAL_INDECISION_COUNT_THRESHOLD = 4;
 
             //Bias for preferring the existing goal.
             public const float EXISTING_GOAL_BIAS = 0.5f;
