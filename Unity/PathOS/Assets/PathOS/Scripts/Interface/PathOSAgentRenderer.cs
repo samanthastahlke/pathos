@@ -61,7 +61,8 @@ public class PathOSAgentRenderer : MonoBehaviour
         "Target",
         "Visited",
         "Visible",
-        "In Memory"
+        "In Memory",
+        "Unreachable"
     };
 
     [Header("Map Drawing")]
@@ -104,11 +105,12 @@ public class PathOSAgentRenderer : MonoBehaviour
         transformCam = Camera.main;
         sceneInit = true;
 
-        gizmoLegendTextures = new Texture[4];
+        gizmoLegendTextures = new Texture[5];
         gizmoLegendTextures[0] = Resources.Load<Texture2D>(targetTex);
         gizmoLegendTextures[1] = Resources.Load<Texture2D>(visitTex);
         gizmoLegendTextures[2] = Resources.Load<Texture2D>(eyeTex);
         gizmoLegendTextures[3] = Resources.Load<Texture2D>(memoryTex);
+        gizmoLegendTextures[4] = Resources.Load<Texture2D>(badTex);
 
         //We want to draw the memory "map" in the lower-left corner of the screen.
         //Grab a persistent reference to the texture.
@@ -339,10 +341,7 @@ public class PathOSAgentRenderer : MonoBehaviour
 
             //Skip if this entity is the target.
             if (memory[i].entity == agentTargetEntity)
-            {
-                //print(agentTargetEntity.entityRef.objectRef.name);
                 continue;
-            }
 
             //Draw the unreachable, visited, memorized, or visible icon as appropriate.
             if (memory[i].unreachable)
