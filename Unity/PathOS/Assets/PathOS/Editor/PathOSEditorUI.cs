@@ -15,16 +15,18 @@ namespace PathOS
             EditorGUILayout.MinMaxSlider(label,
                 ref min, ref max, absMin, absMax);
 
-            min = EditorGUILayout.FloatField(
+            min = Mathf.Clamp(EditorGUILayout.FloatField(
                 PathOS.UI.RoundFloatfield(min),
-                GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
+                GUILayout.Width(PathOS.UI.shortFloatfieldWidth)), 
+                absMin, absMax);
 
             EditorGUILayout.LabelField("<->",
                 GUILayout.Width(PathOS.UI.shortLabelWidth));
 
-            max = EditorGUILayout.FloatField(
+            max = Mathf.Clamp(EditorGUILayout.FloatField(
                 PathOS.UI.RoundFloatfield(max),
-                GUILayout.Width(PathOS.UI.shortFloatfieldWidth));
+                GUILayout.Width(PathOS.UI.shortFloatfieldWidth)),
+                absMin, absMax);
 
             EditorGUILayout.EndHorizontal();
         }

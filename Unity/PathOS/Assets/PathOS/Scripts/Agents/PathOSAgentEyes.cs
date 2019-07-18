@@ -30,7 +30,8 @@ public class PathOSAgentEyes : MonoBehaviour
 
     [DisplayName("Raycast Distance")]
     [Tooltip("How far the agent \"looks\" over the navmesh " +
-        "when scanning for obstacles/exploration targets.")]
+        "when scanning for obstacles/exploration targets. " +
+        "(This value should be positive.)")]
 
     public float navmeshCastDistance = 50.0f;
 
