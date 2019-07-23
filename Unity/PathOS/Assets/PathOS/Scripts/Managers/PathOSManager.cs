@@ -23,9 +23,9 @@ public class PathOSManager : NPSingleton<PathOSManager>
     public bool simulationEnded { get; set; }
 
     public bool showLevelMarkup = true;
-    public List<LevelEntity> levelEntities;
+    public List<LevelEntity> levelEntities = new List<LevelEntity>();
 
-    public List<HeuristicWeightSet> heuristicWeights;
+    public List<HeuristicWeightSet> heuristicWeights = new List<HeuristicWeightSet>();
 
     public GameObject curMouseover { get; set; }
 

@@ -721,7 +721,7 @@ public class PathOSAgent : MonoBehaviour
                     Vector3 agentPos = GetPosition();
                     agentPos.y = 0.0f;
 
-                    Vector3 targetPos = currentDest.pos;
+                    Vector3 targetPos = entity.perceivedPos;
                     targetPos.y = 0.0f;
 
                     if (Vector3.SqrMagnitude(agentPos - targetPos)
