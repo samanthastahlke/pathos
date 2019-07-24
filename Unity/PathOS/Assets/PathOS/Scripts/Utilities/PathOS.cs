@@ -330,8 +330,8 @@ namespace PathOS
             if (diff >= PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD)
                 return newScore > oldMaxScore;
 
-            float max = (newScore > oldMaxScore) ?
-                0.5f * diff : PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_HALF - 0.5f * diff;
+            float max = PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_HALF +
+                (newScore - oldMaxScore) * 0.5f;
 
             return Random.Range(0.0f, PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD) < max;
         }

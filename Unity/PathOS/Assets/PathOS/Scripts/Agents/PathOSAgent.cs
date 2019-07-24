@@ -276,12 +276,6 @@ public class PathOSAgent : MonoBehaviour
         pastCumulativeEntityScore = cumulativeEntityScore;
         cumulativeEntityScore = 0.0f;
 
-        //Potential entity goals.
-        for(int i = 0; i < memory.entities.Count; ++i)
-        {
-            ScoreEntity(memory.entities[i], ref dest, ref maxScore);
-        }
-
         //Potential directional goals.
 
         //Memorized paths.
@@ -328,7 +322,7 @@ public class PathOSAgent : MonoBehaviour
         }
 
         //The existing goal.
-        if(currentDest.entity == null)
+        if (currentDest.entity == null)
         {
             Vector3 goalForward = currentDest.pos - GetPosition();
             goalForward.y = 0.0f;
@@ -342,9 +336,17 @@ public class PathOSAgent : MonoBehaviour
             }
         }
 
+        //Potential entity goals.
+        //Evaluated last to boost the chance of an entity being selected
+        //in the event of multiple "good" options.
+        for (int i = 0; i < memory.entities.Count; ++i)
+        {
+            ScoreEntity(memory.entities[i], ref dest, ref maxScore);
+        }
+
         //Only recompute goal routing if our new goal is different
         //from the previous goal.
-        if(currentDest.entity != dest.entity ||
+        if (currentDest.entity != dest.entity ||
             Vector3.SqrMagnitude(currentDest.pos - dest.pos) 
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
         {
@@ -415,17 +417,15 @@ public class PathOSAgent : MonoBehaviour
             bias -= pastCumulativeEntityScore;
         }
 
-        //Bias for preferring the goal we have already set.
-        //(If we haven't already reached it).
-        if (memory.entity == currentDest.entity
-            && Vector3.SqrMagnitude(GetPosition() - currentDest.pos)
-            > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
-            bias += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
-
         Vector3 toEntity = memory.RecallPos() - GetPosition();
+
+        float distFactor = (toEntity.sqrMagnitude < PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR) ?
+            1.0f : PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR / toEntity.sqrMagnitude;
 
         //Weighted scoring function.
         //Bias added to account for entity's type.
+        float entityBias = 0.0f;
+
         foreach (HeuristicScale heuristicScale in heuristicScales)
         {
             (Heuristic, EntityType) key = (heuristicScale.heuristic, memory.entity.entityType);
@@ -436,17 +436,27 @@ public class PathOSAgent : MonoBehaviour
                 continue;
             }
 
-            bias += heuristicScale.scale * entityScoringLookup[key]
-                * PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR / toEntity.sqrMagnitude;
+            entityBias += heuristicScale.scale * entityScoringLookup[key]
+                * distFactor;
         }
+
+        bias += entityBias;
 
         float score = ScoreDirection(GetPosition(), toEntity, bias, toEntity.magnitude);
 
+        //Bias for preferring interactive objects (if they are favourable).
+        if (entityBias > 0.0f && score > 0.0f)
+            score += PathOS.Constants.Behaviour.INTERACTIVITY_BIAS;
+
         if (!isFinalGoal && score > 0.0f)
             cumulativeEntityScore += score;
-
-        if (bias > 0.0f && score > 0.0f)
-            score += PathOS.Constants.Behaviour.INTERACTIVITY_BIAS;
+        
+        //Bias for preferring the goal we have already set.
+        //(If we haven't already reached it).
+        if (memory.entity == currentDest.entity
+            && Vector3.SqrMagnitude(GetPosition() - currentDest.pos)
+            > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
+            score += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
 
         //Stochasticity introduced to goal update.
         if (PathOS.ScoringUtility.UpdateScore(score, maxScore))
@@ -600,8 +610,11 @@ public class PathOSAgent : MonoBehaviour
 
             //Vector to the entity.
             Vector3 entityVec = memory.entities[i].RecallPos() - origin;
+
             //Scale our factor by inverse square of distance.
-            float distFactor = PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR / entityVec.sqrMagnitude;
+            float distFactor = (entityVec.sqrMagnitude < PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR) ?
+            1.0f : PathOS.Constants.Behaviour.DIST_SCORE_FACTOR_SQR / entityVec.sqrMagnitude;
+
             Vector3 dir2entity = entityVec.normalized;
 
             float dot = Vector3.Dot(dir, dir2entity);

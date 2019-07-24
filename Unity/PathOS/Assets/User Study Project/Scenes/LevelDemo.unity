@@ -24889,32 +24889,47 @@ PrefabInstance:
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[0].scale
-      value: 0.243
-      objectReference: {fileID: 0}
-    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
-        type: 3}
-      propertyPath: experienceScale
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
+      propertyPath: experienceScale
+      value: 0.914
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 3}
       propertyPath: heuristicScales.Array.data[3].scale
-      value: 0.839
+      value: 0.547
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[4].scale
-      value: 0.766
+      value: 0.407
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[5].scale
-      value: 0.538
+      value: 0.736
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[6].scale
-      value: 0.391
+      value: 0.481
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 3}
+      propertyPath: heuristicScales.Array.data[1].scale
+      value: 0.564
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 3}
+      propertyPath: heuristicScales.Array.data[2].scale
+      value: 0.489
+      objectReference: {fileID: 0}
+    - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
+        type: 3}
+      propertyPath: freezeAgent
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114232718271966738, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
