@@ -180,6 +180,17 @@ public class PathOSAgentMemory : MonoBehaviour
         entities.Add(new EntityMemory(entity));
     }
 
+    public EntityMemory GetMemory(PerceivedEntity entity)
+    {
+        for(int i = 0; i < entities.Count; ++i)
+        {
+            if (PerceivedEntity.SameEntity(entity, entities[i]))
+                return entities[i];
+        }
+
+        return null;
+    }
+
     public void CommitLTM(PerceivedEntity entity)
     {
         for(int i = 0; i < entities.Count; ++i)

@@ -125,7 +125,7 @@ namespace PathOS
             public const float FINAL_GOAL_BONUS_MAX = 5.0f;
 
             public const float SCORE_MAX = 10000.0f;
-            public const float SCORE_UNCERTAINTY_THRESHOLD = 0.2f;
+            public const float SCORE_UNCERTAINTY_THRESHOLD = 0.4f;
             public const float SCORE_UNCERTAINTY_HALF = 0.5f * SCORE_UNCERTAINTY_THRESHOLD;
         }
     }

@@ -82,6 +82,7 @@ public class PathOSAgent : MonoBehaviour
 
     //Where is the agent targeting?
     private TargetDest currentDest;
+    private List<TargetDest> destList = new List<TargetDest>();
     private bool pathResolved = true;
 
     //Accumulates to prevent rapid changes in goal with no decision made.
@@ -108,6 +109,56 @@ public class PathOSAgent : MonoBehaviour
 
     private void Awake()
 	{
+        //Testing logic for the new store stochasticity system.
+        //Leaving this here in case we need to test it more over the 
+        //next little while.
+        /*
+        TargetDest testDest = new TargetDest();
+        testDest.score = 0.0f;
+
+        TargetDest testDest2 = new TargetDest();
+        testDest2.score = -0.099f;
+
+        TargetDest testDest3 = new TargetDest();
+        testDest3.score = 0.1f;
+
+        TargetDest testDest4 = new TargetDest();
+        testDest4.score = -2.0f;
+
+        destList.Add(testDest);
+        destList.Add(testDest2);
+        destList.Add(testDest3);
+        destList.Add(testDest4);
+
+        int count1 = 0;
+        int count2 = 0;
+        int count3 = 0;
+        int count4 = 0;
+
+        for(int i = 0; i < 1000; ++i)
+        {
+            TargetDest result = PathOS.ScoringUtility.PickTarget(destList, 0.1f);
+
+            if (ReferenceEquals(result, testDest))
+                ++count1;
+
+            if (ReferenceEquals(result, testDest2))
+                ++count2;
+
+            if (ReferenceEquals(result, testDest3))
+                ++count3;
+
+            if (ReferenceEquals(result, testDest4))
+                ++count4;
+        }
+
+        print((count1 + count2 + count3 + count4).ToString() + " Trials:");
+        print("Dest 1: " + count1);
+        print("Dest 2: " + count2);
+        print("Dest 3: " + count3);
+        print("Dest 4: " + count4);
+        */
+
         eyes = GetComponent<PathOSAgentEyes>();
         memory = GetComponent<PathOSAgentMemory>();
 
@@ -271,10 +322,39 @@ public class PathOSAgent : MonoBehaviour
         //Base target = our existing destination.
         TargetDest dest = new TargetDest(currentDest);
 
+        //Clear the list of candidate destinations.
+        destList.Clear();
+
         float maxScore = -10000.0f;
 
         pastCumulativeEntityScore = cumulativeEntityScore;
         cumulativeEntityScore = 0.0f;
+
+        //Potential entity goals.
+        EntityMemory currentGoalMemory = null;
+
+        //Optimization: Score current goal first to reduce
+        //extra computation, since the current goal receives a score bonus.
+        if(currentDest.entity != null)
+        {
+            currentGoalMemory = memory.GetMemory(currentDest.entity);
+
+            if (null == currentGoalMemory)
+            {
+                NPDebug.LogError("Something went wrong! Targeting " +
+                    currentDest.entity.entityRef.objectRef.name +
+                    " but it could not be found in agent memory!",
+                    typeof(PathOSAgent));
+            }
+            else
+                ScoreEntity(currentGoalMemory, ref maxScore);
+        }
+
+        for (int i = 0; i < memory.entities.Count; ++i)
+        {
+            if (!ReferenceEquals(currentGoalMemory, memory.entities[i]))
+                ScoreEntity(memory.entities[i], ref maxScore);
+        }
 
         //Potential directional goals.
 
@@ -284,7 +364,7 @@ public class PathOSAgent : MonoBehaviour
         {
             ScoreExploreDirection(memory.paths[i].originPoint,
                 memory.paths[i].direction,
-                false, ref dest, ref maxScore);
+                false, ref maxScore);
         }
 
         //Only considering the XZ plane.
@@ -296,29 +376,29 @@ public class PathOSAgent : MonoBehaviour
         XZForward.y = 0.0f;
         XZForward.Normalize();
 
-        ScoreExploreDirection(GetPosition(), XZForward, true, ref dest, ref maxScore);
+        ScoreExploreDirection(GetPosition(), XZForward, true, ref maxScore);
 
         for(int i = 1; i <= steps; ++i)
         {
             ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * exploreDegrees, Vector3.up) * XZForward,
-                true, ref dest, ref maxScore);
+                true, ref maxScore);
             ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * -exploreDegrees, Vector3.up) * XZForward,
-                true, ref dest, ref maxScore);
+                true, ref maxScore);
         }
 
         //Behind the agent (from memory).
         Vector3 XZBack = -XZForward;
 
-        ScoreExploreDirection(GetPosition(), XZBack, false, ref dest, ref maxScore);
+        ScoreExploreDirection(GetPosition(), XZBack, false, ref maxScore);
         halfX = (360.0f - eyes.XFOV()) * 0.5f;
         steps = (int)(halfX / invisibleExploreDegrees);
 
         for(int i = 1; i <= steps; ++i)
         {
             ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * invisibleExploreDegrees, Vector3.up) * XZBack,
-                false, ref dest, ref maxScore);
+                false, ref maxScore);
             ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * -invisibleExploreDegrees, Vector3.up) * XZBack,
-                false, ref dest, ref maxScore);
+                false, ref maxScore);
         }
 
         //The existing goal.
@@ -331,19 +411,13 @@ public class PathOSAgent : MonoBehaviour
             {
                 goalForward.Normalize();
                 bool goalVisible = Mathf.Abs(Vector3.Angle(XZForward, goalForward)) < (eyes.XFOV() * 0.5f);
-                ScoreExploreDirection(GetPosition(), goalForward, goalVisible, ref dest, ref maxScore,
+                ScoreExploreDirection(GetPosition(), goalForward, goalVisible, ref maxScore,
                     true, currentDest.pos);
             }
         }
 
-        //Potential entity goals.
-        //Evaluated last to boost the chance of an entity being selected
-        //in the event of multiple "good" options.
-        for (int i = 0; i < memory.entities.Count; ++i)
-        {
-            ScoreEntity(memory.entities[i], ref dest, ref maxScore);
-        }
-
+        dest = PathOS.ScoringUtility.PickTarget(destList, maxScore);
+        
         //Only recompute goal routing if our new goal is different
         //from the previous goal.
         if (currentDest.entity != dest.entity ||
@@ -389,7 +463,7 @@ public class PathOSAgent : MonoBehaviour
     }
 
     //maxScore is updated if the entity achieves a higher score.
-    private void ScoreEntity(EntityMemory memory, ref TargetDest dest, ref float maxScore)
+    private void ScoreEntity(EntityMemory memory, ref float maxScore)
     {
         //A previously visited entity shouldn't be targeted.
         //Likewise, an entity found to be unreachable shouldn't be targeted.
@@ -458,20 +532,25 @@ public class PathOSAgent : MonoBehaviour
             > PathOS.Constants.Navigation.GOAL_EPSILON_SQR)
             score += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
 
-        //Stochasticity introduced to goal update.
-        if (PathOS.ScoringUtility.UpdateScore(score, maxScore))
+        //Check if the destination should be added to the candidate list.
+        if (score > maxScore 
+            || (maxScore - score) 
+            < PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD)
         {
             //Only update maxScore if the new score is actually higher.
             //(Prevent over-accumulation of error.)
             if (score > maxScore)
                 maxScore = score;
 
+            TargetDest newDest = new TargetDest();
+            newDest.score = score;
+
             //We only need to update the destination position
             //if we're targeting an entity other than the current target.
             if (memory.entity == currentDest.entity)
             {
-                dest.pos = currentDest.pos;
-                dest.accurate = currentDest.accurate;
+                newDest.pos = currentDest.pos;
+                newDest.accurate = currentDest.accurate;
             }
             else
             {
@@ -492,8 +571,8 @@ public class PathOSAgent : MonoBehaviour
                 //its position is set to the actual position of the entity.
                 if (memory.entity.visible || memory.entity.entityRef.alwaysKnown)
                 {
-                    dest.pos = realPos;
-                    dest.accurate = true;
+                    newDest.pos = realPos;
+                    newDest.accurate = true;
                 }
                 //Otherwise, fetch its position from memory.
                 //(Imperfect recall, done when the decision is made).
@@ -506,24 +585,25 @@ public class PathOSAgent : MonoBehaviour
                     navAgent.height * PathOS.Constants.Navigation.NAV_SEARCH_RADIUS_FAC,
                     ref guessPos);
 
-                    dest.pos = (reachable) ? guessPos : realPos;
-                    dest.accurate = !reachable;
+                    newDest.pos = (reachable) ? guessPos : realPos;
+                    newDest.accurate = !reachable;
                 }
             }
             
-            dest.entity = memory.entity;
+            newDest.entity = memory.entity;
+            destList.Add(newDest);
         }
     }
 
     //maxScore is updated if the direction achieves a higher score.
-    void ScoreExploreDirection(Vector3 origin, Vector3 dir, bool visible, ref TargetDest dest, ref float maxScore,
+    void ScoreExploreDirection(Vector3 origin, Vector3 dir, bool visible, ref float maxScore,
         bool overridePos = false, Vector3 overrideDest = default)
     {
         float distance = 0.0f;
-        Vector3 newDest = origin;
+        Vector3 newTarget = origin;
 
         if (overridePos && overrideDest != null)
-            newDest = overrideDest;
+            newTarget = overrideDest;
         else
         {
             if (visible)
@@ -531,7 +611,7 @@ public class PathOSAgent : MonoBehaviour
                 //Grab the "extent" of the direction on the navmesh from the perceptual system.
                 NavMeshHit hit = eyes.ExploreVisibilityCheck(GetPosition(), dir);
                 distance = hit.distance;
-                newDest = hit.position;
+                newTarget = hit.position;
             }
             else
             {
@@ -541,10 +621,10 @@ public class PathOSAgent : MonoBehaviour
                 distance = hit.distance;
 
                 bool reachable = PathOSNavUtility.GetClosestPointWalkable(
-                    origin + distance * dir, exploreTargetMargin, ref newDest);
+                    origin + distance * dir, exploreTargetMargin, ref newTarget);
 
                 //Disqualify a target if the agent has determined it to be unreachable.
-                if (!reachable || IsUnreachable(newDest))
+                if (!reachable || IsUnreachable(newTarget))
                     return;
             }
         }
@@ -553,7 +633,7 @@ public class PathOSAgent : MonoBehaviour
 
         //Bias for preferring the goal we have already set.
         //(If we haven't reached it already.)
-        if (Vector3.SqrMagnitude(newDest - currentDest.pos) < PathOS.Constants.Navigation.GOAL_EPSILON_SQR
+        if (Vector3.SqrMagnitude(newTarget - currentDest.pos) < PathOS.Constants.Navigation.GOAL_EPSILON_SQR
             && (GetPosition() - currentDest.pos).magnitude > exploreThreshold)
         {
             bias += PathOS.Constants.Behaviour.EXISTING_GOAL_BIAS;
@@ -561,11 +641,16 @@ public class PathOSAgent : MonoBehaviour
 
         float score = ScoreDirection(origin, dir, bias, distance);
 
-        //Same stochasticity logic as for entity goals.
-        if(PathOS.ScoringUtility.UpdateScore(score, maxScore))
+        //Same inclusion logic as for entity goals.
+        if (score > maxScore
+            || (maxScore - score)
+            < PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD)
         {
-            if(score > maxScore)
+            if (score > maxScore)
                 maxScore = score;
+
+            TargetDest newDest = new TargetDest();
+            newDest.score = score;
 
             //If we're originating from where we stand, target the "end" point.
             //Else, target the "start" point, and the agent will re-assess its 
@@ -573,15 +658,17 @@ public class PathOSAgent : MonoBehaviour
             if (Vector3.SqrMagnitude(origin - GetPosition())
                 < PathOS.Constants.Navigation.EXPLORE_PATH_POS_THRESHOLD_FAC 
                 * exploreThreshold)
-                dest.pos = newDest;
+                newDest.pos = newTarget;
             else
-                dest.pos = origin;
+                newDest.pos = origin;
 
-            dest.accurate = true;
-            dest.entity = null;
+            newDest.accurate = true;
+            newDest.entity = null;
+
+            destList.Add(newDest);
         }
 
-        memory.AddPath(new ExploreMemory(origin, dir, newDest, score));
+        memory.AddPath(new ExploreMemory(origin, dir, newTarget, score));
     }
 
     float ScoreDirection(Vector3 origin, Vector3 dir, float bias, float maxDistance)

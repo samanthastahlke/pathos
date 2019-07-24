@@ -321,19 +321,48 @@ namespace PathOS
 
     public class ScoringUtility
     {
-        //Returns true if the goal with newScore should usurp the goal 
-        //with oldMaxScore.
-        public static bool UpdateScore(float newScore, float oldMaxScore)
+        //Picks a target from the list based on a given stochasticity threshold.
+        public static TargetDest PickTarget(List<TargetDest> destList, float maxScore)
         {
-            float diff = Mathf.Abs(newScore - oldMaxScore);
+            float totalScore = 0.0f;
 
-            if (diff >= PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD)
-                return newScore > oldMaxScore;
+            TargetDest best = destList[0];
 
-            float max = PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_HALF +
-                (newScore - oldMaxScore) * 0.5f;
+            for(int i = destList.Count - 1; i >= 0; --i)
+            {
+                //Clean out everything below our threshold.
+                if (destList[i].score < maxScore - PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD)
+                {
+                    destList.RemoveAt(i);
+                    continue;
+                }
+                
+                //Keep a "best" target in case of rounding/floating-point errors
+                //during RNG.
+                if (destList[i].score > best.score)
+                    best = destList[i];
 
-            return Random.Range(0.0f, PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD) < max;
+                //Normalized score on [0, 1] 
+                //converted from [maxScore - threshold, maxScore].
+                destList[i].normScore = 1.0f - (maxScore - destList[i].score) /
+                    PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD;
+
+                totalScore += destList[i].normScore;
+            }
+
+            //Roll within the total normalized score range.
+            float roll = Random.Range(0.0f, totalScore);
+            float accumulated = 0.0f;
+
+            for(int i = 0; i < destList.Count; ++i)
+            {
+                accumulated += destList[i].normScore;
+
+                if (roll < accumulated)
+                    return destList[i];
+            }
+
+            return best;
         }
     }
 
@@ -431,6 +460,8 @@ namespace PathOS
         public PerceivedEntity entity = null;
         public Vector3 pos = Vector3.zero;
         public bool accurate = true;
+        public float score = 0.0f;
+        public float normScore = 0.0f;
 
         public TargetDest() { }
 

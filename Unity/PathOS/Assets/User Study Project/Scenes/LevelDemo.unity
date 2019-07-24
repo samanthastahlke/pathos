@@ -24889,42 +24889,42 @@ PrefabInstance:
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[0].scale
-      value: 1
+      value: 0.62003964
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: experienceScale
-      value: 0.914
+      value: 0.47606856
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[3].scale
-      value: 0.547
+      value: 0.99153554
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[4].scale
-      value: 0.407
+      value: 0.4859193
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[5].scale
-      value: 0.736
+      value: 0.48613864
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[6].scale
-      value: 0.481
+      value: 0.8571991
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[1].scale
-      value: 0.564
+      value: 0.7967812
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
       propertyPath: heuristicScales.Array.data[2].scale
-      value: 0.489
+      value: 0.78092456
       objectReference: {fileID: 0}
     - target: {fileID: 114084877281343334, guid: 607318e5beb058643a9226e07f881723,
         type: 3}
