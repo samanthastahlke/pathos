@@ -333,9 +333,14 @@ public class PathOSAgent : MonoBehaviour
         //Potential entity goals.
         EntityMemory currentGoalMemory = null;
 
+        //Used in the calculation of exploration directions.
+        Vector3 XZForward = transform.forward;
+        XZForward.y = 0.0f;
+        XZForward.Normalize();
+
         //Optimization: Score current goal first to reduce
         //extra computation, since the current goal receives a score bonus.
-        if(currentDest.entity != null)
+        if (currentDest.entity != null)
         {
             currentGoalMemory = memory.GetMemory(currentDest.entity);
 
@@ -348,6 +353,19 @@ public class PathOSAgent : MonoBehaviour
             }
             else
                 ScoreEntity(currentGoalMemory, ref maxScore);
+        }
+        else
+        {
+            Vector3 goalForward = currentDest.pos - GetPosition();
+            goalForward.y = 0.0f;
+
+            if (goalForward.sqrMagnitude > 0.1f)
+            {
+                goalForward.Normalize();
+                bool goalVisible = Mathf.Abs(Vector3.Angle(XZForward, goalForward)) < (eyes.XFOV() * 0.5f);
+                ScoreExploreDirection(GetPosition(), goalForward, goalVisible, ref maxScore,
+                    true, currentDest.pos);
+            }
         }
 
         for (int i = 0; i < memory.entities.Count; ++i)
@@ -370,11 +388,6 @@ public class PathOSAgent : MonoBehaviour
         //Only considering the XZ plane.
         float halfX = eyes.XFOV() * 0.5f;
         int steps = (int)(halfX / exploreDegrees);
-
-        //In front of the agent.
-        Vector3 XZForward = transform.forward;
-        XZForward.y = 0.0f;
-        XZForward.Normalize();
 
         ScoreExploreDirection(GetPosition(), XZForward, true, ref maxScore);
 
@@ -399,21 +412,6 @@ public class PathOSAgent : MonoBehaviour
                 false, ref maxScore);
             ScoreExploreDirection(GetPosition(), Quaternion.AngleAxis(i * -invisibleExploreDegrees, Vector3.up) * XZBack,
                 false, ref maxScore);
-        }
-
-        //The existing goal.
-        if (currentDest.entity == null)
-        {
-            Vector3 goalForward = currentDest.pos - GetPosition();
-            goalForward.y = 0.0f;
-
-            if (goalForward.sqrMagnitude > 0.1f)
-            {
-                goalForward.Normalize();
-                bool goalVisible = Mathf.Abs(Vector3.Angle(XZForward, goalForward)) < (eyes.XFOV() * 0.5f);
-                ScoreExploreDirection(GetPosition(), goalForward, goalVisible, ref maxScore,
-                    true, currentDest.pos);
-            }
         }
 
         dest = PathOS.ScoringUtility.PickTarget(destList, maxScore);
