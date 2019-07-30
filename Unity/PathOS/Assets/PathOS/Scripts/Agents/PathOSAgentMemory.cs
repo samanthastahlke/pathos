@@ -82,6 +82,8 @@ public class PathOSAgentMemory : MonoBehaviour
 
         stm.Clear();
 
+        PerceivedEntity targetEntity = agent.GetDestinationEntity();
+
         for(int i = entities.Count - 1; i >= 0; --i)
         {
             EntityMemory entity = entities[i];
@@ -100,9 +102,11 @@ public class PathOSAgentMemory : MonoBehaviour
 
             //Only something which is no longer visible and forgettable
             //can be discarded from memory.
+            //Additionally, the *current* target cannot be forgotten.
             if (!entity.entity.visible 
                 && entity.forgettable
-                && entity.impressionTime >= agent.forgetTime)
+                && entity.impressionTime >= agent.forgetTime
+                && !PerceivedEntity.SameEntity(targetEntity, entity))
             {
                 entities.RemoveAt(i);
                 continue;

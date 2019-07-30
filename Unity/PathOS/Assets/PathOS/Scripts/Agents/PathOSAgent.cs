@@ -108,57 +108,7 @@ public class PathOSAgent : MonoBehaviour
     private List<Vector3> unreachableReference;
 
     private void Awake()
-	{
-        //Testing logic for the new store stochasticity system.
-        //Leaving this here in case we need to test it more over the 
-        //next little while.
-        /*
-        TargetDest testDest = new TargetDest();
-        testDest.score = 0.0f;
-
-        TargetDest testDest2 = new TargetDest();
-        testDest2.score = -0.099f;
-
-        TargetDest testDest3 = new TargetDest();
-        testDest3.score = 0.1f;
-
-        TargetDest testDest4 = new TargetDest();
-        testDest4.score = -2.0f;
-
-        destList.Add(testDest);
-        destList.Add(testDest2);
-        destList.Add(testDest3);
-        destList.Add(testDest4);
-
-        int count1 = 0;
-        int count2 = 0;
-        int count3 = 0;
-        int count4 = 0;
-
-        for(int i = 0; i < 1000; ++i)
-        {
-            TargetDest result = PathOS.ScoringUtility.PickTarget(destList, 0.1f);
-
-            if (ReferenceEquals(result, testDest))
-                ++count1;
-
-            if (ReferenceEquals(result, testDest2))
-                ++count2;
-
-            if (ReferenceEquals(result, testDest3))
-                ++count3;
-
-            if (ReferenceEquals(result, testDest4))
-                ++count4;
-        }
-
-        print((count1 + count2 + count3 + count4).ToString() + " Trials:");
-        print("Dest 1: " + count1);
-        print("Dest 2: " + count2);
-        print("Dest 3: " + count3);
-        print("Dest 4: " + count4);
-        */
-
+    { 
         eyes = GetComponent<PathOSAgentEyes>();
         memory = GetComponent<PathOSAgentMemory>();
 
@@ -414,7 +364,10 @@ public class PathOSAgent : MonoBehaviour
                 false, ref maxScore);
         }
 
-        dest = PathOS.ScoringUtility.PickTarget(destList, maxScore);
+        //If no destinations are added to the list,
+        //the old target will be used.
+        if(destList.Count != 0)
+            dest = PathOS.ScoringUtility.PickTarget(destList, maxScore);
         
         //Only recompute goal routing if our new goal is different
         //from the previous goal.
@@ -535,11 +488,6 @@ public class PathOSAgent : MonoBehaviour
             || (maxScore - score) 
             < PathOS.Constants.Behaviour.SCORE_UNCERTAINTY_THRESHOLD)
         {
-            //Only update maxScore if the new score is actually higher.
-            //(Prevent over-accumulation of error.)
-            if (score > maxScore)
-                maxScore = score;
-
             TargetDest newDest = new TargetDest();
             newDest.score = score;
 
@@ -587,7 +535,13 @@ public class PathOSAgent : MonoBehaviour
                     newDest.accurate = !reachable;
                 }
             }
-            
+
+            //Only update maxScore if the new score is actually higher.
+            //(Prevent over-accumulation of error.)
+            //This will only execute if the destination is reachable.
+            if (score > maxScore)
+                maxScore = score;
+
             newDest.entity = memory.entity;
             destList.Add(newDest);
         }
@@ -930,7 +884,9 @@ public class PathOSAgent : MonoBehaviour
 
     private bool NavmeshPathIncomplete()
     {
-        return !navAgent.pathPending && !navAgent.hasPath;
+        return !navAgent.pathPending && !navAgent.hasPath 
+            && navAgent.pathStatus == NavMeshPathStatus.PathPartial
+            && !navAgent.isPathStale;
     }
 
     //Inelegant and brute-force "animation" of the agent to look around.
