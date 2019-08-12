@@ -168,7 +168,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
         EditorWindow window = EditorWindow.GetWindow(typeof(PathOSAgentBatchingWindow), true, 
             "PathOS Agent Batching");
 
-        window.minSize = new Vector2(420.0f, 690.0f);
+        window.minSize = new Vector2(420.0f, 420.0f);
     }
 
     private void OnEnable()
@@ -271,8 +271,11 @@ public class PathOSAgentBatchingWindow : EditorWindow
 
         PlayerPrefs.SetInt(OGLogManager.overrideFlagId, 0);
 
-        DeleteInstantiatedAgents(instantiatedAgents.Count);
-        SetSceneAgentsActive(true);
+        if(simulationActive)
+        {
+            NPDebug.LogError("Batching control window closed while simulation was active! " +
+                "Any instantiated agents will not be deleted automatically.");
+        }
 
         instantiatedAgents.Clear();
         existingSceneAgents.Clear();
@@ -285,21 +288,6 @@ public class PathOSAgentBatchingWindow : EditorWindow
     private void OnGUI()
     {
         EditorGUILayout.LabelField("General", headerStyle);
-
-        EditorGUI.BeginChangeCheck();
-
-        GrabAgentReference();
-        agentReference = EditorGUILayout.ObjectField("Agent Reference: ", agentReference, typeof(PathOSAgent), true)
-            as PathOSAgent;
-
-        //Update agent ID if the user has selected a new object reference.
-        if(EditorGUI.EndChangeCheck())
-        {
-            hasAgent = agentReference != null;
-
-            if (hasAgent)
-                agentID = agentReference.GetInstanceID();        
-        }
 
         numAgents = EditorGUILayout.IntField("Number of agents: ", numAgents);
 
@@ -330,6 +318,8 @@ public class PathOSAgentBatchingWindow : EditorWindow
                     " with the PathOSAgent component.", errorStyle);
             }
 
+            //For testing.
+            /*
             if(GUILayout.Button("Test Instantiation"))
             {
                 FindSceneAgents();
@@ -342,7 +332,25 @@ public class PathOSAgentBatchingWindow : EditorWindow
                 DeleteInstantiatedAgents(4);
                 SetSceneAgentsActive(true);
             }
+            */
 
+        }
+        else
+        {
+            EditorGUI.BeginChangeCheck();
+
+            GrabAgentReference();
+            agentReference = EditorGUILayout.ObjectField("Agent Reference: ", agentReference, typeof(PathOSAgent), true)
+                as PathOSAgent;
+
+            //Update agent ID if the user has selected a new object reference.
+            if (EditorGUI.EndChangeCheck())
+            {
+                hasAgent = agentReference != null;
+
+                if (hasAgent)
+                    agentID = agentReference.GetInstanceID();
+            }
         }
 
         timeScale = EditorGUILayout.Slider("Timescale: ", timeScale, 1.0f, 8.0f);
@@ -436,11 +444,14 @@ public class PathOSAgentBatchingWindow : EditorWindow
         }
 
         //Apply new heuristic values to the agent.
+        //(For testing.)
+        /*
         if(heuristicMode != HeuristicMode.LOAD)
         {
             if (GUILayout.Button("Apply to agent"))
                 ApplyHeuristics();
         }
+        */
 
         GUILayout.Label("Simulation Controls", headerStyle);
 
@@ -793,8 +804,16 @@ public class PathOSAgentBatchingWindow : EditorWindow
         {
             instantiatedAgents[i].UpdateReference();
 
-            EditorUtility.SetDirty(instantiatedAgents[i].agent);
-            SetHeuristics(instantiatedAgents[i].agent);
+            if(null == instantiatedAgents[i].agent)
+            {
+                NPDebug.LogError("Instantiated agent reference lost! " +
+                    "Heuristic values will not be updated from prefab. Try re-running the simulation.");
+            }
+            else
+            {
+                EditorUtility.SetDirty(instantiatedAgents[i].agent);
+                SetHeuristics(instantiatedAgents[i].agent);
+            }
         }
     }
 
@@ -871,13 +890,16 @@ public class PathOSAgentBatchingWindow : EditorWindow
             count = instantiatedAgents.Count;
 
         for (int i = 0; i < count; ++i)
-        {      
-            instantiatedAgents[instantiatedAgents.Count - 1].UpdateReference();
+        {     
+            if(instantiatedAgents[instantiatedAgents.Count - 1] != null)
+            {
+                instantiatedAgents[instantiatedAgents.Count - 1].UpdateReference();
 
-            if (instantiatedAgents[instantiatedAgents.Count - 1].agent)
-                Object.DestroyImmediate(
-                    instantiatedAgents[instantiatedAgents.Count - 1].agent.gameObject);
-
+                if (instantiatedAgents[instantiatedAgents.Count - 1].agent)
+                    Object.DestroyImmediate(
+                        instantiatedAgents[instantiatedAgents.Count - 1].agent.gameObject);
+            }
+            
             instantiatedAgents.RemoveAt(instantiatedAgents.Count - 1);
         }
     }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 using OGVis;
 
 /*
@@ -136,7 +138,12 @@ public class OGVisEditor : Editor
                     defaultDirectory, "");
 
                 if (selectedPath != "")
+                {
                     vis.logDirectory = selectedPath;
+
+                    EditorUtility.SetDirty(vis);
+                    EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+                }  
 
                 PathOS.UI.TruncateStringHead(vis.logDirectory,
                     ref logDirectoryDisplay, pathDisplayLength);

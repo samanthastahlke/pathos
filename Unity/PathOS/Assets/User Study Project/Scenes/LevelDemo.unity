@@ -94,8 +94,8 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
-    m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
   m_LightingDataAsset: {fileID: 112000000, guid: 1376ed4ae578abe4a96f7b5b176bdaa5,
     type: 2}
   m_UseShadowmask: 1
@@ -566,7 +566,7 @@ PrefabInstance:
     - target: {fileID: 5005646905853620061, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}
       propertyPath: maxSimulationTime
-      value: 180
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5005646905853620061, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}
@@ -1643,15 +1643,35 @@ PrefabInstance:
       propertyPath: levelEntities.Array.data[57].objectVisitRadius
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5005646905853620061, guid: 31f1861d4df0ac1488cf45674399f745,
+        type: 3}
+      propertyPath: limitSimulationTime
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5005646905853620063, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}
       propertyPath: heatmapVisualizer
       value: 
       objectReference: {fileID: 101379481}
+    - target: {fileID: 5005646905853620063, guid: 31f1861d4df0ac1488cf45674399f745,
+        type: 3}
+      propertyPath: logDirectory
+      value: C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Logs
+      objectReference: {fileID: 0}
     - target: {fileID: 3999886422330179394, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5005646905853620062, guid: 31f1861d4df0ac1488cf45674399f745,
+        type: 3}
+      propertyPath: logDirectory
+      value: C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/TestLogs
+      objectReference: {fileID: 0}
+    - target: {fileID: 5005646905853620062, guid: 31f1861d4df0ac1488cf45674399f745,
+        type: 3}
+      propertyPath: enableLogging
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 31f1861d4df0ac1488cf45674399f745, type: 3}
@@ -8093,6 +8113,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0

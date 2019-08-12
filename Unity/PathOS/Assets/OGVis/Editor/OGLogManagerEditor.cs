@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Malee.Editor;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 
 /*
 OGLogManagerEditor.cs
@@ -57,7 +58,12 @@ public class OGLogManagerEditor : Editor
                 defaultDirectory, "");
 
             if (selectedPath != "")
+            {
                 manager.logDirectory = selectedPath;
+
+                EditorUtility.SetDirty(manager);
+                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            }
 
             PathOS.UI.TruncateStringHead(manager.logDirectory,
                 ref logDirectoryDisplay, pathDisplayLength);

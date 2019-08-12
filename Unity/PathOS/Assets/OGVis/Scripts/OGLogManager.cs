@@ -105,7 +105,7 @@ public class OGLogManager : OGSingleton<OGLogManager>
             OGLogger logger = logObjects[i].AddComponent<OGLogger>();
 
             string filename = logFilePrefix + "-" + fileIndex.ToString() + ".csv";
-            logger.logOutput = File.CreateText(logDirectory + filename);
+            logger.InitStream(logDirectory + filename);
 
             logger.WriteHeader("SAMPLE," + sampleRate);
 
@@ -140,7 +140,7 @@ public class OGLogManager : OGSingleton<OGLogManager>
         //Clean up after ourselves.
         foreach (KeyValuePair<int, OGLogger> logPair in loggers)
         {
-            logPair.Value.logOutput.Close();
+            logPair.Value.DisposeStream();
         }
 
         loggers.Clear();

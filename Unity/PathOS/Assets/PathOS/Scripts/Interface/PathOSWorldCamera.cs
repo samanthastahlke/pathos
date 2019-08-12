@@ -40,9 +40,9 @@ public class PathOSWorldCamera : MonoBehaviour
 
         lastCursor = Input.mousePosition;
 
-        delta.x -= Time.deltaTime * panSpeed * mouseDelta.x;
-        delta.z -= Time.deltaTime * panSpeed * mouseDelta.y;
-        delta.y -= Time.deltaTime * scrollSpeed * Input.GetAxisRaw("Mouse ScrollWheel");
+        delta.x -= Time.unscaledDeltaTime * panSpeed * mouseDelta.x;
+        delta.z -= Time.unscaledDeltaTime * panSpeed * mouseDelta.y;
+        delta.y -= Time.unscaledDeltaTime * scrollSpeed * Input.GetAxisRaw("Mouse ScrollWheel");
 
         transform.position = transform.position + delta;
 	}

@@ -16,7 +16,9 @@ public class OGLogger : MonoBehaviour
     public const int INTLOG_L = 6;
 
     //Output and timers.
-    public StreamWriter logOutput { get; set; }
+    private FileStream logStream;
+    private StreamWriter logOutput;
+    private string filename;
     private float sampleTimer = 0.0f;
 
     private static OGLogManager mgr;
@@ -43,14 +45,31 @@ public class OGLogger : MonoBehaviour
 
         sampleTimer += Time.deltaTime;
     }
-    
+
+    public void InitStream(string filename)
+    {
+        this.filename = filename;
+
+        logStream = new FileStream(filename, 
+            FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        logOutput = new StreamWriter(logStream);
+
+        logOutput.AutoFlush = true;
+    }
+
+    public void DisposeStream()
+    {
+        logOutput.Dispose();
+        logStream.Dispose();
+    }
+
     //Called from manager to write custom data into log file.
     public void WriteHeader(string header)
     {
         string line = OGLogManager.LogItemType.HEADER + "," +
             header;
 
-        logOutput.WriteLine(line);
+        WriteLogLine(line);
     }
 
     //Called from manager for custom GameObject interactions.
@@ -65,7 +84,7 @@ public class OGLogger : MonoBehaviour
             location.position.y + "," +
             location.position.z;
 
-        logOutput.WriteLine(line);
+        WriteLogLine(line);
     }
 
     //Transform logging.
@@ -80,6 +99,29 @@ public class OGLogger : MonoBehaviour
             transform.rotation.y + "," +
             transform.rotation.z;
 
-        logOutput.WriteLine(line);
+        WriteLogLine(line);
+    }
+
+    public void WriteLogLine(string line)
+    {
+        if (null == logOutput)
+            return;
+
+        try
+        {
+            logOutput.WriteLine(line);
+        }
+        catch(System.Exception e)
+        {
+            NPDebug.LogWarning("Exception raised while writing logfile: " +
+                e.Message);
+
+            NPDebug.LogError("Unable to write to logfile " + filename + "\n" + 
+                "Try restarting the simulation.\n" +
+                "If this error persists, try running Unity as an administrator and/or " +
+                "whitelisting your logging directory in your antivirus software.");
+
+            logOutput.Dispose();
+        }
     }
 }
