@@ -1666,7 +1666,7 @@ PrefabInstance:
     - target: {fileID: 5005646905853620062, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}
       propertyPath: logDirectory
-      value: C:/Users/Samantha/Documents/PathOS/Unity/PathOS/Assets/TestLogs
+      value: C:/Users/Samantha/Documents/PathOS/Logs
       objectReference: {fileID: 0}
     - target: {fileID: 5005646905853620062, guid: 31f1861d4df0ac1488cf45674399f745,
         type: 3}

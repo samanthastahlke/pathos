@@ -22,6 +22,7 @@ public class OGLogManagerEditor : Editor
     private GUIStyle errorStyle = new GUIStyle();
 
     private string logDirectoryDisplay;
+    private string defaultDialogDirectory;
 
     private SerializedProperty enableLogging;
     private SerializedProperty logFilePrefix;
@@ -40,6 +41,10 @@ public class OGLogManagerEditor : Editor
             ref logDirectoryDisplay, pathDisplayLength);
 
         errorStyle.normal.textColor = Color.red;
+
+        //Need to chop off "/Assets" - 7 characters.
+        defaultDialogDirectory = Application.dataPath.Substring(0,
+            Application.dataPath.Length - 7);
     }
 
     public override void OnInspectorGUI()
@@ -52,7 +57,7 @@ public class OGLogManagerEditor : Editor
         if(GUILayout.Button("Browse..."))
         {
             string defaultDirectory = (manager.LogDirectoryValid()) ?
-                manager.logDirectory : Application.dataPath;
+                manager.logDirectory : defaultDialogDirectory;
 
             string selectedPath = EditorUtility.OpenFolderPanel("Select Folder...",
                 defaultDirectory, "");
@@ -72,7 +77,8 @@ public class OGLogManagerEditor : Editor
         if(!manager.LogDirectoryValid())
         {
             EditorGUILayout.LabelField("Error! You must choose a " +
-                "valid folder on this computer.", errorStyle);
+                "valid directory on this computer outside the Assets folder.", 
+                errorStyle);
         }
 
         EditorGUILayout.PropertyField(logFilePrefix);

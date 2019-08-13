@@ -49,7 +49,8 @@ public class OGLogManager : OGSingleton<OGLogManager>
         if(!LogDirectoryValid())
         {
             Debug.LogError("Log manager has no valid directory set! Logs will not " +
-                "be recorded.");
+                "be recorded.\n Log manager needs a directory on this computer " +
+                "outside of the Assets folder.");
 
             return;
         }
@@ -127,7 +128,8 @@ public class OGLogManager : OGSingleton<OGLogManager>
 
     public bool LogDirectoryValid()
     {
-        return Directory.Exists(logDirectory);
+        return Directory.Exists(logDirectory)
+            && !logDirectory.StartsWith(Application.dataPath);
     }
 
     private void OnApplicationQuit()

@@ -30,6 +30,7 @@ public class OGVisEditor : Editor
     private GUIStyle errorStyle = new GUIStyle();
 
     private string logDirectoryDisplay;
+    private string defaultDialogDirectory;
 
     private SerializedProperty propLogDirectory;
 
@@ -111,6 +112,10 @@ public class OGVisEditor : Editor
         PathOS.UI.TruncateStringHead(vis.logDirectory,
             ref logDirectoryDisplay, pathDisplayLength);
 
+        //Need to chop off "/Assets" - 7 characters.
+        defaultDialogDirectory = Application.dataPath.Substring(0,
+            Application.dataPath.Length - 7);
+
         errorStyle.normal.textColor = Color.red;
 
         heuristics.Clear();
@@ -132,7 +137,7 @@ public class OGVisEditor : Editor
             if(GUILayout.Button("Browse..."))
             {
                 string defaultDirectory = (Directory.Exists(vis.logDirectory)) ?
-                    vis.logDirectory : Application.dataPath;
+                    vis.logDirectory : defaultDialogDirectory;
 
                 string selectedPath = EditorUtility.OpenFolderPanel("Select Folder...",
                     defaultDirectory, "");
