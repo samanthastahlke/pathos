@@ -486,7 +486,7 @@ public class OGLogVisualizer : MonoBehaviour
 
                     if(!aggregateInteractions.ContainsKey(key))
                     { 
-                        Debug.Log("Found new interaction event key!");
+                        //Debug.Log("Found new interaction event key!");
 
                         aggregateInteractions.Add(key, new AggregateInteraction(
                             curEvent.objectName, curEvent.pos));
