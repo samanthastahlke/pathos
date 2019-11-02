@@ -507,6 +507,12 @@ public class PathOSAgent : MonoBehaviour
                     navAgent.height * PathOS.Constants.Navigation.NAV_SEARCH_RADIUS_FAC,
                     ref realPos);
 
+                if (reachable)
+                    reachable = Vector3.SqrMagnitude(
+                        PathOSNavUtility.XZPos(realPos) -
+                        PathOSNavUtility.XZPos(memory.entity.ActualPosition()))
+                        < visitThresholdSqr;
+
                 if (!reachable)
                 {
                     memory.MakeUnreachable();
@@ -842,6 +848,12 @@ public class PathOSAgent : MonoBehaviour
                     currentDest.entity.ActualPosition(),
                     navAgent.height * PathOS.Constants.Navigation.NAV_SEARCH_RADIUS_FAC,
                     ref currentDest.pos);
+
+        if (reachable)
+            reachable = Vector3.SqrMagnitude(
+                PathOSNavUtility.XZPos(currentDest.pos) -
+                PathOSNavUtility.XZPos(currentDest.entity.ActualPosition()))
+                < visitThresholdSqr;
 
         if (!reachable)
         {

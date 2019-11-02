@@ -632,4 +632,10 @@ public class PathOSNavUtility
 
         return found;
     }
+
+    public static Vector3 XZPos(Vector3 p)
+    {
+        p.y = 0.0f;
+        return p;
+    }
 }
