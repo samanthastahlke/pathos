@@ -22,14 +22,14 @@ public class PathOSProfileWindow : EditorWindow
     private int profileIndex = 0;
     private AgentProfile curProfile = new AgentProfile();
 
-    [MenuItem("Window/PathOS Profiles")]
-    public static void ShowWindow()
-    {
-        EditorWindow window = EditorWindow.GetWindow(typeof(PathOSProfileWindow), true,
-            "PathOS Agent Profiles");
-
-        window.minSize = new Vector2(420.0f, 345.0f);
-    }
+   // [MenuItem("Window/PathOS Profiles")]
+   // public static void ShowWindow()
+   // {
+   //     EditorWindow window = EditorWindow.GetWindow(typeof(PathOSProfileWindow), true,
+   //         "PathOS Agent Profiles");
+   //
+   //     window.minSize = new Vector2(420.0f, 345.0f);
+   // }
 
     private void OnEnable()
     {
@@ -148,7 +148,7 @@ public class PathOSProfileWindow : EditorWindow
         sw.Close();
     }
 
-    private void OnGUI()
+    public void OnWindowOpen()
     {
         if(GUILayout.Button("Import Profiles..."))
         {

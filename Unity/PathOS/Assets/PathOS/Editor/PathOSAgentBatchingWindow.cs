@@ -161,15 +161,15 @@ public class PathOSAgentBatchingWindow : EditorWindow
     private bool cleanupFrame = false;
     private bool wasPlaying = false;
     private int agentsLeft = 0;
-
-    [MenuItem("Window/PathOS Agent Batching")]
-    public static void ShowWindow()
-    {
-        EditorWindow window = EditorWindow.GetWindow(typeof(PathOSAgentBatchingWindow), true, 
-            "PathOS Agent Batching");
-
-        window.minSize = new Vector2(420.0f, 420.0f);
-    }
+    //
+    //[MenuItem("Window/PathOS Agent Batching")]
+    //public static void ShowWindow()
+    //{
+    //    EditorWindow window = EditorWindow.GetWindow(typeof(PathOSAgentBatchingWindow), true, 
+    //        "PathOS Agent Batching");
+    //
+    //    window.minSize = new Vector2(420.0f, 420.0f);
+    //}
 
     private void OnEnable()
     {
@@ -285,7 +285,7 @@ public class PathOSAgentBatchingWindow : EditorWindow
         EditorPrefs.SetString(editorPrefsID, prefsData);
     }
 
-    private void OnGUI()
+    public void OnWindowOpen()
     {
         EditorGUILayout.LabelField("General", headerStyle);
 
