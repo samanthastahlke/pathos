@@ -7,7 +7,7 @@ using PathOS;
 
 /*
 PathOSAgentBatchingWindow.cs 
-PathOSAgentBatchingWindow (c) Nine Penguins (Samantha Stahlke) 2019
+PathOSAgentBatchingWindow (c) Nine Penguins (Samantha Stahlke) 2019 (Atiya Nova) 2020
 */
 public class PathOSAgentBatchingWindow : EditorWindow
 {

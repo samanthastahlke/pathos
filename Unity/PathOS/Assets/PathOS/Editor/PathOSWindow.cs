@@ -15,11 +15,16 @@ public class PathOSWindow : EditorWindow
 
     private PathOSProfileWindow profileWindow;
     private PathOSAgentBatchingWindow batchingWindow;
+    private PathOSAgentWindow agentWindow;
+    private PathOSManagerWindow managerWindow;
+
+    private GameObject proxyAgent, proxyManager;
+
 
     [MenuItem("Window/PathOS")]
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(PathOSWindow));
+        EditorWindow.GetWindow(typeof(PathOSWindow), false, "PathOS");
     }
 
 
@@ -28,10 +33,29 @@ public class PathOSWindow : EditorWindow
         //initializes the different windows
         profileWindow = new PathOSProfileWindow();
         batchingWindow = new PathOSAgentBatchingWindow();
+        agentWindow = new PathOSAgentWindow();
+        managerWindow = new PathOSManagerWindow();
     }
+
+    //gizmo stuff from here https://stackoverflow.com/questions/37267021/unity-editor-script-visible-hidden-gizmos
+
+
     void OnGUI()
     {
-        // The actual window code goes here
+        //warning incase gizmos aren't enabled
+        EditorGUILayout.HelpBox("Gizmos are not enabled!", MessageType.Warning);
+
+        //to instantiate the AI
+        if (GUILayout.Button("Instantiate PathOS Agent and Manager"))
+        {
+            proxyAgent = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/PathOS/Prefabs/PathOS Agent.prefab") as GameObject;
+            Instantiate(proxyAgent);
+
+            proxyManager = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/PathOS/Prefabs/PathOS Manager.prefab") as GameObject;
+            Instantiate(proxyManager);
+        }
+
+        // The tabs to alternate between specific menus
         GUILayout.BeginHorizontal();
         tabSelection = GUILayout.Toolbar(tabSelection, tabLabels);
         GUILayout.EndHorizontal();
@@ -39,15 +63,10 @@ public class PathOSWindow : EditorWindow
         switch (tabSelection)
         {
             case 0:
-
-                if (GUILayout.Button("Import Profiles..."))
-                {
-                }
+                agentWindow.OnWindowOpen();
                 break;
             case 1:
-                if (GUILayout.Button("oop Profiles..."))
-                {
-                }
+                managerWindow.OnWindowOpen();
                 break;
             case 2:
                 batchingWindow.OnWindowOpen();
