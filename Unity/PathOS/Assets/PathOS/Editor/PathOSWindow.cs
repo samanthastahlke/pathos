@@ -10,7 +10,7 @@ using UnityEditor;
 public class PathOSWindow : EditorWindow
 {
 
-    string[] tabLabels = { "Agent", "Manager", "Batching", "Profiles"};
+    string[] tabLabels = { "Agent", "Manager", "Visualization", "Batching", "Profiles"};
     int tabSelection = 0;
 
     private PathOSProfileWindow profileWindow;
@@ -69,9 +69,12 @@ public class PathOSWindow : EditorWindow
                 managerWindow.OnWindowOpen();
                 break;
             case 2:
-                batchingWindow.OnWindowOpen();
+                managerWindow.OnVisualizationOpen();
                 break;
             case 3:
+                batchingWindow.OnWindowOpen();
+                break;
+            case 4:
                 profileWindow.OnWindowOpen();
                 break;
         }
