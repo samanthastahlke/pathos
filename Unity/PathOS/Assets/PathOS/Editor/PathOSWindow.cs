@@ -19,7 +19,7 @@ public class PathOSWindow : EditorWindow
     private PathOSManagerWindow managerWindow;
 
     private GameObject proxyAgent, proxyManager;
-
+    private Vector2 scrollPos = Vector2.zero;
 
     [MenuItem("Window/PathOS")]
     public static void ShowWindow()
@@ -42,6 +42,7 @@ public class PathOSWindow : EditorWindow
 
     void OnGUI()
     {
+        scrollPos = GUILayout.BeginScrollView(scrollPos, true, true);
         //warning incase gizmos aren't enabled
         EditorGUILayout.HelpBox("Gizmos are not enabled!", MessageType.Warning);
 
@@ -78,6 +79,7 @@ public class PathOSWindow : EditorWindow
                 profileWindow.OnWindowOpen();
                 break;
         }
+        GUILayout.EndScrollView();
 
     }
 }

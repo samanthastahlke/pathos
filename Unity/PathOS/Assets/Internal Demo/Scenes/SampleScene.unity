@@ -9680,9 +9680,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55fbb645fe59ccf4db9d6c8ff55b211c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  limitSimulationTime: 1
+  limitSimulationTime: 0
   maxSimulationTime: 90
-  endOnCompletionGoal: 1
+  endOnCompletionGoal: 0
   showLevelMarkup: 1
   levelEntities:
   - name: Enemy
@@ -11742,7 +11742,7 @@ MonoBehaviour:
   showMemoryMap: 1
   mapScreenSize: 256
   showPlayerView: 1
-  viewScreenSize: 256
+  viewScreenSize: 229.5
 --- !u!114 &172820114312129007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11759,13 +11759,13 @@ MonoBehaviour:
   experienceScale: 1
   heuristicScales:
   - heuristic: 0
-    scale: 1
+    scale: 0.027
   - heuristic: 10
-    scale: 0
+    scale: 0.085
   - heuristic: 15
     scale: 1
   - heuristic: 20
-    scale: 0.243
+    scale: 0.252
   - heuristic: 25
     scale: 0.446
   - heuristic: 30
@@ -11858,7 +11858,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 284686345582601673}
   m_LocalRotation: {x: -0, y: -0.37108997, z: -0, w: 0.928597}
-  m_LocalPosition: {x: 14.506544, y: -0.35800004, z: -21.092281}
+  m_LocalPosition: {x: 12.17, y: -0.35800004, z: -21.092281}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 288111231334661249}
@@ -13190,9 +13190,9 @@ GameObject:
   - component: {fileID: 283926257325916700}
   - component: {fileID: 92197738123700569}
   - component: {fileID: 172820114312129007}
+  - component: {fileID: 172653425922093211}
   - component: {fileID: 172839074971187793}
   - component: {fileID: 173186865848823903}
-  - component: {fileID: 172653425922093211}
   m_Layer: 2
   m_Name: ProxyAgent
   m_TagString: Untagged
