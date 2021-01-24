@@ -9515,6 +9515,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93acc49b5a9f4e84b89aa62e0282a2a3, type: 3}
+--- !u!1 &1620369426 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1256858306203008, guid: 93acc49b5a9f4e84b89aa62e0282a2a3,
+    type: 3}
+  m_PrefabInstance: {fileID: 1620369425}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1637652016
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9753,7 +9759,7 @@ MonoBehaviour:
     objectVisitRadius: 0
   - name: Mushroom
     objectRef: {fileID: 355282928}
-    entityType: 250
+    entityType: 100
     alwaysKnown: 0
     overrideVisitRadius: 0
     objectVisitRadius: 0
@@ -9817,6 +9823,18 @@ MonoBehaviour:
     alwaysKnown: 0
     overrideVisitRadius: 0
     objectVisitRadius: 0
+  - name: Ground
+    objectRef: {fileID: 1620369426}
+    entityType: 100
+    alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 1
+  - name: Cliff
+    objectRef: {fileID: 1770543646}
+    entityType: 100
+    alwaysKnown: 0
+    overrideVisitRadius: 0
+    objectVisitRadius: 1
   heuristicWeights:
   - heuristic: 0
     weights:
@@ -11759,7 +11777,7 @@ MonoBehaviour:
   experienceScale: 1
   heuristicScales:
   - heuristic: 0
-    scale: 0.027
+    scale: 0.029
   - heuristic: 10
     scale: 0.085
   - heuristic: 15

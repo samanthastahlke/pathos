@@ -7,7 +7,7 @@ using UnityEngine;
 
 /*
 PathOSProfileWindow.cs
-PathOSProfileWindow (c) Nine Penguins (Samantha Stahlke) 2019 (Atiya Nova) 2020
+PathOSProfileWindow (c) Nine Penguins (Samantha Stahlke) 2019 (Atiya Nova) 2021
 */
 
 public class PathOSProfileWindow : EditorWindow

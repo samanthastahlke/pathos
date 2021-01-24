@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEditor;
 
 /*
- * Atiya Nova 2021
+PathOSWindow.cs 
+(Atiya Nova) 2021
  */
 
 public class PathOSWindow : EditorWindow
@@ -44,7 +45,7 @@ public class PathOSWindow : EditorWindow
     {
         scrollPos = GUILayout.BeginScrollView(scrollPos, true, true);
         //warning incase gizmos aren't enabled
-        EditorGUILayout.HelpBox("Gizmos are not enabled!", MessageType.Warning);
+        EditorGUILayout.HelpBox("Please make sure to have Gizmos enabled", MessageType.Warning);
 
         //to instantiate the AI
         if (GUILayout.Button("Instantiate PathOS Agent and Manager"))

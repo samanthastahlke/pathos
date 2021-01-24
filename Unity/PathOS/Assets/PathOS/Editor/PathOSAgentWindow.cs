@@ -6,6 +6,11 @@ using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using PathOS;
 
+/*
+PathOSAgentWindow.cs 
+Nine Penguins (Samantha Stahlke) 2018 (Atiya Nova) 2021
+ */
+
 public class PathOSAgentWindow : EditorWindow
 {
     //Component variables
@@ -15,7 +20,8 @@ public class PathOSAgentWindow : EditorWindow
     private PathOSAgentEyes eyeReference;
     private PathOSAgentRenderer rendererReference;
 
-    private Editor currentTransformEditor, currentAgentEditor, currentMemoryEditor, currentEyeEditor, currentRendererEditor;
+    private Editor currentTransformEditor, currentAgentEditor, currentMemoryEditor, 
+        currentEyeEditor, currentRendererEditor;
 
     //Inspector variables
     private SerializedObject serial;
@@ -59,30 +65,16 @@ public class PathOSAgentWindow : EditorWindow
                 eyeReference = agentReference.GetComponent<PathOSAgentEyes>();
                 rendererReference = agentReference.GetComponent<PathOSAgentRenderer>();
                 InitializeAgent();
+                previousAgent = agentReference;
             }
-            
+
+
             Editor editor = Editor.CreateEditor(agentReference.gameObject);
-            Editor agentEditor = Editor.CreateEditor(agentReference);
-            Editor memoryEditor = Editor.CreateEditor(memoryReference);
-            Editor eyeEditor = Editor.CreateEditor(eyeReference);
-            Editor rendererEditor = Editor.CreateEditor(rendererReference);
-            Editor transformEditor = Editor.CreateEditor(agentReference.gameObject.transform);
-            
-            // Destroy everything if the editor is null
-            if (currentAgentEditor != null)
-            {
-                DestroyImmediate(currentAgentEditor);
-                DestroyImmediate(currentMemoryEditor);
-                DestroyImmediate(currentEyeEditor);
-                DestroyImmediate(currentRendererEditor);
-                DestroyImmediate(currentTransformEditor);
-            }
-            
-            currentAgentEditor = agentEditor;
-            currentMemoryEditor = memoryEditor;
-            currentEyeEditor = eyeEditor;
-            currentRendererEditor = rendererEditor;
-            currentTransformEditor = transformEditor;
+            currentAgentEditor = Editor.CreateEditor(agentReference); ;
+            currentMemoryEditor = Editor.CreateEditor(memoryReference);
+            currentEyeEditor = Editor.CreateEditor(eyeReference);
+            currentRendererEditor = Editor.CreateEditor(rendererReference);
+            currentTransformEditor = Editor.CreateEditor(agentReference.gameObject.transform);
 
             // Shows the created Editor beneath CustomEditor
             editor.DrawHeader();

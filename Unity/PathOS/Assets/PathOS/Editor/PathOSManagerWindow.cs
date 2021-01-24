@@ -6,6 +6,11 @@ using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using PathOS;
 using Malee.Editor;
+
+/*
+PathOSManagerWindow.cs 
+Nine Penguins (Samantha Stahlke) 2018 (Atiya Nova) 2021
+ */
 public class PathOSManagerWindow : EditorWindow
 {
     //Window component settings
@@ -112,6 +117,16 @@ public class PathOSManagerWindow : EditorWindow
     private List<MarkupToggle> markupToggles = new List<MarkupToggle>();
     private MarkupToggle activeToggle = null;
 
+    private void OnEnable()
+    {
+        SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+    }
+
+    void OnDestroy()
+    {
+        SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+    }
+
     public void OnWindowOpen()
     {
         managerReference = EditorGUILayout.ObjectField("Manager Reference: ", managerReference, typeof(PathOSManager), true)
@@ -134,15 +149,11 @@ public class PathOSManagerWindow : EditorWindow
 
             Editor managerEditor = Editor.CreateEditor(managerReference);
 
-            if (currentManagerEditor != null)
-            {
-                DestroyImmediate(currentManagerEditor);
-            }
 
             currentManagerEditor = managerEditor;
 
-
             // Shows the created Editor beneath CustomEditor
+            EditorGUIUtility.labelWidth = 150.0f;
             currentManagerEditor.DrawHeader();
             ManagerEditorGUI();
         }
@@ -160,23 +171,11 @@ public class PathOSManagerWindow : EditorWindow
 
             logManagerReference = managerReference.GetComponent<OGLogManager>();
             logVisualizerReference = managerReference.GetComponent<OGLogVisualizer>();
-
-            EditorGUILayout.Space();
-
-            Editor managerEditor = Editor.CreateEditor(logManagerReference);
-            Editor visualizerEditor = Editor.CreateEditor(logVisualizerReference);
-
-            if (currentLogEditor != null)
-            {
-                DestroyImmediate(currentLogEditor);
-                DestroyImmediate(currentVisEditor);
-            }
-
-
-            currentLogEditor = managerEditor;
-            currentVisEditor = visualizerEditor;
+            currentLogEditor = Editor.CreateEditor(logManagerReference);
+            currentVisEditor = Editor.CreateEditor(logVisualizerReference);
 
             // Shows the created Editor beneath CustomEditor
+            EditorGUIUtility.labelWidth = 150.0f;
             currentLogEditor.DrawHeader();
             currentLogEditor.OnInspectorGUI();
             currentLogEditor.DrawHeader();
@@ -409,80 +408,6 @@ public class PathOSManagerWindow : EditorWindow
         SceneView.RepaintAll();
     }
 
-    private void OnSceneGUI()
-    {
-        if (activeToggle != null)
-        {
-            //Use the current markup icon as the cursor.
-            Cursor.SetCursor(activeToggle.cursor, Vector2.zero, CursorMode.Auto);
-            EditorGUIUtility.AddCursorRect(new Rect(0.0f, 0.0f, 10000.0f, 10000.0f), MouseCursor.CustomCursor);
-
-            //Selection update.
-            if (EditorWindow.mouseOverWindow != null &&
-                EditorWindow.mouseOverWindow.ToString() == " (UnityEditor.SceneView)")
-            {
-                if (Event.current.type == EventType.MouseMove)
-                    selection = HandleUtility.PickGameObject(Event.current.mousePosition, true);
-            }
-            else
-                selection = null;
-
-            //Mark up the current selection.
-            if (Event.current.type == EventType.MouseDown)
-            {
-                if (Event.current.button == 0)
-                {
-                    Event.current.Use();
-
-                    int passiveControlId = GUIUtility.GetControlID(FocusType.Passive);
-                    GUIUtility.hotControl = passiveControlId;
-
-                    if (selection != null)
-                    {
-                        Undo.RecordObject(managerReference, "Edit Level Markup");
-                        EditorUtility.SetDirty(managerReference);
-                        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-
-                        int selectedID = selection.GetInstanceID();
-
-                        bool addNewEntry = !activeToggle.isClear;
-
-                        for (int i = 0; i < managerReference.levelEntities.Count; ++i)
-                        {
-                            if (managerReference.levelEntities[i].objectRef.GetInstanceID() == selectedID)
-                            {
-                                if (activeToggle.isClear)
-                                    managerReference.levelEntities.RemoveAt(i);
-                                else
-                                    managerReference.levelEntities[i].entityType = activeToggle.entityType;
-
-                                addNewEntry = false;
-                                break;
-                            }
-                        }
-
-                        if (addNewEntry)
-                            managerReference.levelEntities.Add(new LevelEntity(selection, activeToggle.entityType));
-                    }
-                }
-                else
-                {
-                    ActivateToggle(null);
-                    Repaint();
-                }
-            }
-
-            //Stop using the markup tool if a key is pressed.
-            else if (Event.current.type == EventType.KeyDown)
-            {
-                ActivateToggle(null);
-                Repaint();
-            }
-        }
-
-        managerReference.curMouseover = selection;
-    }
-
 
     private void BuildWeightDictionary()
     {
@@ -530,4 +455,88 @@ public class PathOSManagerWindow : EditorWindow
             managerReference.showLevelMarkup = true;
         }
     }
+
+    void OnSceneGUI(SceneView sceneView)
+    {
+        Handles.BeginGUI();
+
+        if (managerReference != null)
+        {
+            if (activeToggle != null)
+            {
+                //Use the current markup icon as the cursor.
+                Cursor.SetCursor(activeToggle.cursor, Vector2.zero, CursorMode.Auto);
+                EditorGUIUtility.AddCursorRect(new Rect(0.0f, 0.0f, 10000.0f, 10000.0f), MouseCursor.CustomCursor);
+
+                //Selection update.
+                if (EditorWindow.mouseOverWindow != null &&
+                    EditorWindow.mouseOverWindow.ToString() == " (UnityEditor.SceneView)")
+                {
+                    if (Event.current.type == EventType.MouseMove)
+                        selection = HandleUtility.PickGameObject(Event.current.mousePosition, true);
+                }
+                else
+                    selection = null;
+
+                //Mark up the current selection.
+                if (Event.current.type == EventType.MouseDown)
+                {
+                    if (Event.current.button == 0)
+                    {
+                        Event.current.Use();
+
+                        int passiveControlId = GUIUtility.GetControlID(FocusType.Passive);
+                        GUIUtility.hotControl = passiveControlId;
+
+                        if (selection != null)
+                        {
+                            Undo.RecordObject(managerReference, "Edit Level Markup");
+                            EditorUtility.SetDirty(managerReference);
+                            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+
+                            int selectedID = selection.GetInstanceID();
+
+                            bool addNewEntry = !activeToggle.isClear;
+
+                            for (int i = 0; i < managerReference.levelEntities.Count; ++i)
+                            {
+                                if (managerReference.levelEntities[i].objectRef.GetInstanceID() == selectedID)
+                                {
+                                    if (activeToggle.isClear)
+                                        managerReference.levelEntities.RemoveAt(i);
+                                    else
+                                        managerReference.levelEntities[i].entityType = activeToggle.entityType;
+
+                                    addNewEntry = false;
+                                    break;
+                                }
+                            }
+
+                            if (addNewEntry)
+                                managerReference.levelEntities.Add(new LevelEntity(selection, activeToggle.entityType));
+                        }
+                    }
+                    else
+                    {
+                        ActivateToggle(null);
+                        Repaint();
+                    }
+                }
+
+                //Stop using the markup tool if a key is pressed.
+                else if (Event.current.type == EventType.KeyDown)
+                {
+                    ActivateToggle(null);
+                    Repaint();
+                }
+            }
+
+            managerReference.curMouseover = selection;
+        }
+            Handles.EndGUI();
+        
+
+    }
+
+
 }
