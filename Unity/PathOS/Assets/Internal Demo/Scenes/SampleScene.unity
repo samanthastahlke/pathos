@@ -9771,7 +9771,7 @@ MonoBehaviour:
     objectVisitRadius: 0
   - name: Mushroom
     objectRef: {fileID: 399391077}
-    entityType: 250
+    entityType: 150
     alwaysKnown: 0
     overrideVisitRadius: 0
     objectVisitRadius: 0

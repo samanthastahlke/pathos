@@ -22,11 +22,12 @@ public class PathOSWindow : EditorWindow
     private GameObject proxyAgent, proxyManager;
     private Vector2 scrollPos = Vector2.zero;
 
-    [MenuItem("Window/PathOS")]
-    public static void ShowWindow()
-    {
-        EditorWindow.GetWindow(typeof(PathOSWindow), false, "PathOS");
-    }
+
+//    [MenuItem("Window/PathOS")]
+//    public static void ShowWindow()
+//    {
+//        EditorWindow.GetWindow(typeof(PathOSWindow), false, "PathOS");
+//    }
 
 
     private void OnEnable()
@@ -62,24 +63,25 @@ public class PathOSWindow : EditorWindow
         tabSelection = GUILayout.Toolbar(tabSelection, tabLabels);
         GUILayout.EndHorizontal();
 
-        switch (tabSelection)
-        {
-            case 0:
-                agentWindow.OnWindowOpen();
-                break;
-            case 1:
-                managerWindow.OnWindowOpen();
-                break;
-            case 2:
-                managerWindow.OnVisualizationOpen();
-                break;
-            case 3:
-                batchingWindow.OnWindowOpen();
-                break;
-            case 4:
-                profileWindow.OnWindowOpen();
-                break;
-        }
+        //switch (tabSelection)
+        //{
+        //    case 0:
+        //        agentWindow.OnWindowOpen();
+        //        break;
+        //    case 1:
+        //        managerWindow.OnWindowOpen();
+        //        break;
+        //    case 2:
+        //        managerWindow.OnVisualizationOpen();
+        //        break;
+        //    case 3:
+        //        batchingWindow.OnWindowOpen();
+        //        break;
+        //    case 4:
+        //        profileWindow.OnWindowOpen();
+        //        break;
+        //}
+
         GUILayout.EndScrollView();
 
     }
