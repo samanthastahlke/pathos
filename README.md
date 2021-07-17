@@ -1,5 +1,8 @@
 # PathOS
 
+## PathOS+
+The next iteration of this project is known as "PathOS+". It updates the project so that it can support expert evaluation. This new version is available at: https://github.com/AtiyaNova/pathosplus
+
 ## About
 
 PathOS is a project exploring the potential of AI agents to stand in for human players in early-stage level testing for games with 3D navigation in a virtual world. 
